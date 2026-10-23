@@ -1,0 +1,64 @@
+plugins {
+    id 'java-library'
+    id 'com.gradleup.shadow' version '9.0.0-beta4'
+}
+
+version = '0.1'
+
+repositories {
+    maven {
+        name = 'ferra13671-maven'
+        url = 'https://ferra13671.github.io/maven/'
+    }
+    mavenCentral()
+    mavenLocal()
+}
+
+configurations {
+    implementation.extendsFrom(library)
+    shadow.extendsFrom(library)
+}
+
+dependencies {
+    library "com.ferra13671:comet-renderer:${cometrenderer_version}"
+    library "com.ferra13671:comet-renderer-better-compiler:${cometrenderer_version}"
+    library "com.ferra13671:comet-renderer-glfw:${cometrenderer_version}"
+    library "de.marhali:json5-java:${project.json5_version}"
+    library "com.ferra13671:json-utils:${project.json_utils_version}"
+
+
+    library platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+
+    library "org.lwjgl:lwjgl"
+    library "org.lwjgl:lwjgl-glfw"
+    library "org.lwjgl:lwjgl-opengl"
+    library "org.lwjgl:lwjgl-stb"
+    library "org.joml:joml:${jomlVersion}"
+
+    def platforms = [
+            'natives-windows', 'natives-windows-x86',
+            'natives-macos', 'natives-macos-arm64',
+            'natives-linux', 'natives-linux-arm64', 'natives-linux-arm32'
+    ]
+    platforms.each { platformName ->
+        library group: 'org.lwjgl', name: 'lwjgl', classifier: platformName
+        library group: 'org.lwjgl', name: 'lwjgl-glfw', classifier: platformName
+        library group: 'org.lwjgl', name: 'lwjgl-opengl', classifier: platformName
+        library group: 'org.lwjgl', name: 'lwjgl-opengles', classifier: platformName
+        library group: 'org.lwjgl', name: 'lwjgl-stb', classifier: platformName
+    }
+
+    compileOnly 'org.jetbrains:annotations:26.1.0'
+    compileOnly "org.projectlombok:lombok:${project.lombok_version}"
+    annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+
+    archiveClassifier.set('')
+}
+
+build {
+    finalizedBy shadowJar
+}
