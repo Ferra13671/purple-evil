@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class World {
+    public final Camera camera = new Camera();
     public final Player player = new Player();
     public Room currentRoom = createRoomTest(30, 30);
 
@@ -18,6 +19,8 @@ public class World {
     public void tick() {
         if (this.currentRoom != null)
             this.currentRoom.tick();
+
+        this.camera.tick();
     }
 
     //TODO убрать

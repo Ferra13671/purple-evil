@@ -3,13 +3,16 @@ package govno.renderer;
 import com.ferra13671.cometrenderer.texture.atlas.TextureAtlas;
 import govno.AABB;
 import govno.GameInstance;
+import govno.Utils;
 import govno.renderer.batch.impl.BasicRectBatch;
 import govno.renderer.batch.impl.BasicTextureBatch;
 import govno.world.Room;
 import govno.world.World;
 import govno.world.block.Block;
+import govno.world.entity.Player;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
+import org.joml.Vector2f;
 
 public class WorldRenderer implements GameInstance {
     public static final int MAX_BLOCKS_IN_WIDTH = 30;
@@ -30,7 +33,8 @@ public class WorldRenderer implements GameInstance {
 
             renderRoom(room);
 
-            AABB aabb = game.getWorld().player.worldAABB;
+            Player player = game.getWorld().player;
+            AABB aabb = new AABB(player.modelAABB).move(Utils.lerp(player.prevPosition, player.position, game.getTicker().getTickDelta()));
             new BasicRectBatch()
                     .rectPositioned((float) aabb.getMinX(), (float) aabb.getMinY(), (float) aabb.getMaxX(), (float) aabb.getMaxY())
                     .build()
@@ -71,10 +75,10 @@ public class WorldRenderer implements GameInstance {
                 -100, 100
         );
 
-        Vector2d playerPos = game.getWorld().player.position;
+        Vector2f cameraPos = game.getWorld().camera.getLerpedPosition();
         this.renderer.view.identity().translate(
-                (float) -playerPos.x,
-                (float) -playerPos.y,
+                -cameraPos.x,
+                -cameraPos.y,
                 0.0f
         );
     }

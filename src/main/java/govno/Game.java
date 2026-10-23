@@ -57,6 +57,7 @@ public class Game {
         this.window.setVisible(true);
 
         this.window.setLoopCallback(() -> {
+            this.ticker.onStartFrame();
             if (this.ticker.shouldTick()) {
                 this.world.tick();
 
