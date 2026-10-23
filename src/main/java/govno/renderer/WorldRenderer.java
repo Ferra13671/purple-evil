@@ -6,12 +6,11 @@ import govno.GameInstance;
 import govno.Utils;
 import govno.renderer.batch.impl.BasicRectBatch;
 import govno.renderer.batch.impl.BasicTextureBatch;
-import govno.world.Room;
+import govno.world.room.Room;
 import govno.world.World;
 import govno.world.block.Block;
 import govno.world.entity.Player;
 import org.joml.Matrix4f;
-import org.joml.Vector2d;
 import org.joml.Vector2f;
 
 public class WorldRenderer implements GameInstance {

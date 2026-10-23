@@ -10,6 +10,7 @@ import govno.renderer.Programs;
 import govno.renderer.ShaderLibraries;
 import govno.renderer.Textures;
 import govno.world.World;
+import govno.world.room.RoomTemplates;
 import lombok.Getter;
 import govno.renderer.Renderer;
 
@@ -21,14 +22,16 @@ public class Game {
     @Getter
     private Window window;
     @Getter
+    private final RoomTemplates roomTemplates;
+    @Getter
+    private final World world;
+    @Getter
     private final Textures textures;
     private final ShaderLibraries shaderLibraries;
     @Getter
     private final Programs programs;
     @Getter
     private final Renderer renderer;
-    @Getter
-    private final World world = new World();
 
     public Game() {
         instance = this;
@@ -36,6 +39,9 @@ public class Game {
         initWindow();
         CometRenderer.init();
         BetterCompilerPlugin.init();
+
+        this.roomTemplates = new RoomTemplates();
+        this.world = new World();
 
         this.textures = new Textures();
         this.shaderLibraries = new ShaderLibraries();

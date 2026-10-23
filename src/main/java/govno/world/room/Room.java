@@ -1,6 +1,7 @@
-package govno.world;
+package govno.world.room;
 
 import govno.world.block.Block;
+import govno.world.block.BlockType;
 import govno.world.entity.Entity;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
@@ -14,8 +15,17 @@ public class Room {
     public final List<Block> blocks = new ArrayList<>();
     public final List<Entity> entities = new ArrayList<>();
 
-    public Room(List<Block> blocks) {
-        this.blocks.addAll(blocks);
+    public Room(RoomTemplate template, int x, int y) {
+        int halfWidth = template.width() / 2;
+        int halfHeight = template.height() / 2;
+        for (BlockTemplate blockTemplate : template.blocks()) {
+            this.blocks.add(new Block(
+                    blockTemplate.blockType(),
+                    blockTemplate.x() + x - halfWidth,
+                    blockTemplate.y() + y + halfHeight,
+                    blockTemplate.blockType() == BlockType.Wall ? new String[]{"wall"} : new String[]{"floor"}
+            ));
+        }
     }
 
     public void tick() {
