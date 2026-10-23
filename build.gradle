@@ -23,6 +23,8 @@ dependencies {
     library "com.ferra13671:comet-renderer:${cometrenderer_version}"
     library "com.ferra13671:comet-renderer-better-compiler:${cometrenderer_version}"
     library "com.ferra13671:comet-renderer-glfw:${cometrenderer_version}"
+    library "de.marhali:json5-java:${project.json5_version}"
+    library "com.ferra13671:json-utils:${project.json_utils_version}"
 
 
     library platform("org.lwjgl:lwjgl-bom:$lwjglVersion")

@@ -8,6 +8,7 @@ import com.ferra13671.cometrenderer.plugins.glfw.Window;
 import com.ferra13671.cometrenderer.plugins.glfw.WindowHints;
 import govno.renderer.Programs;
 import govno.renderer.ShaderLibraries;
+import govno.renderer.Textures;
 import govno.world.World;
 import lombok.Getter;
 import govno.renderer.Renderer;
@@ -19,6 +20,8 @@ public class Game {
     private final Ticker ticker = new Ticker(50);
     @Getter
     private Window window;
+    @Getter
+    private final Textures textures;
     private final ShaderLibraries shaderLibraries;
     @Getter
     private final Programs programs;
@@ -34,6 +37,7 @@ public class Game {
         CometRenderer.init();
         BetterCompilerPlugin.init();
 
+        this.textures = new Textures();
         this.shaderLibraries = new ShaderLibraries();
         this.programs = new Programs();
         this.renderer = new Renderer();

@@ -16,9 +16,9 @@ public class Player extends Entity {
     }
 
     protected void tickMovement() {
-        double friction = 0.2;
-        double acceleration = 0.45 * friction;
-        double speed = 0.3;
+        double friction = 0.3;
+        double acceleration = 0.60 * friction;
+        double speed = 0.6;
 
         Vector2d inputSpeed = new Vector2d(this.input.vector).normalize().mul(speed);
         if (inputSpeed.lengthSquared() > 0.001f) {
