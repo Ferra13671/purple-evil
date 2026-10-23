@@ -2,6 +2,7 @@ package govno;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.joml.Vector2d;
 import org.joml.Vector2dc;
 
 @AllArgsConstructor
@@ -40,5 +41,34 @@ public class AABB {
         this.maxY += delta.y();
 
         return this;
+    }
+
+    public Vector2d getPenetrationVector(AABB other, boolean resolveX) {
+        double cx1 = (this.minX + this.maxX) * 0.5;
+        double cy1 = (this.minY + this.maxY) * 0.5;
+        double cx2 = (other.minX + other.maxX) * 0.5;
+        double cy2 = (other.minY + other.maxY) * 0.5;
+
+        double dx = cx2 - cx1;
+        double dy = cy2 - cy1;
+
+        double halfW1 = (this.maxX - this.minX) * 0.5;
+        double halfH1 = (this.maxY - this.minY) * 0.5;
+        double halfW2 = (other.maxX - other.minX) * 0.5;
+        double halfH2 = (other.maxY - other.minY) * 0.5;
+
+        double overlapX = halfW1 + halfW2 - Math.abs(dx);
+        double overlapY = halfH1 + halfH2 - Math.abs(dy);
+
+        double EPSILON = 0.0001;
+
+        if (overlapX > 0 && overlapY > 0) {
+            if (resolveX) {
+                return new Vector2d(-Math.signum(dx) * (overlapX + EPSILON), 0);
+            } else {
+                return new Vector2d(0, -Math.signum(dy) * (overlapY + EPSILON));
+            }
+        }
+        return null;
     }
 }

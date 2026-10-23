@@ -1,18 +1,17 @@
 package govno.world.entity;
 
 import org.joml.Vector2d;
+import org.joml.Vector2dc;
 
 public class Player extends Entity {
     protected final PlayerInput input = new PlayerInput();
 
     @Override
     public void tick() {
-        startTick();
+        super.tick();
 
         this.input.tick();
         tickMovement();
-
-        endTick();
     }
 
     protected void tickMovement() {
@@ -34,5 +33,31 @@ public class Player extends Entity {
         }
 
         this.velocity.mul(10000).round().mul(1 / 10000d);
+    }
+
+    @Override
+    public void onWorldCollision(Vector2dc out) {
+        this.position.add(out);
+
+        double len = out.length();
+        if (len < 1e-12f)
+            return;
+
+        double nx = out.x() / len;
+        double ny = out.y() / len;
+
+        double vn = this.velocity.x() * nx + this.velocity.y() * ny;
+
+        if (vn < 0f) {
+            this.velocity.add(
+                    -nx * vn,
+                    -ny * vn
+            );
+        }
+    }
+
+    @Override
+    public void onEntityCollision(Entity other, Vector2dc out) {
+
     }
 }

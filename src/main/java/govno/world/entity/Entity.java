@@ -3,6 +3,7 @@ package govno.world.entity;
 import govno.AABB;
 import govno.GameInstance;
 import org.joml.Vector2d;
+import org.joml.Vector2dc;
 
 public abstract class Entity implements GameInstance {
     public final Vector2d position = new Vector2d();
@@ -14,17 +15,15 @@ public abstract class Entity implements GameInstance {
     public final AABB worldAABB = new AABB(this.modelAABB);
 
     public void tick() {
-        startTick();
-        endTick();
-    }
-
-    protected void startTick() {
         this.prevPosition.set(this.position);
         this.prevYaw = this.yaw;
     }
 
-    protected void endTick() {
+    public void updateAABB() {
         this.worldAABB.set(this.modelAABB).move(this.position);
-        this.position.add(this.velocity);
     }
+
+    public abstract void onWorldCollision(Vector2dc out);
+
+    public abstract void onEntityCollision(Entity other, Vector2dc out);
 }
