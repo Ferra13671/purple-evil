@@ -39,6 +39,8 @@ public class Textures {
             e.printStackTrace();
         }
 
-        return new TextureAtlas("world-atlas", this.worldTextures.values().stream().toList());
+        TextureAtlas atlas = new TextureAtlas("world-atlas", this.worldTextures.values().stream().toList());
+        atlas.setFiltering(TextureFiltering.DEFAULT);
+        return atlas;
     }
 }
