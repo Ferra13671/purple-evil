@@ -23,8 +23,6 @@ dependencies {
     library "com.ferra13671:comet-renderer:${cometrenderer_version}"
     library "com.ferra13671:comet-renderer-better-compiler:${cometrenderer_version}"
     library "com.ferra13671:comet-renderer-glfw:${cometrenderer_version}"
-    library "de.marhali:json5-java:${project.json5_version}"
-    library "com.ferra13671:json-utils:${project.json_utils_version}"
 
 
     library platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
@@ -51,6 +49,12 @@ dependencies {
     compileOnly 'org.jetbrains:annotations:26.1.0'
     compileOnly "org.projectlombok:lombok:${project.lombok_version}"
     annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'govno.main.Main'
+    }
 }
 
 shadowJar {
