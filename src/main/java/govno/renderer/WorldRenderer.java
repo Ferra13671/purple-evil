@@ -6,6 +6,7 @@ import govno.utils.AABB;
 import govno.GameInstance;
 import govno.utils.Utils;
 import govno.renderer.batch.impl.BasicTextureBatch;
+import govno.world.entity.Entity;
 import govno.world.entity.LivingEntity;
 import govno.world.room.Room;
 import govno.world.block.Block;
@@ -28,7 +29,7 @@ public class WorldRenderer implements GameInstance {
 
         renderRooms();
 
-        renderLivingEntity(game.getWorld().player);
+        renderEntities();
     }
 
     private void renderRooms() {
@@ -56,6 +57,22 @@ public class WorldRenderer implements GameInstance {
                     .build()
                     .tryDraw()
                     .close();
+        }
+    }
+
+    private void renderEntities() {
+        for (Room room : game.getWorld().rooms) {
+            for (Entity entity : room.entities)
+                renderEntity(entity);
+        }
+
+        renderLivingEntity(game.getWorld().player);
+    }
+
+    private void renderEntity(Entity entity) {
+        if (entity instanceof  LivingEntity le) {
+            renderLivingEntity(le);
+            return;
         }
     }
 

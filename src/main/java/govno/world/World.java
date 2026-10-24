@@ -3,14 +3,17 @@ package govno.world;
 import govno.GameInstance;
 import govno.utils.AABB;
 import govno.world.block.Block;
+import govno.world.block.BlockType;
 import govno.world.entity.Entity;
 import govno.world.entity.Player;
+import govno.world.entity.SlimeEntity;
 import govno.world.room.Room;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class World implements GameInstance {
     public static final double MAX_VELOCITY_STEP = 0.25;
@@ -27,6 +30,52 @@ public class World implements GameInstance {
 
     public World() {
         this.currentRoom.entities.add(this.player);
+
+        spawnEnemies();
+    }
+
+    private void spawnEnemies() {
+        Random random = new Random();
+
+        // Начинаем с индекса 1, чтобы не спавнить слизней в стартовой комнате игрока
+        for (int i = 1; i < rooms.size(); i++) {
+            Room room = rooms.get(i);
+
+            // 1. Пропускаем туннели по флагу
+            if (room.isCorridor) continue;
+
+            // Собираем все проходимые блоки (пол и выходы) в комнате
+            List<Block> floorBlocks = new ArrayList<>();
+            for (Block b : room.blocks) {
+                if (b.blockType == BlockType.Floor) {
+                    floorBlocks.add(b);
+                }
+            }
+
+            if (floorBlocks.isEmpty()) continue;
+
+            // Спавним от 1 до 3 слизней на комнату
+            int slimeCount = 1 + random.nextInt(3);
+
+            // 2. Защита: нельзя заспавнить больше слизней, чем есть свободных блоков пола
+            slimeCount = Math.min(slimeCount, floorBlocks.size());
+
+            for (int j = 0; j < slimeCount; j++) {
+                Block spawnBlock = floorBlocks.remove(random.nextInt(floorBlocks.size()));
+
+                SlimeEntity slime = new SlimeEntity(
+                        new Vector2d(0, 0),
+                        null,
+                        room
+                );
+
+                slime.position.set(spawnBlock.x + 0.5, spawnBlock.y + 0.5);
+                slime.prevPosition.set(slime.position);
+                slime.updateAABB();
+
+                room.entities.add(slime);
+            }
+        }
     }
 
     public void tick() {

@@ -1,9 +1,8 @@
 package govno.world.entity.input;
 
-import govno.GameInstance;
 import org.lwjgl.glfw.GLFW;
 
-public class PlayerInput extends Input implements GameInstance {
+public class PlayerInput extends Input {
 
     public void tick() {
         double xDelta = 0, yDelta = 0;

@@ -1,8 +1,8 @@
 package govno.world.entity;
 
 import govno.model.EntityModel;
+import govno.utils.AABB;
 import govno.world.attribute.Attributes;
-import govno.world.attribute.EntityAttributes;
 import govno.world.entity.input.PlayerInput;
 import govno.world.weapon.MagicStaffWeapon;
 import org.joml.Vector2d;
@@ -14,7 +14,7 @@ public class Player extends LivingEntity {
     public Player() {
         super(
                 new EntityModel(game.getEntityModelTemplates().templates.get("knight")),
-                new PlayerInput(),
+                new AABB(-0.5,  -0.5, 0.5, 0.5),
                 new Attributes(new HashMap<>(){{
                     put(EntityAttributes.MAX_HEALTH, 100d);
                     put(EntityAttributes.REGENERATION, 0.4);
@@ -25,6 +25,8 @@ public class Player extends LivingEntity {
                 new Vector2d(0.5, 1),
                 new MagicStaffWeapon()
         );
+
+        setInput(new PlayerInput());
     }
 
     @Override

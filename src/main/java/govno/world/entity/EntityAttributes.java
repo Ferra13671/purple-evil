@@ -1,4 +1,4 @@
-package govno.world.attribute;
+package govno.world.entity;
 
 import lombok.experimental.UtilityClass;
 

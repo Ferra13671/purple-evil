@@ -1,19 +1,23 @@
 package govno.world.entity;
 
 import govno.model.EntityModel;
+import govno.utils.AABB;
 import govno.utils.Direction;
+import govno.utils.Utils;
 import govno.world.attribute.Attributes;
-import govno.world.attribute.EntityAttributes;
 import govno.world.entity.input.Input;
 import govno.world.weapon.Weapon;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
 import org.lwjgl.glfw.GLFW;
 
 public class LivingEntity extends Entity {
-    protected final Input input;
+    @NonNull
+    @Setter
+    protected Input input = new Input();
     protected final Attributes attributes;
     @Getter
     protected Direction facing = Direction.DOWN;
@@ -26,10 +30,9 @@ public class LivingEntity extends Entity {
     @Getter
     protected final Vector2d handPos;
 
-    public LivingEntity(@NonNull EntityModel model, @NonNull Input input, @NonNull Attributes attributes, double health, Vector2d handPos, @NonNull Weapon weapon) {
-        super(model);
+    public LivingEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, double health, Vector2d handPos, Weapon weapon) {
+        super(model, aabb);
 
-        this.input = input;
         this.attributes = attributes;
         this.health = Math.clamp(health, 0, getAttributeValue(EntityAttributes.MAX_HEALTH));
         this.handPos = handPos;
@@ -45,29 +48,28 @@ public class LivingEntity extends Entity {
             this.weapon.getEntityModifiers().forEach((attribute, modifier) -> this.attributes.removeModifier(attribute, modifier.id()));
 
         this.weapon = weapon;
-        this.weapon.getEntityModifiers().forEach(this.attributes::addModifier);
+        if (this.weapon != null)
+            this.weapon.getEntityModifiers().forEach(this.attributes::addModifier);
     }
 
     public double getRenderYaw() {
-        int width = game.getWindow().getFramebufferWidth();
-        int height = game.getWindow().getFramebufferHeight();
-        double dx = game.getMouseListener().position.x - (width / 2.0);
-        double dy = (height / 2.0) - game.getMouseListener().position.y;
-        return Math.toDegrees(Math.atan2(dy, dx));
+        return Utils.lerp(this.prevYaw, this.yaw, game.getTicker().getTickDelta());
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (game.getWindow().isPressedMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
-            if (!this.usingWeapon) {
-                this.usingWeapon = true;
-                this.weapon.startUse(this);
+        if (this.weapon != null) {
+            if (game.getWindow().isPressedMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
+                if (!this.usingWeapon) {
+                    this.usingWeapon = true;
+                    this.weapon.startUse(this);
+                }
+            } else if (this.usingWeapon) {
+                this.usingWeapon = false;
+                this.weapon.endUse(this);
             }
-        } else if (this.usingWeapon) {
-            this.usingWeapon = false;
-            this.weapon.endUse(this);
         }
 
         if (this.health < getAttributeValue(EntityAttributes.MAX_HEALTH))

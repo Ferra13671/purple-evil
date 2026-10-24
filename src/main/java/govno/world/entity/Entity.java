@@ -3,6 +3,7 @@ package govno.world.entity;
 import govno.model.EntityModel;
 import govno.utils.AABB;
 import govno.GameInstance;
+import lombok.NonNull;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
 
@@ -13,11 +14,13 @@ public abstract class Entity implements GameInstance {
     public double yaw = 0;
     public double prevYaw = 0;
     public final EntityModel model;
-    public final AABB modelAABB = new AABB(-0.5,  -0.5, 0.5, 0.5);
-    public final AABB worldAABB = new AABB(this.modelAABB);
+    public final AABB modelAABB;
+    public final AABB worldAABB;
 
-    public Entity(EntityModel model) {
+    public Entity(EntityModel model, @NonNull AABB modelAABB) {
         this.model = model;
+        this.modelAABB = modelAABB;
+        this.worldAABB = new AABB(modelAABB);
     }
 
     public void tick() {

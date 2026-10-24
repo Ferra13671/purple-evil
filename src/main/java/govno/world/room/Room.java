@@ -14,6 +14,8 @@ public class Room {
     public final int centerX;
     public final int centerY;
 
+    public final boolean isCorridor;
+
     private AABB cachedBounds;
 
     public Room(RoomTemplate template, int x, int y) {
@@ -37,6 +39,8 @@ public class Room {
         AABB bounds = getBounds();
         this.centerX = (int) ((bounds.getMinX() + bounds.getMaxX()) * 0.5);
         this.centerY = (int) ((bounds.getMinY() + bounds.getMaxY()) * 0.5);
+
+        this.isCorridor = false;
     }
 
     public Room(List<Block> blocks) {
@@ -45,6 +49,8 @@ public class Room {
         AABB bounds = getBounds();
         this.centerX = (int) ((bounds.getMinX() + bounds.getMaxX()) * 0.5);
         this.centerY = (int) ((bounds.getMinY() + bounds.getMaxY()) * 0.5);
+
+        this.isCorridor = true;
     }
 
     public AABB getBounds() {
