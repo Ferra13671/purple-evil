@@ -39,6 +39,7 @@ public class GameSession implements GameInstance {
 
         Map<EnemyType, SpawnProperty> spawns = new HashMap<>();
         spawns.put(EnemyType.Slime, new SpawnProperty(3 + level, 1.0 + level * 0.2));
+        spawns.put(EnemyType.Bat, new SpawnProperty(3 + level, 1.0 + level * 0.2));
 
         return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, maxMobs);
     }

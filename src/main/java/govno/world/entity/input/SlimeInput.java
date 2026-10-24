@@ -6,7 +6,7 @@ import govno.world.room.Room;
 import org.joml.Vector2d;
 import java.util.Random;
 
-public class EnemyInput extends Input {
+public class SlimeInput extends Input {
     private final LivingEntity owner;
     private final AABB roomBounds;
     private final Random random = new Random();
@@ -15,7 +15,7 @@ public class EnemyInput extends Input {
     private int actionTimer = 0;
     private boolean isIdle = false;
 
-    public EnemyInput(LivingEntity owner, Room room) {
+    public SlimeInput(LivingEntity owner, Room room) {
         this.owner = owner;
         this.roomBounds = room.getBounds();
     }

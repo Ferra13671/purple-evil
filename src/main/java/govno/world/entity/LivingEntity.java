@@ -136,7 +136,7 @@ public class LivingEntity extends Entity {
 
     @Override
     public void onEntityCollision(Entity other, Vector2dc out) {
-        if (other instanceof LivingEntity)
+        if (other instanceof LivingEntity && !(other instanceof BatEntity))
             onCollision(new Vector2d(out).mul(0.5f));
     }
 

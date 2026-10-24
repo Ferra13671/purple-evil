@@ -3,9 +3,10 @@ package govno.world.entity;
 import govno.model.EntityModel;
 import govno.utils.AABB;
 import govno.world.attribute.Attributes;
-import govno.world.entity.input.EnemyInput;
+import govno.world.entity.input.SlimeInput;
 import govno.world.room.Room;
 import org.joml.Vector2d;
+import org.joml.Vector2dc;
 
 import java.util.HashMap;
 
@@ -27,6 +28,12 @@ public class SlimeEntity extends LivingEntity {
                 null
         );
 
-        setInput(new EnemyInput(this, room));
+        setInput(new SlimeInput(this, room));
+    }
+
+    @Override
+    public void onEntityCollision(Entity other, Vector2dc out) {
+        if (other == game.getGameSession().player)
+            game.getGameSession().player.damage(getAttributeValue(EnemyAttributes.DAMAGE));
     }
 }
