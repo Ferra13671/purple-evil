@@ -5,14 +5,13 @@ import govno.utils.AABB;
 import govno.world.attribute.Attributes;
 import govno.world.entity.input.EnemyInput;
 import govno.world.room.Room;
-import govno.world.weapon.Weapon;
 import org.joml.Vector2d;
 
 import java.util.HashMap;
 
 public class SlimeEntity extends LivingEntity {
 
-    public SlimeEntity(Vector2d handPos, Weapon weapon, Room room) {
+    public SlimeEntity(Room room) {
         super(
                 new EntityModel(game.getEntityModelTemplates().templates.get("slime")),
                 new AABB(-0.5,  -0.5, 0.5, 0.5),
@@ -24,8 +23,8 @@ public class SlimeEntity extends LivingEntity {
                     put(EnemyAttributes.DAMAGE, 25d);
                 }}),
                 15d,
-                handPos,
-                weapon
+                new Vector2d(0, 0),
+                null
         );
 
         setInput(new EnemyInput(this, room));

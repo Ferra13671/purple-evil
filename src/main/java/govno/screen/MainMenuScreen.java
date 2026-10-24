@@ -5,11 +5,15 @@ import com.ferra13671.overtone.Overtone;
 import com.ferra13671.overtone.SoundSource;
 import govno.renderer.RectColors;
 import govno.renderer.batch.impl.ColoredRectBatch;
-import govno.world.DungeonWorld;
+import govno.world.dungeon.DungeonProperties;
+import govno.world.dungeon.DungeonWorld;
+import govno.world.dungeon.spawn.EnemyType;
+import govno.world.dungeon.spawn.SpawnProperty;
 import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MainMenuScreen extends Screen {
     private SoundSource mainMenuSound;
@@ -43,7 +47,15 @@ public class MainMenuScreen extends Screen {
 
         this.buttons.add(new Button(
                 "Play", halfWidth - (buttonWidth / 2), halfHeight - (buttonHeight / 2), buttonWidth, buttonHeight, () -> {
-                    game.setWorld(new DungeonWorld());
+                    game.setWorld(new DungeonWorld(new DungeonProperties(
+                            10,
+                            12,
+                            0.05,
+                            Map.of(
+                                    EnemyType.Slime, new SpawnProperty(8, 2)
+                            ),
+                            12
+                    )));
                     game.setScreen(null);
                 }
         ));

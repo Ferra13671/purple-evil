@@ -1,4 +1,4 @@
-package govno.world;
+package govno.world.dungeon;
 
 import govno.utils.Direction;
 import govno.world.block.Block;
@@ -8,19 +8,21 @@ import java.util.*;
 
 public class DungeonGenerator {
 
-    private static final int GAP = 10;
-    private static final int MAX_ROOMS = 12;
-    private static final double BRANCH_CHANCE = 0.05;
+    //private static final int GAP = 10;
+    //private static final int MAX_ROOMS = 12;
+    //private static final double BRANCH_CHANCE = 0.05;
 
     private final RoomTemplates templates;
+    private final DungeonProperties properties;
     private final Random random;
 
     private final List<PlacedRoom> placed = new ArrayList<>();
     private final List<Room> tunnelRooms = new ArrayList<>();
     private final Set<Long> occupied = new HashSet<>();
 
-    public DungeonGenerator(RoomTemplates templates, long seed) {
+    public DungeonGenerator(RoomTemplates templates, DungeonProperties properties, long seed) {
         this.templates = templates;
+        this.properties = properties;
         this.random = new Random(seed);
     }
 
@@ -71,7 +73,7 @@ public class DungeonGenerator {
         placed.add(new PlacedRoom(spawnRoom, new ArrayList<>(spawnRoom.exits)));
         commitRoom(spawnRoom);  // ← ФИКС: занятое место учитывается
 
-        while (placed.size() < MAX_ROOMS) {
+        while (placed.size() < this.properties.maxRooms()) {
             if (!tryPlaceNextRoom()) break;
         }
     }
@@ -86,7 +88,7 @@ public class DungeonGenerator {
         List<PlacedRoom> sources = new ArrayList<>(candidates);
         Collections.shuffle(sources, random);
 
-        if (!last.freeExits.isEmpty() && random.nextDouble() >= BRANCH_CHANCE) {
+        if (!last.freeExits.isEmpty() && random.nextDouble() >= this.properties.branchChance()) {
             sources.remove(last);
             sources.addFirst(last);
         }
@@ -151,10 +153,10 @@ public class DungeonGenerator {
         int halfW = tw / 2, halfH = th / 2;
         int targetBX, targetBY;
         switch (exitA.side()) {
-            case RIGHT -> { targetBX = exitA.x() + exitA.width() + GAP; targetBY = exitA.y(); }
-            case LEFT  -> { targetBX = exitA.x() - GAP - exitBTemplate.width(); targetBY = exitA.y(); }
-            case UP    -> { targetBX = exitA.x(); targetBY = exitA.y() + exitA.height() + GAP; }
-            case DOWN  -> { targetBX = exitA.x(); targetBY = exitA.y() - GAP - exitBTemplate.height(); }
+            case RIGHT -> { targetBX = exitA.x() + exitA.width() + this.properties.tunnelLength(); targetBY = exitA.y(); }
+            case LEFT  -> { targetBX = exitA.x() - this.properties.tunnelLength() - exitBTemplate.width(); targetBY = exitA.y(); }
+            case UP    -> { targetBX = exitA.x(); targetBY = exitA.y() + exitA.height() + this.properties.tunnelLength(); }
+            case DOWN  -> { targetBX = exitA.x(); targetBY = exitA.y() - this.properties.tunnelLength() - exitBTemplate.height(); }
             default -> throw new IllegalStateException();
         }
         return new int[]{
