@@ -5,10 +5,12 @@ import govno.utils.Direction;
 import govno.world.attribute.Attributes;
 import govno.world.attribute.EntityAttributes;
 import govno.world.entity.input.Input;
+import govno.world.weapon.Weapon;
 import lombok.Getter;
 import lombok.NonNull;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
+import org.lwjgl.glfw.GLFW;
 
 public class LivingEntity extends Entity {
     protected final Input input;
@@ -17,23 +19,56 @@ public class LivingEntity extends Entity {
     protected Direction facing = Direction.DOWN;
     @Getter
     protected double health;
+    @Getter
+    protected Weapon weapon;
+    @Getter
+    protected boolean usingWeapon = false;
+    @Getter
+    protected final Vector2d handPos;
 
-
-    public LivingEntity(@NonNull EntityModel model, @NonNull Input input, @NonNull Attributes attributes, double health) {
+    public LivingEntity(@NonNull EntityModel model, @NonNull Input input, @NonNull Attributes attributes, double health, Vector2d handPos, @NonNull Weapon weapon) {
         super(model);
 
         this.input = input;
         this.attributes = attributes;
         this.health = Math.clamp(health, 0, getAttributeValue(EntityAttributes.MAX_HEALTH));
+        this.handPos = handPos;
+        setWeapon(weapon);
     }
 
     public double getAttributeValue(String id) {
         return this.attributes.getCurrentValue(id);
     }
 
+    public void setWeapon(Weapon weapon) {
+        if (this.weapon != null)
+            this.weapon.getEntityModifiers().forEach((attribute, modifier) -> this.attributes.removeModifier(attribute, modifier.id()));
+
+        this.weapon = weapon;
+        this.weapon.getEntityModifiers().forEach(this.attributes::addModifier);
+    }
+
+    public double getRenderYaw() {
+        int width = game.getWindow().getFramebufferWidth();
+        int height = game.getWindow().getFramebufferHeight();
+        double dx = game.getMouseListener().position.x - (width / 2.0);
+        double dy = (height / 2.0) - game.getMouseListener().position.y;
+        return Math.toDegrees(Math.atan2(dy, dx));
+    }
+
     @Override
     public void tick() {
         super.tick();
+
+        if (game.getWindow().isPressedMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
+            if (!this.usingWeapon) {
+                this.usingWeapon = true;
+                this.weapon.startUse(this);
+            }
+        } else if (this.usingWeapon) {
+            this.usingWeapon = false;
+            this.weapon.endUse(this);
+        }
 
         if (this.health < getAttributeValue(EntityAttributes.MAX_HEALTH))
             this.health = Math.min(this.health + getAttributeValue(EntityAttributes.REGENERATION), getAttributeValue(EntityAttributes.MAX_HEALTH));

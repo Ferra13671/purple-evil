@@ -30,4 +30,15 @@ public class Utils {
                 lerp(start.y(), end.y(), step)
         );
     }
+
+    public double lerpDegress(double start, double end, double step) {
+        double delta = end - start;
+
+        delta = ((delta % 360) + 360) % 360;
+        if (delta > 180) {
+            delta -= 360;
+        }
+
+        return start + delta * step;
+    }
 }
