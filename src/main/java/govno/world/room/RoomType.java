@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum RoomType {
     Spawn("spawn"),
+    Exit("Exit"),
     Tunnel("tunnel"),
     Combat("combat");
 

@@ -4,5 +4,6 @@
   'cross',
   'corridor',
   'ball',
-  'diamond'
+  'diamond',
+  'exit'
 ]

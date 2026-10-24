@@ -18,6 +18,9 @@ public enum BlockType {
             new Pair<>(0.02f, "floor-rubble"),
             new Pair<>(0.01f, "floor-bones")
     }),
+    PortalFloor(false, 'P', new Pair[]{
+            new Pair<>(1f, "floor-runes")
+    }),
     Void(false, ' ', null),
     Exit(false, '@', new Pair[]{
             new Pair<>(0.97f, "floor"),
