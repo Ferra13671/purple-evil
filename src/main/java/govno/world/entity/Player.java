@@ -6,10 +6,15 @@ import govno.world.attribute.Attributes;
 import govno.world.entity.input.PlayerInput;
 import govno.world.weapon.Weapon;
 import org.joml.Vector2d;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
+import java.util.Random;
 
 public class Player extends LivingEntity {
+
+    private double stepTimer = 0;
+    private final Random random = new Random();
 
     public Player(EntityModel model, Weapon weapon) {
         super(
@@ -34,25 +39,42 @@ public class Player extends LivingEntity {
     public void tick() {
         super.tick();
 
-        // 1. Получаем размеры окна
         int width = game.getWindow().getFramebufferWidth();
         int height = game.getWindow().getFramebufferHeight();
-
-        // 2. Центр экрана
         double centerX = width / 2.0;
         double centerY = height / 2.0;
-
-        // 3. Позиция мыши
         double mouseX = game.getMouseListener().position.x;
         double mouseY = game.getMouseListener().position.y;
-
-        // 4. Вектор от центра к мыши
-        // Обрати внимание: centerY - mouseY, так как экранный Y идет вниз, а мировой — вверх
         double dx = mouseX - centerX;
         double dy = centerY - mouseY;
-
-        // 5. Вычисляем угол (в радианах, от -PI до +PI)
-        // 0 радиан = вправо, PI/2 = вверх, -PI/2 = вниз
         this.yaw = Math.toDegrees(Math.atan2(dy, dx));
+
+        if (game.getWindow().isPressedMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
+            if (!this.usingWeapon) {
+                this.usingWeapon = true;
+                this.weapon.startUse(this);
+            }
+        } else if (this.usingWeapon) {
+            this.usingWeapon = false;
+            this.weapon.endUse(this);
+        }
+
+
+        float dt = game.getTicker().getTickDelay() / 1000f;
+        double speed = this.velocity.length();
+
+        if (speed > 0.05) {
+            this.stepTimer -= dt;
+
+            double newStepTimer = 0.15 / speed;
+            this.stepTimer = Math.min(this.stepTimer, newStepTimer);
+
+            if (this.stepTimer <= 0) {
+                float pitch = 0.8f + random.nextFloat() * 0.4f;
+                game.getSoundManager().playRawSound(game.getSounds().STEP, 0.4f, pitch);
+
+                this.stepTimer = newStepTimer;
+            }
+        }
     }
 }

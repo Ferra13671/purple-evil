@@ -50,6 +50,8 @@ public class Game {
     @Getter
     private final Sounds sounds;
     @Getter
+    private final SoundManager soundManager;
+    @Getter
     private final GameSession gameSession;
 
     public Game() {
@@ -71,6 +73,7 @@ public class Game {
 
         Overtone.init();
         this.sounds = new Sounds();
+        this.soundManager = new SoundManager();
 
         this.gameSession = new GameSession();
 

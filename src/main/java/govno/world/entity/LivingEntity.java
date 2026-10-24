@@ -12,7 +12,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
-import org.lwjgl.glfw.GLFW;
 
 public class LivingEntity extends Entity {
     @NonNull
@@ -73,16 +72,19 @@ public class LivingEntity extends Entity {
     public void tick() {
         super.tick();
 
-        if (this.weapon != null) {
-            if (game.getWindow().isPressedMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
-                if (!this.usingWeapon) {
-                    this.usingWeapon = true;
-                    this.weapon.startUse(this);
-                }
-            } else if (this.usingWeapon) {
-                this.usingWeapon = false;
-                this.weapon.endUse(this);
+        if (this.model != null) {
+            float dt = game.getTicker().getTickDelay() / 1000f;
+            float animSpeed = 1.0f;
+
+            // Если это живая сущность, проверяем её скорость
+            if (this.model.getCurrentAnimationName().equals("go")) {
+                double speed = this.velocity.length();
+
+                animSpeed = (float) (speed * 4.0);
+                animSpeed = Math.clamp(animSpeed, 0f, 3.0f);
             }
+
+            this.model.tick(dt * animSpeed);
         }
 
         if (this.health <= 0)
