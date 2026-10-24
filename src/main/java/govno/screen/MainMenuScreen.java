@@ -5,7 +5,7 @@ import com.ferra13671.overtone.Overtone;
 import com.ferra13671.overtone.SoundSource;
 import govno.renderer.RectColors;
 import govno.renderer.batch.impl.ColoredRectBatch;
-import govno.world.World;
+import govno.world.DungeonWorld;
 import org.joml.Vector4f;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class MainMenuScreen extends Screen {
 
         this.buttons.add(new Button(
                 "Play", halfWidth - (buttonWidth / 2), halfHeight - (buttonHeight / 2), buttonWidth, buttonHeight, () -> {
-                    game.setWorld(new World());
+                    game.setWorld(new DungeonWorld());
                     game.setScreen(null);
                 }
         ));

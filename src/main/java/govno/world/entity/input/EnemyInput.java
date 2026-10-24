@@ -31,7 +31,7 @@ public class EnemyInput extends Input {
 
         if (playerInSameRoom) {
             // РЕЖИМ ПОГОНИ
-            Vector2d toPlayer = new Vector2d(game.getWorld().player.position).sub(owner.position);
+            Vector2d toPlayer = new Vector2d(game.getGameSession().player.position).sub(owner.position);
 
             if (toPlayer.lengthSquared() > 0.01) {
                 this.vector.set(toPlayer.normalize());

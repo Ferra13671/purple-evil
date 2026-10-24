@@ -66,7 +66,7 @@ public class WorldRenderer implements GameInstance {
                 renderEntity(entity);
         }
 
-        renderEntity(game.getWorld().player);
+        renderEntity(game.getGameSession().player);
     }
 
     private void renderEntity(Entity entity) {

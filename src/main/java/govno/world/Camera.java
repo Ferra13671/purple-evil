@@ -10,7 +10,7 @@ public class Camera implements GameInstance {
 
     public void tick() {
         this.prevPosition.set(this.position);
-        this.position.set(game.getWorld().player.prevPosition);
+        this.position.set(game.getGameSession().player.prevPosition);
     }
 
     public Vector2f getLerpedPosition() {
