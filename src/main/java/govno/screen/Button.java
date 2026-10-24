@@ -64,7 +64,7 @@ public class Button implements GameInstance {
                 .close();
     }
 
-    public void onMousePress(double mouseX, double mouseY, int button) {
+    public void onMouseRelease(double mouseX, double mouseY, int button) {
         if (this.aabb.contains(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT)
             pressRunnable.run();
     }

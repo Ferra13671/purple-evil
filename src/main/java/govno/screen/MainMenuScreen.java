@@ -68,8 +68,8 @@ public class MainMenuScreen extends Screen {
     }
 
     @Override
-    public void onMousePress(double mouseX, double mouseY, int button) {
+    public void onMouseRelease(double mouseX, double mouseY, int button) {
         for (Button b : buttons)
-            b.onMousePress(mouseX, mouseY, button);
+            b.onMouseRelease(mouseX, mouseY, button);
     }
 }
