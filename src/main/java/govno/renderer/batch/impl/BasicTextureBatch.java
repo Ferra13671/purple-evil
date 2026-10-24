@@ -11,6 +11,7 @@ import com.ferra13671.cometrenderer.vertex.DrawMode;
 import com.ferra13671.cometrenderer.vertex.element.VertexElementType;
 import com.ferra13671.cometrenderer.vertex.format.VertexFormat;
 import com.ferra13671.cometrenderer.vertex.mesh.Mesh;
+import govno.renderer.Renderer;
 import govno.renderer.batch.AbstractPrimitiveBatch;
 import org.joml.Matrix4f;
 
@@ -93,19 +94,19 @@ public class BasicTextureBatch extends AbstractPrimitiveBatch {
     }
 
     public BasicTextureBatch rectPositioned(float x1, float y1, float x2, float y2, TextureBorder textureBorder) {
-        this.meshBuilder.vertex(x1, y1, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u1(), textureBorder.v1());
-        this.meshBuilder.vertex(x1, y2, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u1(), textureBorder.v2());
-        this.meshBuilder.vertex(x2, y2, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u2(), textureBorder.v2());
-        this.meshBuilder.vertex(x2, y1, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u2(), textureBorder.v1());
+        this.meshBuilder.vertex(x1, y1, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u1(), Renderer.RENDER_WORLD ? textureBorder.v2() : textureBorder.v1());
+        this.meshBuilder.vertex(x1, y2, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u1(), Renderer.RENDER_WORLD ? textureBorder.v1() : textureBorder.v2());
+        this.meshBuilder.vertex(x2, y2, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u2(), Renderer.RENDER_WORLD ? textureBorder.v1() : textureBorder.v2());
+        this.meshBuilder.vertex(x2, y1, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u2(), Renderer.RENDER_WORLD ? textureBorder.v2() : textureBorder.v1());
 
         return this;
     }
 
     public BasicTextureBatch rectPositioned(float x1, float y1, float x2, float y2, TextureBorder textureBorder, Matrix4f matrix4f) {
-        this.meshBuilder.vertex(matrix4f, x1, y1, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u1(), textureBorder.v1());
-        this.meshBuilder.vertex(matrix4f, x1, y2, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u1(), textureBorder.v2());
-        this.meshBuilder.vertex(matrix4f, x2, y2, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u2(), textureBorder.v2());
-        this.meshBuilder.vertex(matrix4f, x2, y1, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u2(), textureBorder.v1());
+        this.meshBuilder.vertex(matrix4f, x1, y1, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u1(), Renderer.RENDER_WORLD ? textureBorder.v2() : textureBorder.v1());
+        this.meshBuilder.vertex(matrix4f, x1, y2, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u1(), Renderer.RENDER_WORLD ? textureBorder.v1() : textureBorder.v2());
+        this.meshBuilder.vertex(matrix4f, x2, y2, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u2(), Renderer.RENDER_WORLD ? textureBorder.v1() : textureBorder.v2());
+        this.meshBuilder.vertex(matrix4f, x2, y1, 0).element("Texture", VertexElementType.FLOAT, textureBorder.u2(), Renderer.RENDER_WORLD ? textureBorder.v2() : textureBorder.v1());
 
         return this;
     }

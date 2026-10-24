@@ -7,7 +7,6 @@ import govno.utils.Utils;
 import govno.renderer.batch.impl.BasicRectBatch;
 import govno.renderer.batch.impl.BasicTextureBatch;
 import govno.world.room.Room;
-import govno.world.World;
 import govno.world.block.Block;
 import govno.world.entity.Player;
 import org.joml.Matrix4f;
@@ -22,7 +21,7 @@ public class WorldRenderer implements GameInstance {
     }
 
     public void render() {
-        World world = game.getWorld();
+        Renderer.RENDER_WORLD = true;
 
         setWorldMatrices();
 
@@ -37,6 +36,8 @@ public class WorldRenderer implements GameInstance {
                 .build()
                 .tryDraw()
                 .close();
+
+        Renderer.RENDER_WORLD = false;
     }
 
     private void renderRooms() {
@@ -46,16 +47,16 @@ public class WorldRenderer implements GameInstance {
             BasicTextureBatch textureBatch = new BasicTextureBatch().texture(textureAtlas);
 
             for (Block block : room.blocks) {
-                String textureId = block.blockType.textureId;
+                String textureId = block.textureId;
 
-                if (game.getTextures().getWorldTexture(textureId) != null) {
+                if (textureId != null && game.getTextures().getWorldTexture(textureId) != null) {
                     textureBatch
                             .rectSized(
                                     block.x,
                                     block.y,
                                     1,
                                     1,
-                                    textureAtlas.getBorder(game.getTextures().getWorldTexture(block.blockType.textureId))
+                                    textureAtlas.getBorder(game.getTextures().getWorldTexture(textureId))
                             );
                 }
             }
