@@ -4,27 +4,27 @@ import govno.model.EntityModel;
 import govno.utils.AABB;
 import govno.world.attribute.Attributes;
 import govno.world.entity.input.PlayerInput;
-import govno.world.weapon.MagicStaffWeapon;
+import govno.world.weapon.Weapon;
 import org.joml.Vector2d;
 
 import java.util.HashMap;
 
 public class Player extends LivingEntity {
 
-    public Player() {
+    public Player(EntityModel model, Weapon weapon) {
         super(
-                new EntityModel(game.getEntityModelTemplates().templates.get("knight")),
+                model,
                 new AABB(-0.5,  -0.5, 0.5, 0.5),
                 new Attributes(new HashMap<>(){{
                     put(EntityAttributes.MAX_HEALTH, 100d);
                     put(EntityAttributes.REGENERATION, 0.04);
                     put(EntityAttributes.ACCELERATION, 0.6);
                     put(EntityAttributes.SPEED, 0.25);
-                    put(EntityAttributes.INVINCIBILITY_TIME, 0.5);
+                    put(EntityAttributes.INVINCIBILITY_TIME, 1d);
                 }}),
                 100,
                 new Vector2d(0.5, 1),
-                new MagicStaffWeapon()
+                weapon
         );
 
         setInput(new PlayerInput());

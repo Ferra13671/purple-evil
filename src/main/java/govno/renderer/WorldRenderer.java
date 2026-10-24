@@ -1,5 +1,6 @@
 package govno.renderer;
 
+import com.ferra13671.cometrenderer.CometRenderer;
 import com.ferra13671.cometrenderer.texture.atlas.TextureAtlas;
 import govno.GameInstance;
 import govno.model.Sprite;
@@ -10,6 +11,7 @@ import govno.world.entity.Entity;
 import govno.world.entity.LivingEntity;
 import govno.world.room.Room;
 import govno.world.block.Block;
+import govno.world.weapon.SwordWeapon;
 import govno.world.weapon.Weapon;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -24,11 +26,8 @@ public class WorldRenderer implements GameInstance {
 
     public void render() {
         setWorldMatrices();
-
         game.getWindow().getFramebuffer().bind(true);
-
         renderRooms();
-
         renderEntities();
     }
 
@@ -73,10 +72,9 @@ public class WorldRenderer implements GameInstance {
         if (entity instanceof LivingEntity livingEntity) {
             // Если сущность неуязвима, она мигает (пропускает каждый второй кадр)
             if (livingEntity.isInvincible()) {
-                // Мигание с частотой 10 раз в секунду
                 int blinkPhase = (int) (livingEntity.getInvincibilityTimer() * 10);
                 if (blinkPhase % 2 == 0) {
-                    return; // Пропускаем рендер (сущность становится невидимой на этот кадр)
+                    return; // Пропускаем рендер
                 }
             }
         }
@@ -96,13 +94,20 @@ public class WorldRenderer implements GameInstance {
                 .tryDraw()
                 .close();
 
-        if (entity instanceof  LivingEntity le)
+        if (entity instanceof LivingEntity le)
             renderLivingEntityWeapon(aabb, le);
     }
 
     private void renderLivingEntityWeapon(AABB aabb, LivingEntity livingEntity) {
         Weapon weapon = livingEntity.getWeapon();
         if (weapon != null) {
+            float renderAngle = (float) livingEntity.getRenderYaw();
+
+            // Если это меч — берем угол из меча (там уже учтен взмах)
+            if (weapon instanceof SwordWeapon sword) {
+                renderAngle = sword.getRenderAngle(livingEntity);
+            }
+
             this.renderer.view.pushMatrix().translate(
                     (float) (aabb.getMinX() + livingEntity.getHandPos().x),
                     (float) (aabb.getMinY() + livingEntity.getHandPos().y),
@@ -111,6 +116,7 @@ public class WorldRenderer implements GameInstance {
 
             float halfWeaponSize = weapon.getSize() / 2;
 
+            // Рендерим сам меч
             new BasicTextureBatch()
                     .texture(game.getTextures().weaponAtlas)
                     .rectPositioned(
@@ -120,7 +126,8 @@ public class WorldRenderer implements GameInstance {
                             halfWeaponSize,
                             game.getTextures().weaponAtlas.getBorder(game.getTextures().getWeaponTexture(weapon.getTextureId())),
                             new Matrix4f()
-                                    .rotateZ((float) Math.toRadians(livingEntity.getRenderYaw() - 45))
+                                    .rotateZ((float) Math.toRadians(renderAngle - 45))
+                                    .translate(0.5f, 0.5f, 0)
                     )
                     .build()
                     .tryDraw()

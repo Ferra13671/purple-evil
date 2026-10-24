@@ -22,6 +22,7 @@ public class LivingEntity extends Entity {
     @Getter
     protected Direction facing = Direction.DOWN;
     @Getter
+    @Setter
     protected double health;
     @Getter
     protected Weapon weapon;
@@ -31,6 +32,7 @@ public class LivingEntity extends Entity {
     protected final Vector2d handPos;
 
     @Getter
+    @Setter
     protected double invincibilityTimer = 0;
 
     public LivingEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, double health, Vector2d handPos, Weapon weapon) {

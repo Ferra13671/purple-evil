@@ -1,17 +1,29 @@
 package govno;
 
+import govno.model.EntityModel;
 import govno.world.LobbyWorld;
 import govno.world.dungeon.DungeonProperties;
 import govno.world.dungeon.DungeonWorld;
 import govno.world.dungeon.spawn.EnemyType;
 import govno.world.dungeon.spawn.SpawnProperty;
 import govno.world.entity.Player;
+import govno.world.weapon.MagicStaffWeapon;
+import govno.world.weapon.SwordWeapon;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class GameSession implements GameInstance {
-    public final Player player = new Player();
+    private final Player knight = new Player(
+            new EntityModel(game.getEntityModelTemplates().templates.get("knight")),
+            new MagicStaffWeapon()
+    );
+    private final Player mage = new Player(
+            new EntityModel(game.getEntityModelTemplates().templates.get("mage")),
+            new SwordWeapon()
+    );
+
+    public Player player = this.mage;
     public int currentLevel = 1;
 
     public void startGame() {
@@ -28,7 +40,12 @@ public class GameSession implements GameInstance {
     }
 
     public void completeDungeon() {
-        currentLevel++;
+        this.currentLevel++;
+
+        this.player = this.currentLevel % 2 == 0 ? this.mage : this.knight;
+        this.player.setHealth(this.player.getAttributeValue("max_health"));
+        this.player.setInvincibilityTimer(0);
+
         startLobby();
     }
 
