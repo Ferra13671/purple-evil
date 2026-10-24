@@ -21,8 +21,6 @@ public class WorldRenderer implements GameInstance {
     }
 
     public void render() {
-        Renderer.RENDER_WORLD = true;
-
         setWorldMatrices();
 
         game.getWindow().getFramebuffer().bind(true);
@@ -36,8 +34,6 @@ public class WorldRenderer implements GameInstance {
                 .build()
                 .tryDraw()
                 .close();
-
-        Renderer.RENDER_WORLD = false;
     }
 
     private void renderRooms() {
@@ -73,7 +69,7 @@ public class WorldRenderer implements GameInstance {
         float halfW = MAX_BLOCKS_IN_WIDTH * 0.5f;
         float halfH = halfW / aspect;
 
-        this.renderer.projection = new Matrix4f().ortho(
+        this.renderer.projection.identity().ortho(
                 -halfW, halfW,
                 -halfH, halfH,
                 -100, 100

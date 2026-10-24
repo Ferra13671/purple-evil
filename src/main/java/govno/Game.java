@@ -9,6 +9,7 @@ import com.ferra13671.cometrenderer.plugins.glfw.WindowHints;
 import govno.renderer.Programs;
 import govno.renderer.ShaderLibraries;
 import govno.renderer.Textures;
+import govno.screen.Screen;
 import govno.utils.Ticker;
 import govno.world.World;
 import govno.world.room.RoomTemplates;
@@ -21,11 +22,17 @@ public class Game {
     @Getter
     private final Ticker ticker = new Ticker(50);
     @Getter
+    private final MouseListener mouseListener = new MouseListener();
+    @Getter
+    private final KeyboardListener keyboardListener = new KeyboardListener();
+    @Getter
     private Window window;
     @Getter
     private final RoomTemplates roomTemplates;
     @Getter
-    private final World world;
+    private Screen screen;
+    @Getter
+    private World world;
     @Getter
     private final Textures textures;
     private final ShaderLibraries shaderLibraries;
@@ -42,7 +49,6 @@ public class Game {
         BetterCompilerPlugin.init();
 
         this.roomTemplates = new RoomTemplates();
-        this.world = new World();
 
         this.textures = new Textures();
         this.shaderLibraries = new ShaderLibraries();
@@ -63,16 +69,40 @@ public class Game {
         this.window.setTitle("govno.Game");
         this.window.setVisible(true);
 
+        this.window.setFramebufferSizeCallback((width, height) -> {
+            if (this.screen != null)
+                this.screen.resize(width, height);
+        });
+        this.window.setMouseCallback(this.mouseListener);
+        this.window.setMousePosCallback(this.mouseListener);
+        this.window.setKeyboardCallback(this.keyboardListener);
+
         this.window.setLoopCallback(() -> {
             this.ticker.onStartFrame();
             if (this.ticker.shouldTick()) {
-                this.world.tick();
+                if (this.world != null)
+                    this.world.tick();
+
+                if (this.screen != null)
+                    this.screen.tick();
 
                 this.ticker.reset();
             }
 
             this.renderer.render();
         });
+    }
+
+    public void setScreen(Screen screen) {
+        if (this.screen != null)
+            this.screen.onClose();
+
+        this.screen = screen;
+        if (this.screen != null)
+            this.screen.onOpen(
+                    this.window.getFramebufferWidth(),
+                    this.window.getFramebufferHeight()
+            );
     }
 
     public static void start() {

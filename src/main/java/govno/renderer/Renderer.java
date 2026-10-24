@@ -8,13 +8,19 @@ import org.joml.Matrix4f;
 public class Renderer implements GameInstance {
     public static boolean RENDER_WORLD = false;
 
-    public Matrix4f projection;
+    public Matrix4f projection = new Matrix4f();
     public Matrix4f view = new Matrix4f();
 
     protected final WorldRenderer worldRenderer = new WorldRenderer(this);
+    protected final GuiRenderer guiRenderer = new GuiRenderer(this);
 
     public void render() {
-        this.worldRenderer.render();
+        if (game.getWorld() != null) {
+            Renderer.RENDER_WORLD = true;
+            this.worldRenderer.render();
+        }
+        Renderer.RENDER_WORLD = false;
+        this.guiRenderer.render();
     }
 
     public void applyMatrices() {
