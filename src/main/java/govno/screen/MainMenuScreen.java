@@ -1,6 +1,8 @@
 package govno.screen;
 
 import com.ferra13671.cometrenderer.plugins.glfw.CometGLFW;
+import com.ferra13671.overtone.Overtone;
+import com.ferra13671.overtone.SoundSource;
 import govno.renderer.RectColors;
 import govno.renderer.batch.impl.ColoredRectBatch;
 import govno.world.World;
@@ -10,11 +12,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainMenuScreen extends Screen {
+    private SoundSource mainMenuSound;
     private final List<Button> buttons = new ArrayList<>();
 
     @Override
     public void onOpen(int width, int height) {
         resize(width, height);
+
+        this.mainMenuSound = Overtone.create2DSource();
+        this.mainMenuSound.setSoundBuffer(game.getSounds().MAIN_MENU);
+        this.mainMenuSound.setLooping(true);
+        this.mainMenuSound.play();
+    }
+
+    @Override
+    public void onClose() {
+        this.mainMenuSound.close();
+        this.mainMenuSound = null;
     }
 
     @Override

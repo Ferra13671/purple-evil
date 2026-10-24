@@ -6,6 +6,7 @@ import com.ferra13671.cometrenderer.plugins.glfw.CometGLFW;
 import com.ferra13671.cometrenderer.plugins.glfw.FullScreenSwitchCombination;
 import com.ferra13671.cometrenderer.plugins.glfw.Window;
 import com.ferra13671.cometrenderer.plugins.glfw.WindowHints;
+import com.ferra13671.overtone.Overtone;
 import govno.renderer.Programs;
 import govno.renderer.ShaderLibraries;
 import govno.renderer.Textures;
@@ -43,6 +44,8 @@ public class Game {
     private final Programs programs;
     @Getter
     private final Renderer renderer;
+    @Getter
+    private final Sounds sounds;
 
     public Game() {
         instance = this;
@@ -57,6 +60,9 @@ public class Game {
         this.shaderLibraries = new ShaderLibraries();
         this.programs = new Programs();
         this.renderer = new Renderer();
+
+        Overtone.init();
+        this.sounds = new Sounds();
 
         this.window.loop();
     }

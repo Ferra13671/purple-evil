@@ -25,6 +25,7 @@ dependencies {
     library "com.ferra13671:comet-renderer-glfw:${cometrenderer_version}"
     library "de.marhali:json5-java:${project.json5_version}"
     library "com.ferra13671:json-utils:${project.json_utils_version}"
+    library "com.ferra13671:overtone:${project.overtone_version}"
 
 
     library platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
@@ -32,6 +33,7 @@ dependencies {
     library "org.lwjgl:lwjgl"
     library "org.lwjgl:lwjgl-glfw"
     library "org.lwjgl:lwjgl-opengl"
+    implementation "org.lwjgl:lwjgl-openal"
     library "org.lwjgl:lwjgl-stb"
     library "org.joml:joml:${jomlVersion}"
 
@@ -44,6 +46,7 @@ dependencies {
         library group: 'org.lwjgl', name: 'lwjgl', classifier: platformName
         library group: 'org.lwjgl', name: 'lwjgl-glfw', classifier: platformName
         library group: 'org.lwjgl', name: 'lwjgl-opengl', classifier: platformName
+        library group: 'org.lwjgl', name: 'lwjgl-openal', classifier: platformName
         library group: 'org.lwjgl', name: 'lwjgl-opengles', classifier: platformName
         library group: 'org.lwjgl', name: 'lwjgl-stb', classifier: platformName
     }
