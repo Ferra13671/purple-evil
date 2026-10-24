@@ -1,5 +1,6 @@
 package govno.screen;
 
+import com.ferra13671.cometrenderer.plugins.glfw.CometGLFW;
 import govno.renderer.RectColors;
 import govno.renderer.batch.impl.ColoredRectBatch;
 import govno.world.World;
@@ -20,11 +21,23 @@ public class MainMenuScreen extends Screen {
     public void resize(int width, int height) {
         this.buttons.clear();
 
+        float halfWidth = width / 2f;
+        float halfHeight = height / 2f;
+
+        float buttonWidth = 200;
+        float buttonHeight = 50;
+
         this.buttons.add(new Button(
-                "Play", (width / 2f) - 100, (height / 2f) - 25, 200, 50, () -> {
+                "Play", halfWidth - (buttonWidth / 2), halfHeight - (buttonHeight / 2), buttonWidth, buttonHeight, () -> {
                     game.setWorld(new World());
                     game.setScreen(null);
                 }
+        ));
+        this.buttons.add(new Button(
+                "Settings", halfWidth - (buttonWidth / 2), halfHeight + (buttonHeight / 2) + 10, buttonWidth, buttonHeight, () -> {}
+        ));
+        this.buttons.add(new Button(
+                "Quit", halfWidth - (buttonWidth / 2), halfHeight + (buttonHeight * 1.5f) + 20, buttonWidth, buttonHeight, CometGLFW::close
         ));
     }
 
