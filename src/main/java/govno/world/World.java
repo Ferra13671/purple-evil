@@ -23,8 +23,6 @@ public class World implements GameInstance {
 
     public World() {
         this.currentRoom.entities.add(this.player);
-
-        System.out.println(this.rooms);
     }
 
     public void tick() {

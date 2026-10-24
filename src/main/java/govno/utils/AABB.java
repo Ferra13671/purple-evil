@@ -43,6 +43,10 @@ public class AABB {
         return this;
     }
 
+    public boolean contains(double x, double y) {
+        return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
+    }
+
     public Vector2d getPenetrationVector(AABB other, boolean resolveX) {
         double cx1 = (this.minX + this.maxX) * 0.5;
         double cy1 = (this.minY + this.maxY) * 0.5;

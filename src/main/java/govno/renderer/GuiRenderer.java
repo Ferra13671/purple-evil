@@ -2,7 +2,6 @@ package govno.renderer;
 
 import com.ferra13671.cometrenderer.buffer.framebuffer.Framebuffer;
 import govno.GameInstance;
-import govno.renderer.batch.impl.BasicRectBatch;
 
 public class GuiRenderer implements GameInstance {
     private final Renderer renderer;
@@ -22,12 +21,6 @@ public class GuiRenderer implements GameInstance {
         );
 
         framebuffer.bind(true);
-
-        new BasicRectBatch()
-                .rectSized(500, 500, 100, 100)
-                .build()
-                .tryDraw()
-                .close();
 
         if (game.getScreen() != null)
             game.getScreen().render(
