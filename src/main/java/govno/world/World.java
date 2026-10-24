@@ -78,6 +78,11 @@ public class World implements GameInstance {
         }
     }
 
+    public void removeEntity(Entity entity) {
+        for (Room room : rooms)
+            room.entities.remove(entity);
+    }
+
     public void tick() {
         // 1. Тикаем логику игрока (ввод, поворот и т.д.)
         this.player.tick();
@@ -166,16 +171,15 @@ public class World implements GameInstance {
                 for (int j = i + 1; j < entities.size(); j++) {
                     Entity e1 = entities.get(i), e2 = entities.get(j);
 
-                    Vector2d outX = e1.worldAABB.getPenetrationVector(e2.worldAABB, true);
-                    if (outX != null) {
-                        e1.onEntityCollision(e2, outX); e1.updateAABB();
-                        e2.onEntityCollision(e1, outX.negate()); e2.updateAABB();
-                    }
+                    // Используем новый метод, который сам выбирает кратчайший путь
+                    Vector2d out = e1.worldAABB.getPenetrationVector(e2.worldAABB);
 
-                    Vector2d outY = e1.worldAABB.getPenetrationVector(e2.worldAABB, false);
-                    if (outY != null) {
-                        e1.onEntityCollision(e2, outY); e1.updateAABB();
-                        e2.onEntityCollision(e1, outY.negate()); e2.updateAABB();
+                    if (out != null) {
+                        e1.onEntityCollision(e2, out);
+                        e1.updateAABB();
+
+                        e2.onEntityCollision(e1, out.negate());
+                        e2.updateAABB();
                     }
                 }
             }

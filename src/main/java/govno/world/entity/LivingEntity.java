@@ -56,6 +56,10 @@ public class LivingEntity extends Entity {
         return Utils.lerp(this.prevYaw, this.yaw, game.getTicker().getTickDelta());
     }
 
+    public void onDeath() {
+        game.getWorld().removeEntity(this);
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -71,6 +75,9 @@ public class LivingEntity extends Entity {
                 this.weapon.endUse(this);
             }
         }
+
+        if (this.health <= 0)
+            onDeath();
 
         if (this.health < getAttributeValue(EntityAttributes.MAX_HEALTH))
             this.health = Math.min(this.health + getAttributeValue(EntityAttributes.REGENERATION), getAttributeValue(EntityAttributes.MAX_HEALTH));
@@ -124,6 +131,16 @@ public class LivingEntity extends Entity {
 
     @Override
     public void onWorldCollision(Vector2dc out) {
+        onCollision(out);
+    }
+
+    @Override
+    public void onEntityCollision(Entity other, Vector2dc out) {
+        if (other instanceof LivingEntity)
+            onCollision(new Vector2d(out).mul(0.5f));
+    }
+
+    protected void onCollision(Vector2dc out) {
         this.position.add(out);
 
         double len = out.length();
@@ -141,10 +158,5 @@ public class LivingEntity extends Entity {
                     -ny * vn
             );
         }
-    }
-
-    @Override
-    public void onEntityCollision(Entity other, Vector2dc out) {
-
     }
 }

@@ -1,5 +1,6 @@
 package govno.world.weapon;
 
+import govno.GameInstance;
 import govno.world.attribute.Attributes;
 import govno.world.attribute.modifier.AttributeModifier;
 import govno.world.entity.LivingEntity;
@@ -8,7 +9,7 @@ import lombok.NonNull;
 
 import java.util.Map;
 
-public class Weapon {
+public class Weapon implements GameInstance {
     @Getter
     protected final String textureId;
     @Getter

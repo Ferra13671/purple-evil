@@ -6,10 +6,11 @@ import govno.world.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Room {
-    public final List<Block> blocks = new ArrayList<>();
-    public final List<Entity> entities = new ArrayList<>();
+    public final List<Block> blocks = new CopyOnWriteArrayList<>();
+    public final List<Entity> entities = new CopyOnWriteArrayList<>();
     public final List<RoomExit> exits = new ArrayList<>();
     public final int centerX;
     public final int centerY;

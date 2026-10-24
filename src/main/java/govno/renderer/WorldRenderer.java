@@ -1,11 +1,11 @@
 package govno.renderer;
 
 import com.ferra13671.cometrenderer.texture.atlas.TextureAtlas;
-import govno.model.Sprite;
-import govno.utils.AABB;
 import govno.GameInstance;
-import govno.utils.Utils;
+import govno.model.Sprite;
 import govno.renderer.batch.impl.BasicTextureBatch;
+import govno.utils.AABB;
+import govno.utils.Utils;
 import govno.world.entity.Entity;
 import govno.world.entity.LivingEntity;
 import govno.world.room.Room;
@@ -66,24 +66,17 @@ public class WorldRenderer implements GameInstance {
                 renderEntity(entity);
         }
 
-        renderLivingEntity(game.getWorld().player);
+        renderEntity(game.getWorld().player);
     }
 
     private void renderEntity(Entity entity) {
-        if (entity instanceof  LivingEntity le) {
-            renderLivingEntity(le);
-            return;
-        }
-    }
-
-    private void renderLivingEntity(LivingEntity livingEntity) {
-        AABB aabb = new AABB(livingEntity.modelAABB).move(Utils.lerp(livingEntity.prevPosition, livingEntity.position, game.getTicker().getTickDelta()));
-        Sprite sprite = livingEntity.model.getCurrentSprite();
+        AABB aabb = new AABB(entity.modelAABB).move(Utils.lerp(entity.prevPosition, entity.position, game.getTicker().getTickDelta()));
+        Sprite sprite = entity.model.getCurrentSprite();
 
         new BasicTextureBatch()
                 .texture(game.getTextures().entityAtlas)
                 .rectSized(
-                        (float) aabb.getMinX(), (float) aabb.getMinY(), sprite.width(), sprite.height(),
+                        (float) aabb.getMinX(), (float) aabb.getMinY(), (float) aabb.getXLength() * sprite.width(), (float) aabb.getYLength() * sprite.height(),
                         game.getTextures().entityAtlas.getBorder(
                                 game.getTextures().getEntityTexture(sprite.textureId())
                         )
@@ -92,6 +85,11 @@ public class WorldRenderer implements GameInstance {
                 .tryDraw()
                 .close();
 
+        if (entity instanceof  LivingEntity le)
+            renderLivingEntityWeapon(aabb, le);
+    }
+
+    private void renderLivingEntityWeapon(AABB aabb, LivingEntity livingEntity) {
         Weapon weapon = livingEntity.getWeapon();
         if (weapon != null) {
             this.renderer.view.pushMatrix().translate(
