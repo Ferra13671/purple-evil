@@ -1,15 +1,13 @@
 package govno.world.room;
 
 import com.ferra13671.jsonutils.model.*;
+import govno.utils.Direction;
 import govno.world.block.BlockType;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RoomTemplates {
     public static final String ROOMS_PATH = "assets/world/rooms/";
@@ -57,12 +55,76 @@ public class RoomTemplates {
                     x = 0;
                 }
 
-                return new RoomTemplate(name, blockTemplates, maxWidth, -y);
+                int width = maxWidth;
+                int height = -y;
+
+                List<RoomExit> exits = computeExits(blockTemplates, width, height);
+
+                return new RoomTemplate(name, blockTemplates, exits, width, height);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return null;
+    }
+
+    private List<RoomExit> computeExits(List<BlockTemplate> blockTemplates, int width, int height) {
+        List<BlockTemplate> exitBlocks = blockTemplates.stream()
+                .filter(t -> t.blockType() == BlockType.Exit)
+                .toList();
+
+        List<RoomExit> exits = new ArrayList<>();
+        Set<BlockTemplate> unvisited = new HashSet<>(exitBlocks);
+
+        while (!unvisited.isEmpty()) {
+            BlockTemplate start = unvisited.iterator().next();
+            unvisited.remove(start);
+
+            int minX = start.x(), maxX = start.x();
+            int minY = start.y(), maxY = start.y();
+
+            Queue<BlockTemplate> queue = new LinkedList<>();
+            queue.add(start);
+
+            while (!queue.isEmpty()) {
+                BlockTemplate current = queue.poll();
+                minX = Math.min(minX, current.x());
+                maxX = Math.max(maxX, current.x());
+                minY = Math.min(minY, current.y());
+                maxY = Math.max(maxY, current.y());
+
+                Iterator<BlockTemplate> it = unvisited.iterator();
+                while (it.hasNext()) {
+                    BlockTemplate other = it.next();
+                    if (Math.abs(current.x() - other.x()) + Math.abs(current.y() - other.y()) == 1) {
+                        it.remove();
+                        queue.add(other);
+                    }
+                }
+            }
+
+            int w = maxX - minX + 1;
+            int h = maxY - minY + 1;
+            Direction side = detectSide(minX, minY, maxX, maxY, width, height);
+            exits.add(new RoomExit(minX, minY, w, h, side));
+        }
+
+        return exits;
+    }
+
+    private Direction detectSide(int minX, int minY, int maxX, int maxY, int width, int height) {
+        if (minX == maxX) {
+            if (minX == 0)          return Direction.LEFT;
+            if (minX == width - 1)  return Direction.RIGHT;
+        }
+        if (minY == maxY) {
+            if (maxY == 0)            return Direction.UP;
+            if (minY == -(height - 1)) return Direction.DOWN;
+        }
+        throw new IllegalArgumentException(
+                "Exit has unsupported shape or isn't on the boundary: " +
+                        "[" + minX + ".." + maxX + "] x [" + minY + ".." + maxY + "]"
+        );
     }
 }

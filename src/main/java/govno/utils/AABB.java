@@ -1,4 +1,4 @@
-package govno;
+package govno.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

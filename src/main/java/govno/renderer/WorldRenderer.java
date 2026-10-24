@@ -1,9 +1,9 @@
 package govno.renderer;
 
 import com.ferra13671.cometrenderer.texture.atlas.TextureAtlas;
-import govno.AABB;
+import govno.utils.AABB;
 import govno.GameInstance;
-import govno.Utils;
+import govno.utils.Utils;
 import govno.renderer.batch.impl.BasicRectBatch;
 import govno.renderer.batch.impl.BasicTextureBatch;
 import govno.world.room.Room;
@@ -23,44 +23,48 @@ public class WorldRenderer implements GameInstance {
 
     public void render() {
         World world = game.getWorld();
-        Room room = world.currentRoom;
 
-        if (room != null) {
-            setWorldMatrices();
+        setWorldMatrices();
 
-            game.getWindow().getFramebuffer().bind(true);
+        game.getWindow().getFramebuffer().bind(true);
 
-            renderRoom(room);
+        renderRooms();
 
-            Player player = game.getWorld().player;
-            AABB aabb = new AABB(player.modelAABB).move(Utils.lerp(player.prevPosition, player.position, game.getTicker().getTickDelta()));
-            new BasicRectBatch()
-                    .rectPositioned((float) aabb.getMinX(), (float) aabb.getMinY(), (float) aabb.getMaxX(), (float) aabb.getMaxY())
+        Player player = game.getWorld().player;
+        AABB aabb = new AABB(player.modelAABB).move(Utils.lerp(player.prevPosition, player.position, game.getTicker().getTickDelta()));
+        new BasicRectBatch()
+                .rectPositioned((float) aabb.getMinX(), (float) aabb.getMinY(), (float) aabb.getMaxX(), (float) aabb.getMaxY())
+                .build()
+                .tryDraw()
+                .close();
+    }
+
+    private void renderRooms() {
+        TextureAtlas textureAtlas = game.getTextures().worldAtlas;
+
+        for (Room room : game.getWorld().rooms) {
+            BasicTextureBatch textureBatch = new BasicTextureBatch().texture(textureAtlas);
+
+            for (Block block : room.blocks) {
+                String textureId = block.blockType.textureId;
+
+                if (game.getTextures().getWorldTexture(textureId) != null) {
+                    textureBatch
+                            .rectSized(
+                                    block.x,
+                                    block.y,
+                                    1,
+                                    1,
+                                    textureAtlas.getBorder(game.getTextures().getWorldTexture(block.blockType.textureId))
+                            );
+                }
+            }
+
+            textureBatch
                     .build()
                     .tryDraw()
                     .close();
         }
-    }
-
-    private void renderRoom(Room room) {
-        TextureAtlas textureAtlas = game.getTextures().worldAtlas;
-        BasicTextureBatch textureBatch = new BasicTextureBatch().texture(textureAtlas);
-
-        for (Block block : room.blocks)
-            for (String id : block.textureIds)
-                textureBatch
-                        .rectSized(
-                            block.x,
-                            block.y,
-                            1,
-                            1,
-                                textureAtlas.getBorder(game.getTextures().getWorldTexture(id))
-                        );
-
-        textureBatch
-                .build()
-                .tryDraw()
-                .close();
     }
 
     private void setWorldMatrices() {

@@ -1,110 +1,80 @@
 package govno.world.room;
 
+import govno.utils.AABB;
 import govno.world.block.Block;
-import govno.world.block.BlockType;
 import govno.world.entity.Entity;
-import org.joml.Vector2d;
-import org.joml.Vector2dc;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Room {
-    public static final double MAX_VELOCITY_STEP = 0.25;
-
     public final List<Block> blocks = new ArrayList<>();
     public final List<Entity> entities = new ArrayList<>();
+    public final List<RoomExit> exits = new ArrayList<>();
+    public final int centerX;
+    public final int centerY;
+
+    private AABB cachedBounds;
 
     public Room(RoomTemplate template, int x, int y) {
         int halfWidth = template.width() / 2;
         int halfHeight = template.height() / 2;
-        for (BlockTemplate blockTemplate : template.blocks()) {
+        for (BlockTemplate bt : template.blocks()) {
             this.blocks.add(new Block(
-                    blockTemplate.blockType(),
-                    blockTemplate.x() + x - halfWidth,
-                    blockTemplate.y() + y + halfHeight,
-                    blockTemplate.blockType() == BlockType.Wall ? new String[]{"wall"} : new String[]{"floor"}
+                    bt.blockType(),
+                    bt.x() + x - halfWidth,
+                    bt.y() + y + halfHeight
             ));
         }
+        for (RoomExit e : template.exits()) {
+            this.exits.add(new RoomExit(
+                    e.x() + x - halfWidth,
+                    e.y() + y + halfHeight,
+                    e.width(), e.height(), e.side()
+            ));
+        }
+
+        AABB bounds = getBounds();
+        this.centerX = (int) ((bounds.getMinX() + bounds.getMaxX()) * 0.5);
+        this.centerY = (int) ((bounds.getMinY() + bounds.getMaxY()) * 0.5);
+    }
+
+    public Room(List<Block> blocks) {
+        this.blocks.addAll(blocks);
+
+        AABB bounds = getBounds();
+        this.centerX = (int) ((bounds.getMinX() + bounds.getMaxX()) * 0.5);
+        this.centerY = (int) ((bounds.getMinY() + bounds.getMaxY()) * 0.5);
+    }
+
+    public AABB getBounds() {
+        if (this.cachedBounds == null) {
+            int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
+            int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+            for (Block b : blocks) {
+                minX = Math.min(minX, b.x);
+                minY = Math.min(minY, b.y);
+                maxX = Math.max(maxX, b.x + 1);
+                maxY = Math.max(maxY, b.y + 1);
+            }
+            this.cachedBounds = new AABB(minX, minY, maxX, maxY);
+        }
+        return cachedBounds;
+    }
+
+    public boolean intersects(AABB other) {
+        AABB b = getBounds();
+        return b.getMaxX() > other.getMinX() && b.getMinX() < other.getMaxX()
+                && b.getMaxY() > other.getMinY() && b.getMinY() < other.getMaxY();
     }
 
     public void tick() {
-        for (Entity entity : this.entities)
-            entity.tick();
-
-        tickPhysics();
+        for (Entity e : this.entities)
+            e.tick();
     }
 
-    private void tickPhysics() {
-        double maxSpeed = 0;
-        for (Entity entity : this.entities)
-            maxSpeed = Math.max(maxSpeed, entity.velocity.length());
-
-        int steps = Math.max((int) Math.ceil(maxSpeed / MAX_VELOCITY_STEP), 1);
-        double stepDelta = 1.0 / steps;
-
-        for (int step = 0; step < steps; step++) {
-
-            for (Entity entity : this.entities) {
-                entity.position.y += entity.velocity.y * stepDelta;
-                entity.updateAABB();
-            }
-
-            for (Entity entity : this.entities) {
-                for (Block block : this.blocks) {
-                    if (block.collisionBox != null) {
-                        Vector2dc out = entity.worldAABB.getPenetrationVector(block.collisionBox, false);
-                        if (out != null) {
-                            entity.onWorldCollision(out);
-                            entity.updateAABB();
-                        }
-                    }
-                }
-            }
-
-
-
-            for (Entity entity : this.entities) {
-                entity.position.x += entity.velocity.x * stepDelta;
-                entity.updateAABB();
-            }
-
-            for (Entity entity : this.entities) {
-                for (Block block : this.blocks) {
-                    if (block.collisionBox != null) {
-                        Vector2dc out = entity.worldAABB.getPenetrationVector(block.collisionBox, true);
-                        if (out != null) {
-                            entity.onWorldCollision(out);
-                            entity.updateAABB();
-                        }
-                    }
-                }
-            }
-
-
-
-            for (int i = 0; i < this.entities.size(); i++) {
-                for (int j = i + 1; j < this.entities.size(); j++) {
-                    Entity e1 = this.entities.get(i);
-                    Entity e2 = this.entities.get(j);
-
-                    Vector2d outX = e1.worldAABB.getPenetrationVector(e2.worldAABB, true);
-                    if (outX != null) {
-                        e1.onEntityCollision(e2, outX);
-                        e1.updateAABB();
-                        e2.onEntityCollision(e1, outX.negate());
-                        e2.updateAABB();
-                    }
-
-                    Vector2d outY = e1.worldAABB.getPenetrationVector(e2.worldAABB, false);
-                    if (outY != null) {
-                        e1.onEntityCollision(e2, outY);
-                        e1.updateAABB();
-                        e2.onEntityCollision(e1, outY.negate());
-                        e2.updateAABB();
-                    }
-                }
-            }
-        }
+    @Override
+    public String toString() {
+        return String.format("Room[%s, %s, %s]", centerX, centerY, blocks);
     }
 }

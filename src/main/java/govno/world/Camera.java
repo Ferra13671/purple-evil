@@ -1,7 +1,7 @@
 package govno.world;
 
 import govno.GameInstance;
-import govno.Utils;
+import govno.utils.Utils;
 import org.joml.Vector2f;
 
 public class Camera implements GameInstance {

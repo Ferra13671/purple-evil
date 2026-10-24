@@ -1,4 +1,4 @@
-package govno;
+package govno.utils;
 
 import lombok.experimental.UtilityClass;
 import org.joml.Vector2d;

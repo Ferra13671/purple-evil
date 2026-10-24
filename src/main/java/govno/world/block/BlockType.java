@@ -4,12 +4,15 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum BlockType {
-    Wall('W'),
-    Floor('.'),
-    Void(' '),
-    Exit('@');
+    Wall(true, 'W', "wall"),
+    Floor(false, '.', "floor"),
+    Void(false, ' ', null),
+    Exit(false, '@', "floor"),
+    SealedExit(true, '#', "rock");
 
+    public boolean hasCollidion;
     public final Character id;
+    public final String textureId;
 
     public static BlockType fromId(Character id) {
         for (BlockType type : values())

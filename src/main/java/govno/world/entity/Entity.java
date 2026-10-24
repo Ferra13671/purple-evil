@@ -1,6 +1,6 @@
 package govno.world.entity;
 
-import govno.AABB;
+import govno.utils.AABB;
 import govno.GameInstance;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;

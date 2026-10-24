@@ -9,6 +9,7 @@ import com.ferra13671.cometrenderer.plugins.glfw.WindowHints;
 import govno.renderer.Programs;
 import govno.renderer.ShaderLibraries;
 import govno.renderer.Textures;
+import govno.utils.Ticker;
 import govno.world.World;
 import govno.world.room.RoomTemplates;
 import lombok.Getter;
