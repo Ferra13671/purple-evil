@@ -17,6 +17,8 @@ public abstract class Entity implements GameInstance {
     public final AABB modelAABB;
     public final AABB worldAABB;
 
+    public boolean removed = false;
+
     public Entity(EntityModel model, @NonNull AABB modelAABB) {
         this.model = model;
         this.modelAABB = modelAABB;

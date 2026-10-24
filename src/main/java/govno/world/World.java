@@ -44,6 +44,7 @@ public class World implements GameInstance {
     }
 
     public void removeEntity(Entity entity) {
+        entity.removed = true;
         for (Room room : rooms)
             room.entities.remove(entity);
     }
@@ -100,10 +101,12 @@ public class World implements GameInstance {
 
         for (int step = 0; step < steps; step++) {
             for (Entity e : entities) {
+                if (e.removed) continue; // <-- Пропускаем удалённые при движении
                 e.position.y += e.velocity.y * stepDelta;
                 e.updateAABB();
             }
             for (Entity e : entities) {
+                if (e.removed) continue;
                 for (Block block : blocks) {
                     if (block.collisionBox == null) continue;
                     Vector2dc out = e.worldAABB.getPenetrationVector(block.collisionBox, false);
@@ -112,10 +115,12 @@ public class World implements GameInstance {
             }
 
             for (Entity e : entities) {
+                if (e.removed) continue;
                 e.position.x += e.velocity.x * stepDelta;
                 e.updateAABB();
             }
             for (Entity e : entities) {
+                if (e.removed) continue;
                 for (Block block : blocks) {
                     if (block.collisionBox == null) continue;
                     Vector2dc out = e.worldAABB.getPenetrationVector(block.collisionBox, true);
@@ -124,8 +129,13 @@ public class World implements GameInstance {
             }
 
             for (int i = 0; i < entities.size(); i++) {
+                Entity e1 = entities.get(i);
+                if (e1.removed) continue; // <-- Пропускаем, если снаряд уже уничтожен
+
                 for (int j = i + 1; j < entities.size(); j++) {
-                    Entity e1 = entities.get(i), e2 = entities.get(j);
+                    Entity e2 = entities.get(j);
+                    if (e2.removed) continue;
+
                     Vector2d out = e1.worldAABB.getPenetrationVector(e2.worldAABB);
                     if (out != null) {
                         e1.onEntityCollision(e2, out);
