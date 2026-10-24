@@ -105,6 +105,9 @@ public class Game {
                 if (this.world != null)
                     this.world.tick();
 
+                Overtone.tick();
+                this.soundManager.tick();
+
                 if (this.screen != null)
                     this.screen.tick();
                 else if (this.world == null)

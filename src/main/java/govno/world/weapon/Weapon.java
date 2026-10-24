@@ -26,6 +26,8 @@ public class Weapon implements GameInstance {
         this.entityModifiers = entityModifiers;
     }
 
+    public void tick(LivingEntity entity) {}
+
     public void startUse(LivingEntity entity) {}
 
     public void endUse(LivingEntity entity) {}

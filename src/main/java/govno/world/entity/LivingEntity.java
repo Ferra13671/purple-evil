@@ -72,6 +72,9 @@ public class LivingEntity extends Entity {
     public void tick() {
         super.tick();
 
+        if (this.weapon != null)
+            this.weapon.tick(this);
+
         if (this.model != null) {
             float dt = game.getTicker().getTickDelay() / 1000f;
             float animSpeed = 1.0f;

@@ -15,14 +15,14 @@ public class SwordWeapon extends Weapon {
     private final double attackRange;
     private final double attackArc;
 
-    // --- СОСТОЯНИЕ ВЗМАХА ---
     private long swingStartTime = 0;
-    private final long swingDurationMs = 250; // Взмах длится 250 мс
+    private final long swingDurationMs = 250;
+    private boolean hasHit = false;
 
     public SwordWeapon() {
         super("sword", 1.8f, new Attributes(new HashMap<>()), new HashMap<>());
-        this.damage = 35;
-        this.attackRange = 2.2;
+        this.damage = 20;
+        this.attackRange = 2.0;
         this.attackArc = 120;
     }
 
@@ -35,44 +35,46 @@ public class SwordWeapon extends Weapon {
         return (System.currentTimeMillis() - swingStartTime) / (float) swingDurationMs;
     }
 
-    /** Вычисляет угол меча с учетом взмаха */
-    public float getRenderAngle(LivingEntity entity) {
-        float baseAngle = (float) entity.getRenderYaw();
-        if (!isSwinging()) return baseAngle;
+    @Override
+    public void startUse(LivingEntity entity) {
+        if (isSwinging()) return; // Защита от спама
 
-        float progress = getSwingProgress();
+        this.swingStartTime = System.currentTimeMillis();
+        this.hasHit = false;
 
-        // Сглаживание (Smoothstep) - делает взмах более резким и естественным
-        float easedProgress = progress * progress * (3.0f - 2.0f * progress);
-
-        // Взмах от -90 (слева/сзади) до +90 (справа/спереди)
-        float startOffset = -90f;
-        float endOffset = 90f;
-        float currentOffset = startOffset + (endOffset - startOffset) * easedProgress;
-
-        return baseAngle + currentOffset;
+        game.getSoundManager().playRawSound(game.getSounds().SWING, 0.5f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
     }
 
     @Override
-    public void startUse(LivingEntity entity) {
-        if (isSwinging())
-            return; // Защита от спама
+    public void tick(LivingEntity entity) {
+        if (isSwinging() && !this.hasHit) {
+            float progress = getSwingProgress();
 
-        this.swingStartTime = System.currentTimeMillis();
+            if (progress >= 0.4f) {
+                this.hasHit = true;
+                performHit(entity);
+            }
+        }
+    }
 
-        game.getSoundManager().playRawSound(game.getSounds().SWING, 0.5f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
-
-        // Логика нанесения урона (остается без изменений)
+    private void performHit(LivingEntity entity) {
         Room room = game.getWorld().currentRoom;
+
+        double handX = entity.position.x;
+        double handY = entity.position.y + 0.5;
+
         for (Entity target : room.entities) {
             if (target == entity || !(target instanceof LivingEntity livingTarget) || livingTarget.getHealth() <= 0) continue;
 
-            double dx = livingTarget.position.x - entity.position.x;
-            double dy = livingTarget.position.y - entity.position.y;
-            double distance = Math.sqrt(dx * dx + dy * dy);
+            double closestX = Math.clamp(handX, livingTarget.worldAABB.getMinX(), livingTarget.worldAABB.getMaxX());
+            double closestY = Math.clamp(handY, livingTarget.worldAABB.getMinY(), livingTarget.worldAABB.getMaxY());
+            double distance = Math.sqrt(Math.pow(handX - closestX, 2) + Math.pow(handY - closestY, 2));
 
-            if (distance <= attackRange) {
+            if (distance <= this.attackRange) {
+                double dx = livingTarget.position.x - handX;
+                double dy = livingTarget.position.y - handY;
                 double targetAngle = Math.toDegrees(Math.atan2(dy, dx));
+
                 double angleDiff = Math.abs(entity.yaw - targetAngle) % 360;
                 if (angleDiff > 180) angleDiff = 360 - angleDiff;
 
@@ -80,11 +82,24 @@ public class SwordWeapon extends Weapon {
                     game.getSoundManager().playRawSound(game.getSounds().SWING_HIT, 0.3f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
                     livingTarget.damage(damage);
 
-                    // Откидывание
                     Vector2d knockback = new Vector2d(dx, dy).normalize().mul(0.3);
                     livingTarget.velocity.add(knockback);
                 }
             }
         }
+    }
+
+    public float getRenderAngle(LivingEntity entity) {
+        float baseAngle = (float) entity.getRenderYaw();
+        if (!isSwinging()) return baseAngle;
+
+        float progress = getSwingProgress();
+        float easedProgress = progress * progress * (3.0f - 2.0f * progress);
+
+        float startOffset = -60f;
+        float endOffset = 60f;
+        float currentOffset = startOffset + (endOffset - startOffset) * easedProgress;
+
+        return baseAngle + currentOffset;
     }
 }
