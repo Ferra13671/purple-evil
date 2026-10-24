@@ -47,15 +47,7 @@ public class MainMenuScreen extends Screen {
 
         this.buttons.add(new Button(
                 "Play", halfWidth - (buttonWidth / 2), halfHeight - (buttonHeight / 2), buttonWidth, buttonHeight, () -> {
-                    game.setWorld(new DungeonWorld(new DungeonProperties(
-                            10,
-                            12,
-                            0.05,
-                            Map.of(
-                                    EnemyType.Slime, new SpawnProperty(8, 2)
-                            ),
-                            12
-                    )));
+                    game.getGameSession().startGame();
                     game.setScreen(null);
                 }
         ));

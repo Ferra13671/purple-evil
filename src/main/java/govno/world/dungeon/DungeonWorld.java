@@ -1,13 +1,16 @@
 package govno.world.dungeon;
 
+import govno.world.LobbyWorld;
 import govno.world.World;
 import govno.world.block.Block;
 import govno.world.block.BlockType;
 import govno.world.dungeon.spawn.EnemyType;
 import govno.world.dungeon.spawn.SpawnProperty;
 import govno.world.entity.LivingEntity;
+import govno.world.entity.PortalEntity;
 import govno.world.room.Room;
 import govno.world.room.RoomType;
+import org.joml.Vector2d;
 
 import java.util.*;
 
@@ -20,6 +23,28 @@ public class DungeonWorld extends World {
         this.properties = properties;
 
         spawnEnemies();
+        spawnExitPortal();
+    }
+
+    private void spawnExitPortal() {
+        Room exitRoom = this.rooms.stream()
+                .filter(r -> r.roomType == RoomType.Exit)
+                .findFirst()
+                .orElse(null);
+
+        if (exitRoom != null) {
+            Block portalBlock = LobbyWorld.findPortalBlock(exitRoom.blocks);
+            if (portalBlock != null) {
+                PortalEntity portal = new PortalEntity(
+                        new Vector2d(
+                                portalBlock.x + 0.5,
+                                portalBlock.y + 0.5
+                        ),
+                        () -> game.getGameSession().completeDungeon()
+                );
+                exitRoom.entities.add(portal);
+            }
+        }
     }
 
     private void spawnEnemies() {
