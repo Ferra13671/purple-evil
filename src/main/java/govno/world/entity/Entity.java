@@ -1,5 +1,6 @@
 package govno.world.entity;
 
+import govno.model.EntityModel;
 import govno.utils.AABB;
 import govno.GameInstance;
 import org.joml.Vector2d;
@@ -11,12 +12,20 @@ public abstract class Entity implements GameInstance {
     public final Vector2d velocity = new Vector2d();
     public double yaw = 0;
     public double prevYaw = 0;
+    public final EntityModel model;
     public final AABB modelAABB = new AABB(-0.5,  -0.5, 0.5, 0.5);
     public final AABB worldAABB = new AABB(this.modelAABB);
+
+    public Entity(EntityModel model) {
+        this.model = model;
+    }
 
     public void tick() {
         this.prevPosition.set(this.position);
         this.prevYaw = this.yaw;
+
+        if (this.model != null)
+            this.model.tick(game.getTicker().getTickDelay() / 1000f);
     }
 
     public void updateAABB() {

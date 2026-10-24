@@ -1,7 +1,15 @@
 package govno.utils;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public enum Direction {
-    UP, DOWN, LEFT, RIGHT;
+    UP("up"),
+    DOWN("down"),
+    LEFT("left"),
+    RIGHT("right");
+
+    public final String id;
 
     public Direction opposite() {
         return switch (this) {

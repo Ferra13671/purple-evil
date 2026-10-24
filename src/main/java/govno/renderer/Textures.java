@@ -7,6 +7,7 @@ import com.ferra13671.cometrenderer.texture.loader.TextureLoader;
 import com.ferra13671.jsonutils.model.JArray;
 import com.ferra13671.jsonutils.model.JModel;
 import com.ferra13671.jsonutils.model.JType;
+import govno.model.EntityModelTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,8 +19,11 @@ public class Textures {
     public static final String ROOM_TEXTURES_PATH = "assets/textures/world/";
 
     private final Map<String, GLTexture> worldTextures = new HashMap<>();
+    private final Map<String, GLTexture> entityTextures = new HashMap<>();
 
     public final TextureAtlas worldAtlas;
+    private final AtlasBuilder entityAtlasBuilder = new AtlasBuilder("entity-atlas");
+    public TextureAtlas entityAtlas;
 
     public Textures() {
         this.worldAtlas = loadRoomAtlas();
@@ -27,6 +31,20 @@ public class Textures {
 
     public GLTexture getWorldTexture(String id) {
         return this.worldTextures.get(id);
+    }
+
+    public GLTexture getEntityTexture(String id) {
+        return this.entityTextures.get(id);
+    }
+
+    public void addEntityTexture(GLTexture texture) {
+        this.entityAtlasBuilder.texture(texture);
+        this.entityTextures.put(texture.getName(), texture);
+    }
+
+    public void buildAtlases() {
+        this.entityAtlas = entityAtlasBuilder.build();
+        this.entityAtlas.setFiltering(TextureFiltering.DEFAULT);
     }
 
     private TextureAtlas loadRoomAtlas() {

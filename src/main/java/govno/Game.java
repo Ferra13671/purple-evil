@@ -7,6 +7,7 @@ import com.ferra13671.cometrenderer.plugins.glfw.FullScreenSwitchCombination;
 import com.ferra13671.cometrenderer.plugins.glfw.Window;
 import com.ferra13671.cometrenderer.plugins.glfw.WindowHints;
 import com.ferra13671.overtone.Overtone;
+import govno.model.EntityModelTemplates;
 import govno.renderer.Programs;
 import govno.renderer.ShaderLibraries;
 import govno.renderer.Textures;
@@ -39,6 +40,8 @@ public class Game {
     private World world;
     @Getter
     private final Textures textures;
+    @Getter
+    private final EntityModelTemplates entityModelTemplates;
     private final ShaderLibraries shaderLibraries;
     @Getter
     private final Programs programs;
@@ -57,9 +60,12 @@ public class Game {
         this.roomTemplates = new RoomTemplates();
 
         this.textures = new Textures();
+        this.entityModelTemplates = new EntityModelTemplates();
         this.shaderLibraries = new ShaderLibraries();
         this.programs = new Programs();
         this.renderer = new Renderer();
+
+        this.textures.buildAtlases();
 
         Overtone.init();
         this.sounds = new Sounds();

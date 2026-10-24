@@ -1,6 +1,7 @@
 package govno.renderer;
 
 import com.ferra13671.cometrenderer.texture.atlas.TextureAtlas;
+import govno.model.Sprite;
 import govno.utils.AABB;
 import govno.GameInstance;
 import govno.utils.Utils;
@@ -28,8 +29,16 @@ public class WorldRenderer implements GameInstance {
 
         Player player = game.getWorld().player;
         AABB aabb = new AABB(player.modelAABB).move(Utils.lerp(player.prevPosition, player.position, game.getTicker().getTickDelta()));
-        new BasicRectBatch()
-                .rectPositioned((float) aabb.getMinX(), (float) aabb.getMinY(), (float) aabb.getMaxX(), (float) aabb.getMaxY())
+        Sprite sprite = player.model.getCurrentSprite();
+
+        new BasicTextureBatch()
+                .texture(game.getTextures().entityAtlas)
+                .rectSized(
+                        (float) aabb.getMinX(), (float) aabb.getMinY(), sprite.width(), sprite.height(),
+                        game.getTextures().entityAtlas.getBorder(
+                                game.getTextures().getEntityTexture(sprite.textureId())
+                        )
+                )
                 .build()
                 .tryDraw()
                 .close();

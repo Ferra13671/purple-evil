@@ -1,10 +1,17 @@
 package govno.world.entity;
 
+import govno.model.EntityModel;
+import govno.utils.Direction;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
 
 public class Player extends Entity {
     protected final PlayerInput input = new PlayerInput();
+    private Direction facing = Direction.DOWN;
+
+    public Player() {
+        super(new EntityModel(game.getEntityModelTemplates().templates.get("knight")));
+    }
 
     @Override
     public void tick() {
@@ -19,12 +26,17 @@ public class Player extends Entity {
         double acceleration = 0.60 * friction;
         double speed = 0.6;
 
+        updateFacing();
+
         Vector2d inputSpeed = new Vector2d(this.input.vector).normalize().mul(speed);
         if (inputSpeed.lengthSquared() > 0.001f) {
             this.velocity.set(
                     this.velocity.x + (inputSpeed.x - this.velocity.x) * acceleration,
                     this.velocity.y + (inputSpeed.y - this.velocity.y) * acceleration
             );
+
+            if (this.model != null)
+                this.model.play("go");
         } else {
             this.velocity.set(
                     this.velocity.x * (1 - acceleration),
@@ -33,6 +45,20 @@ public class Player extends Entity {
         }
 
         this.velocity.mul(10000).round().mul(1 / 10000d);
+    }
+
+    private void updateFacing() {
+        Vector2d in = this.input.vector;
+        if (in.lengthSquared() < 0.001) return;
+
+        if (Math.abs(in.x) >= Math.abs(in.y)) {
+            this.facing = in.x > 0 ? Direction.RIGHT : Direction.LEFT;
+        } else {
+            this.facing = in.y > 0 ? Direction.UP : Direction.DOWN;
+        }
+
+        if (this.model != null)
+            this.model.setDirection(this.facing);
     }
 
     @Override
