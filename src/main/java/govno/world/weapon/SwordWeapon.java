@@ -7,6 +7,7 @@ import govno.world.room.Room;
 import org.joml.Vector2d;
 
 import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SwordWeapon extends Weapon {
 
@@ -54,9 +55,12 @@ public class SwordWeapon extends Weapon {
 
     @Override
     public void startUse(LivingEntity entity) {
-        if (isSwinging()) return; // Защита от спама
+        if (isSwinging())
+            return; // Защита от спама
 
         this.swingStartTime = System.currentTimeMillis();
+
+        game.getSoundManager().playRawSound(game.getSounds().SWING, 0.5f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
 
         // Логика нанесения урона (остается без изменений)
         Room room = game.getWorld().currentRoom;
@@ -73,6 +77,7 @@ public class SwordWeapon extends Weapon {
                 if (angleDiff > 180) angleDiff = 360 - angleDiff;
 
                 if (angleDiff <= attackArc / 2) {
+                    game.getSoundManager().playRawSound(game.getSounds().SWING_HIT, 0.3f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
                     livingTarget.damage(damage);
 
                     // Откидывание

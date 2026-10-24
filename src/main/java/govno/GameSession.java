@@ -23,7 +23,7 @@ public class GameSession implements GameInstance {
             new SwordWeapon()
     );
 
-    public Player player = this.mage;
+    public Player player = this.knight;
     public int currentLevel = 1;
 
     public void startGame() {
