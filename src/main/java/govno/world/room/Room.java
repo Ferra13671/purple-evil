@@ -2,7 +2,9 @@ package govno.world.room;
 
 import govno.utils.AABB;
 import govno.world.block.Block;
+import govno.world.block.BlockType;
 import govno.world.entity.Entity;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,9 @@ public class Room {
     public final int centerX;
     public final int centerY;
 
-    public final boolean isCorridor;
+    public final RoomType roomType;
+    @Getter
+    private boolean closed = false;
 
     private AABB cachedBounds;
 
@@ -41,17 +45,17 @@ public class Room {
         this.centerX = (int) ((bounds.getMinX() + bounds.getMaxX()) * 0.5);
         this.centerY = (int) ((bounds.getMinY() + bounds.getMaxY()) * 0.5);
 
-        this.isCorridor = false;
+        this.roomType = template.roomType();
     }
 
-    public Room(List<Block> blocks) {
+    public Room(List<Block> blocks, RoomType roomType) {
         this.blocks.addAll(blocks);
 
         AABB bounds = getBounds();
         this.centerX = (int) ((bounds.getMinX() + bounds.getMaxX()) * 0.5);
         this.centerY = (int) ((bounds.getMinY() + bounds.getMaxY()) * 0.5);
 
-        this.isCorridor = true;
+        this.roomType = roomType;
     }
 
     public AABB getBounds() {
@@ -67,6 +71,36 @@ public class Room {
             this.cachedBounds = new AABB(minX, minY, maxX, maxY);
         }
         return cachedBounds;
+    }
+
+    public void closeRoom() {
+        this.closed = true;
+
+        for (Block block : this.blocks) {
+            if (block.blockType == BlockType.Exit) {
+                this.blocks.remove(block);
+                this.blocks.add(new Block(
+                        BlockType.ClosedExit,
+                        block.x,
+                        block.y
+                ));
+            }
+        }
+    }
+
+    public void openRoom() {
+        this.closed = false;
+
+        for (Block block : this.blocks) {
+            if (block.blockType == BlockType.ClosedExit) {
+                this.blocks.remove(block);
+                this.blocks.add(new Block(
+                        BlockType.Exit,
+                        block.x,
+                        block.y
+                ));
+            }
+        }
     }
 
     public boolean intersects(AABB other) {

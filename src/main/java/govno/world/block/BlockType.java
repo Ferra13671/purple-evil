@@ -23,6 +23,9 @@ public enum BlockType {
             new Pair<>(0.97f, "floor"),
             new Pair<>(0.03f, "floor-bones")
     }),
+    ClosedExit(true, 'C', new Pair[]{
+            new Pair<>(1f, "wall-wood")
+    }),
     SealedExit(true, '#', new Pair[]{
             new Pair<>(1f, "rock")
     });

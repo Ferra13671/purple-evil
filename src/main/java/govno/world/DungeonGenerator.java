@@ -204,6 +204,6 @@ public class DungeonGenerator {
             }
         }
 
-        return new Room(blocks);
+        return new Room(blocks, RoomType.Tunnel);
     }
 }

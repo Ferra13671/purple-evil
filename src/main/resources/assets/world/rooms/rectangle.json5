@@ -1,5 +1,6 @@
 {
   name: 'recTangle',
+  type: 'combat',
 
   grid: [
     'WWWWWWWWWT@@@@@TWWWWWWWWW',

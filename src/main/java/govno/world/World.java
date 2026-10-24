@@ -8,6 +8,7 @@ import govno.world.entity.Entity;
 import govno.world.entity.Player;
 import govno.world.entity.SlimeEntity;
 import govno.world.room.Room;
+import govno.world.room.RoomType;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
 
@@ -38,11 +39,10 @@ public class World implements GameInstance {
         Random random = new Random();
 
         // Начинаем с индекса 1, чтобы не спавнить слизней в стартовой комнате игрока
-        for (int i = 1; i < rooms.size(); i++) {
-            Room room = rooms.get(i);
-
+        for (Room room : rooms) {
             // 1. Пропускаем туннели по флагу
-            if (room.isCorridor) continue;
+            if (room.roomType != RoomType.Combat)
+                continue;
 
             // Собираем все проходимые блоки (пол и выходы) в комнате
             List<Block> floorBlocks = new ArrayList<>();

@@ -1,5 +1,6 @@
 {
   name: 'cross',
+  type: 'combat',
 
   grid: [
     '       WWT@@@@@TWW       ',

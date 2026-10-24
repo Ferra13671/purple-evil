@@ -1,5 +1,6 @@
 {
   name: 'diamond',
+  type: 'combat',
 
   grid: [
     '         W@@@@@W         ',

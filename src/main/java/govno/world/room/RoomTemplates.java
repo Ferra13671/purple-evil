@@ -35,6 +35,8 @@ public class RoomTemplates {
                 String name = object.getElement("name").cast(JType.STRING, null);
                 List<BlockTemplate> blockTemplates = new ArrayList<>();
 
+                RoomType roomType = RoomType.fromId(object.getElement("type").cast(JType.STRING, null));
+
                 int maxWidth = 0;
                 int x = 0, y = 0;
                 JArray grid = object.castElement("grid", JType.JARRAY, null);
@@ -60,7 +62,7 @@ public class RoomTemplates {
 
                 List<RoomExit> exits = computeExits(blockTemplates, width, height);
 
-                return new RoomTemplate(name, blockTemplates, exits, width, height);
+                return new RoomTemplate(name, blockTemplates, exits, width, height, roomType);
             }
         } catch (IOException e) {
             e.printStackTrace();
