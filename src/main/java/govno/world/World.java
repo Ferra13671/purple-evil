@@ -1,6 +1,7 @@
 package govno.world;
 
 import govno.GameInstance;
+import govno.utils.AABB;
 import govno.world.block.Block;
 import govno.world.entity.Entity;
 import govno.world.entity.Player;
@@ -8,10 +9,13 @@ import govno.world.room.Room;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class World implements GameInstance {
     public static final double MAX_VELOCITY_STEP = 0.25;
+    // Радиус, в котором комнаты остаются активными (тикаются)
+    public static final double ACTIVE_RADIUS = 60.0;
 
     public final Camera camera = new Camera();
     public final Player player = new Player();
@@ -26,28 +30,55 @@ public class World implements GameInstance {
     }
 
     public void tick() {
+        // 1. Тикаем логику игрока (ввод, поворот и т.д.)
         this.player.tick();
 
-        if (this.currentRoom != null) {
-            this.currentRoom.tick();
-            tickPhysics(this.currentRoom);
+        // 2. Определяем зону активности вокруг игрока
+        AABB activeArea = new AABB(
+                player.position.x - ACTIVE_RADIUS, player.position.y - ACTIVE_RADIUS,
+                player.position.x + ACTIVE_RADIUS, player.position.y + ACTIVE_RADIUS
+        );
+
+        // 3. Находим все комнаты в этой зоне
+        List<Room> activeRooms = new ArrayList<>();
+        for (Room room : this.rooms) {
+            if (room.intersects(activeArea)) {
+                activeRooms.add(room);
+            }
         }
 
-        for (Room room : this.rooms) {
+        // 4. Тикаем сущностей во ВСЕХ активных комнатах (ИИ врагов)
+        for (Room room : activeRooms) {
+            room.tick();
+        }
+
+        // 5. Обновляем currentRoom (для рендера и камеры)
+        for (Room room : activeRooms) {
             if (room.intersects(this.player.worldAABB) && room != this.currentRoom) {
                 this.currentRoom.entities.remove(this.player);
                 this.currentRoom = room;
                 this.currentRoom.entities.add(this.player);
+                break; // Нам нужен только один currentRoom
             }
         }
 
+        // 6. Собираем всех сущностей и все блоки из активных комнат для физики
+        List<Entity> activeEntities = new ArrayList<>();
+        List<Block> activeBlocks = new ArrayList<>();
+        for (Room room : activeRooms) {
+            activeEntities.addAll(room.entities);
+            activeBlocks.addAll(room.blocks);
+        }
+
+        // 7. Применяем физику ко всем активным сущностям
+        tickPhysics(activeEntities, activeBlocks);
+
+        // 8. Обновляем камеру
         this.camera.tick();
     }
 
-    public void tickPhysics(Room room) {
-        List<Entity> entities = room.entities;
-        List<Block> blocks = room.blocks;
-
+    // Изменили сигнатуру метода: теперь он принимает списки, а не одну комнату
+    public void tickPhysics(List<Entity> entities, List<Block> blocks) {
         if (entities.isEmpty()) return;
 
         double maxSpeed = 0;
