@@ -2,6 +2,8 @@ package govno.renderer;
 
 import com.ferra13671.cometrenderer.buffer.framebuffer.Framebuffer;
 import govno.GameInstance;
+import govno.renderer.batch.impl.text.RenderText;
+import govno.renderer.batch.impl.text.TextBatch;
 
 public class GuiRenderer implements GameInstance {
     private final Renderer renderer;
@@ -19,13 +21,29 @@ public class GuiRenderer implements GameInstance {
                 height, 0,
                 -100, 100
         );
+        this.renderer.view.identity();
 
         framebuffer.bind(true);
+
+        if (game.getWorld() != null)
+            renderOverlay(framebuffer);
 
         if (game.getScreen() != null)
             game.getScreen().render(
                     game.getMouseListener().position.x,
                     game.getMouseListener().position.y
             );
+    }
+
+    private void renderOverlay(Framebuffer framebuffer) {
+        new TextBatch(this.renderer.font)
+                .text(new RenderText(
+                        String.format("Health: %s", game.getWorld().player.getHealth()),
+                        10,
+                        10
+                ).withShadow(true))
+                .build()
+                .tryDraw()
+                .close();
     }
 }
