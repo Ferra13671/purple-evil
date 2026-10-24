@@ -18,9 +18,10 @@ public class BatEntity extends LivingEntity {
                 new AABB(-0.4, -0.4, 0.4, 0.4),
                 new Attributes(new HashMap<>(){{
                     put(EntityAttributes.MAX_HEALTH, 30d);
-                    put(EntityAttributes.REGENERATION, 0.1);
+                    put(EntityAttributes.REGENERATION, 0.01);
                     put(EntityAttributes.ACCELERATION, 2d);
                     put(EntityAttributes.SPEED, 0.6);
+                    put(EntityAttributes.INVINCIBILITY_TIME, 0d);
                     put(EnemyAttributes.DAMAGE, 15d);
                 }}),
                 30d,

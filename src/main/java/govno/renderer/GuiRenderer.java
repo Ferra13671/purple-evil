@@ -38,7 +38,7 @@ public class GuiRenderer implements GameInstance {
     private void renderOverlay(Framebuffer framebuffer) {
         new TextBatch(this.renderer.font)
                 .text(new RenderText(
-                        String.format("Health: %s\nLevel: %s", game.getGameSession().player.getHealth(), game.getGameSession().currentLevel),
+                        String.format("Health: %s\nLevel: %s", (int) game.getGameSession().player.getHealth(), game.getGameSession().currentLevel),
                         10,
                         10
                 ).withShadow(true))

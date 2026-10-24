@@ -30,6 +30,9 @@ public class LivingEntity extends Entity {
     @Getter
     protected final Vector2d handPos;
 
+    @Getter
+    protected double invincibilityTimer = 0;
+
     public LivingEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, double health, Vector2d handPos, Weapon weapon) {
         super(model, aabb);
 
@@ -60,6 +63,10 @@ public class LivingEntity extends Entity {
         game.getWorld().removeEntity(this);
     }
 
+    public boolean isInvincible() {
+        return invincibilityTimer > 0;
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -82,12 +89,23 @@ public class LivingEntity extends Entity {
         if (this.health < getAttributeValue(EntityAttributes.MAX_HEALTH))
             this.health = Math.min(this.health + getAttributeValue(EntityAttributes.REGENERATION), getAttributeValue(EntityAttributes.MAX_HEALTH));
 
+        if (this.invincibilityTimer > 0) {
+            this.invincibilityTimer -= game.getTicker().getTickDelay() / 1000.0;
+            if (this.invincibilityTimer < 0) {
+                this.invincibilityTimer = 0;
+            }
+        }
+
         this.input.tick();
         tickMovement();
     }
 
     public void damage(double damage) {
+        if (isInvincible())
+            return;
         this.health -= damage;
+
+        this.invincibilityTimer = getAttributeValue(EntityAttributes.INVINCIBILITY_TIME);
     }
 
     private void updateFacing() {

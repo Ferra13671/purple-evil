@@ -17,9 +17,10 @@ public class Player extends LivingEntity {
                 new AABB(-0.5,  -0.5, 0.5, 0.5),
                 new Attributes(new HashMap<>(){{
                     put(EntityAttributes.MAX_HEALTH, 100d);
-                    put(EntityAttributes.REGENERATION, 0.4);
+                    put(EntityAttributes.REGENERATION, 0.04);
                     put(EntityAttributes.ACCELERATION, 0.6);
                     put(EntityAttributes.SPEED, 0.4);
+                    put(EntityAttributes.INVINCIBILITY_TIME, 0.5);
                 }}),
                 100,
                 new Vector2d(0.5, 1),

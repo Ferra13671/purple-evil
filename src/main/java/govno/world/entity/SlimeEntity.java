@@ -18,9 +18,10 @@ public class SlimeEntity extends LivingEntity {
                 new AABB(-0.5,  -0.5, 0.5, 0.5),
                 new Attributes(new HashMap<>(){{
                     put(EntityAttributes.MAX_HEALTH, 60d);
-                    put(EntityAttributes.REGENERATION, 0.2);
+                    put(EntityAttributes.REGENERATION, 0.02);
                     put(EntityAttributes.ACCELERATION, 1d);
                     put(EntityAttributes.SPEED, 0.05);
+                    put(EntityAttributes.INVINCIBILITY_TIME, 0d);
                     put(EnemyAttributes.DAMAGE, 25d);
                 }}),
                 60d,

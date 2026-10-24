@@ -70,6 +70,17 @@ public class WorldRenderer implements GameInstance {
     }
 
     private void renderEntity(Entity entity) {
+        if (entity instanceof LivingEntity livingEntity) {
+            // Если сущность неуязвима, она мигает (пропускает каждый второй кадр)
+            if (livingEntity.isInvincible()) {
+                // Мигание с частотой 10 раз в секунду
+                int blinkPhase = (int) (livingEntity.getInvincibilityTimer() * 10);
+                if (blinkPhase % 2 == 0) {
+                    return; // Пропускаем рендер (сущность становится невидимой на этот кадр)
+                }
+            }
+        }
+
         AABB aabb = new AABB(entity.modelAABB).move(Utils.lerp(entity.prevPosition, entity.position, game.getTicker().getTickDelta()));
         Sprite sprite = entity.model.getCurrentSprite();
 
