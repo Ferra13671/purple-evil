@@ -19,7 +19,7 @@ public class Player extends LivingEntity {
                     put(EntityAttributes.MAX_HEALTH, 100d);
                     put(EntityAttributes.REGENERATION, 0.04);
                     put(EntityAttributes.ACCELERATION, 0.6);
-                    put(EntityAttributes.SPEED, 0.4);
+                    put(EntityAttributes.SPEED, 0.25);
                     put(EntityAttributes.INVINCIBILITY_TIME, 0.5);
                 }}),
                 100,
