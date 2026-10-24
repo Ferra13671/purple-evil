@@ -5,7 +5,6 @@ import govno.model.Sprite;
 import govno.utils.AABB;
 import govno.GameInstance;
 import govno.utils.Utils;
-import govno.renderer.batch.impl.BasicRectBatch;
 import govno.renderer.batch.impl.BasicTextureBatch;
 import govno.world.room.Room;
 import govno.world.block.Block;

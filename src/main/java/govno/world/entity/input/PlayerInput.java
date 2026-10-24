@@ -1,11 +1,9 @@
-package govno.world.entity;
+package govno.world.entity.input;
 
 import govno.GameInstance;
-import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
 
-public class PlayerInput implements GameInstance {
-    public final Vector2d vector = new Vector2d();
+public class PlayerInput extends Input implements GameInstance {
 
     public void tick() {
         double xDelta = 0, yDelta = 0;
