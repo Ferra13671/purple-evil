@@ -10,6 +10,9 @@ public enum BlockType {
             new Pair<>(0.15f, "wall-cracked"),
             new Pair<>(0.15f, "wall-mossy")
     }),
+    WallWithTorch(true, 'T', new Pair[]{
+            new Pair<>(1f, "wall-torch")
+    }),
     Floor(false, '.', new Pair[]{
             new Pair<>(0.97f, "floor"),
             new Pair<>(0.02f, "floor-rubble"),
