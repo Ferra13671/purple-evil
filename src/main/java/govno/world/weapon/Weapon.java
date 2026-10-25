@@ -15,22 +15,53 @@ public class Weapon implements GameInstance {
     @Getter
     protected final float size;
     @Getter
+    protected final long cooldownMs;
+    @Getter
     protected final Attributes attributes;
     @Getter
     protected final Map<String, AttributeModifier> entityModifiers;
 
-    public Weapon(@NonNull String textureId, float size, @NonNull Attributes attributes, @NonNull Map<String, AttributeModifier> entityModifiers) {
+    @Getter
+    protected boolean usingWeapon = false;
+    protected long lastUseTime = 0;
+
+    public Weapon(@NonNull String textureId, float size, long cooldownMs, @NonNull Attributes attributes, @NonNull Map<String, AttributeModifier> entityModifiers) {
         this.textureId = textureId;
         this.size = size;
+        this.cooldownMs = cooldownMs;
         this.attributes = attributes;
         this.entityModifiers = entityModifiers;
     }
 
-    public void tick(LivingEntity entity) {}
+    public boolean canUse() {
+        return System.currentTimeMillis() - this.lastUseTime >= this.cooldownMs;
+    }
 
-    public void startUse(LivingEntity entity) {}
+    public float getCooldownProgress() {
+        if (this.cooldownMs <= 0) return 1f;
+        long elapsed = System.currentTimeMillis() - this.lastUseTime;
+        return Math.min(1f, elapsed / (float) this.cooldownMs);
+    }
 
-    public void endUse(LivingEntity entity) {}
+    public void tick(LivingEntity entity) {
+        if (this.usingWeapon && canUse())
+            attack(entity);
+    }
+
+    public void startUse(LivingEntity entity) {
+        this.usingWeapon = true;
+
+        if (canUse())
+            attack(entity);
+    }
+
+    public void endUse(LivingEntity entity) {
+        this.usingWeapon = false;
+    }
+
+    protected void attack(LivingEntity entity) {
+        this.lastUseTime = System.currentTimeMillis();
+    }
 
     public double getAttributeValue(String id) {
         return this.attributes.getCurrentValue(id);

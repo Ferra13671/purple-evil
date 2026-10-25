@@ -15,38 +15,36 @@ public class SwordWeapon extends Weapon {
     private final double attackRange;
     private final double attackArc;
 
-    private long swingStartTime = 0;
-    private final long swingDurationMs = 500;
     private boolean hasHit = false;
 
     public SwordWeapon() {
-        super("sword", 1.8f, new Attributes(new HashMap<>()), new HashMap<>());
+        super("sword", 1.8f, 500, new Attributes(new HashMap<>()), new HashMap<>());
         this.damage = 20;
         this.attackRange = 2.0;
         this.attackArc = 120;
     }
 
     public boolean isSwinging() {
-        return System.currentTimeMillis() - swingStartTime < swingDurationMs;
+        return !canUse();
     }
 
     public float getSwingProgress() {
-        if (!isSwinging()) return 1f;
-        return (System.currentTimeMillis() - swingStartTime) / (float) swingDurationMs;
+        return getCooldownProgress();
     }
 
     @Override
-    public void startUse(LivingEntity entity) {
-        if (isSwinging()) return; // Защита от спама
+    protected void attack(LivingEntity entity) {
+        super.attack(entity);
 
-        this.swingStartTime = System.currentTimeMillis();
         this.hasHit = false;
-
         game.getSoundManager().playRawSound(game.getSounds().SWING, 0.5f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
     }
 
     @Override
     public void tick(LivingEntity entity) {
+        super.tick(entity); // Вызываем базовый tick (для автоатаки)
+
+        // Логика нанесения урона в середине взмаха
         if (isSwinging() && !this.hasHit) {
             float progress = getSwingProgress();
 

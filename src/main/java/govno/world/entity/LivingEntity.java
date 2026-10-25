@@ -26,8 +26,6 @@ public class LivingEntity extends Entity {
     @Getter
     protected Weapon weapon;
     @Getter
-    protected boolean usingWeapon = false;
-    @Getter
     protected final Vector2d handPos;
 
     @Getter

@@ -50,12 +50,9 @@ public class Player extends LivingEntity {
         this.yaw = Math.toDegrees(Math.atan2(dy, dx));
 
         if (game.getWindow().isPressedMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
-            if (!this.usingWeapon) {
-                this.usingWeapon = true;
+            if (!this.weapon.isUsingWeapon())
                 this.weapon.startUse(this);
-            }
-        } else if (this.usingWeapon) {
-            this.usingWeapon = false;
+        } else if (this.weapon.isUsingWeapon()) {
             this.weapon.endUse(this);
         }
 
