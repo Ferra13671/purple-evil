@@ -23,8 +23,7 @@ public enum BlockType {
     }),
     Void(false, ' ', null),
     Exit(false, '@', new Pair[]{
-            new Pair<>(0.97f, "floor"),
-            new Pair<>(0.03f, "floor-bones")
+            new Pair<>(1f, "wall-wood-dark")
     }),
     ClosedExit(true, 'C', new Pair[]{
             new Pair<>(1f, "wall-wood")
