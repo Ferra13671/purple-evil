@@ -30,7 +30,7 @@ public class GuiRenderer implements GameInstance {
 
         framebuffer.bind(true);
 
-        if (game.getGameSession() != null && game.getWorld() != null)
+        if (game.getGameSession() != null && game.getWorld() != null && !game.getGameSession().player.isDying())
             renderOverlay(framebuffer);
 
         if (game.getScreen() != null)

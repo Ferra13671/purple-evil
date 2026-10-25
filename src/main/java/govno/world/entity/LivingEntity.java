@@ -17,6 +17,7 @@ public class LivingEntity extends Entity {
     @NonNull
     @Setter
     protected Input input = new Input();
+    @Getter
     protected final Attributes attributes;
     @Getter
     protected Direction facing = Direction.DOWN;
@@ -75,6 +76,17 @@ public class LivingEntity extends Entity {
 
     public boolean isInvincible() {
         return invincibilityTimer > 0;
+    }
+
+    public void revive() {
+        this.dying = false;
+        this.removed = false;
+        this.invincibilityTimer = 0;
+        this.velocity.set(0, 0);
+        this.input.vector.set(0, 0);
+
+        if (this.model != null)
+            this.model.play("stay");
     }
 
     @Override

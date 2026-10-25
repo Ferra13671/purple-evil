@@ -36,6 +36,8 @@ public class GameSession implements GameInstance {
     public int currentLevel = 1;
     public int score = 0;
 
+    private Checkpoint checkpoint = null;
+
     private static final long SWAP_COOLDOWN_MS = 5000;
     private long lastSwapTime = 0;
 
@@ -45,6 +47,7 @@ public class GameSession implements GameInstance {
     }
 
     public void startLobby() {
+        saveCheckpoint();
         game.setWorld(new LobbyWorld());
     }
 
@@ -56,6 +59,32 @@ public class GameSession implements GameInstance {
     public void completeDungeon() {
         this.currentLevel++;
         startLobby();
+    }
+
+    public void loadCheckpoint() {
+        if (this.checkpoint != null) {
+            this.score = checkpoint.score();
+            this.currentLevel = checkpoint.level();
+
+            this.knight.revive();
+            this.mage.revive();
+
+            this.knight.setHealth(this.checkpoint.knightHealth());
+            this.mage.setHealth(this.checkpoint.mageHealth());
+
+            this.knight.getAttributes().loadModifiers(this.checkpoint.knightMods());
+            this.mage.getAttributes().loadModifiers(this.checkpoint.mageMods());
+
+            this.player = this.knight;
+        }
+    }
+
+    private void saveCheckpoint() {
+        this.checkpoint = new Checkpoint(
+                this.knight.getHealth(), this.mage.getHealth(),
+                this.knight.getAttributes().saveModifiers(), this.mage.getAttributes().saveModifiers(),
+                this.score, this.currentLevel
+        );
     }
 
     public void tick() {

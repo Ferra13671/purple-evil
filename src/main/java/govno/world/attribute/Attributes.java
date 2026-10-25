@@ -4,7 +4,9 @@ package govno.world.attribute;
 import govno.world.attribute.modifier.AttributeInstance;
 import govno.world.attribute.modifier.AttributeModifier;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Attributes {
@@ -33,5 +35,22 @@ public class Attributes {
 
     public void clearAllModifiers() {
         this.attributes.values().forEach(AttributeInstance::clearModifiers);
+    }
+
+    public Map<String, List<AttributeModifier>> saveModifiers() {
+        Map<String, List<AttributeModifier>> result = new HashMap<>();
+        this.attributes.forEach((key, instance) -> {
+            result.put(key, new ArrayList<>(instance.getModifiers()));
+        });
+        return result;
+    }
+
+    public void loadModifiers(Map<String, List<AttributeModifier>> snapshot) {
+        this.attributes.forEach((key, instance) -> {
+            instance.clearModifiers();
+            if (snapshot.containsKey(key)) {
+                snapshot.get(key).forEach(instance::addModifier);
+            }
+        });
     }
 }

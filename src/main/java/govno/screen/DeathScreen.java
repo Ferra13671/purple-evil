@@ -41,7 +41,8 @@ public class DeathScreen extends Screen {
         this.buttons.add(new Button(
                 "Continue",
                 halfWidth - (buttonWidth / 2), halfHeight + 20 + buttonHeight + spacing, buttonWidth, buttonHeight, () -> {
-                    game.getGameSession().startDungeon();
+                    game.getGameSession().loadCheckpoint();
+                    game.getGameSession().startLobby();
                     game.setScreen(null);
                 }
         ));
