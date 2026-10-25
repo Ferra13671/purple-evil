@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EnemyEntity extends LivingEntity {
-    private static final float UPGRADE_DROP_CHANCE = 0.1f;
+    private static final float UPGRADE_DROP_CHANCE = 0.17f;
 
     public EnemyEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, double health, Vector2d handPos, Weapon weapon) {
         super(model, aabb, attributes, health, handPos, weapon);

@@ -39,7 +39,7 @@ public class LivingEntity extends Entity {
     @Getter
     protected int poisonTimer = 0;
     protected int poisonTickTimer = 0;
-    protected double poisonDamage = 0;
+    protected double poisonLevel = 0;
 
     public LivingEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, double health, Vector2d handPos, Weapon weapon) {
         super(model, aabb);
@@ -67,8 +67,8 @@ public class LivingEntity extends Entity {
         return Utils.lerp(this.prevYaw, this.yaw, game.getTicker().getTickDelta());
     }
 
-    public void applyPoison(double damagePerTick, int durationTicks) {
-        this.poisonDamage = damagePerTick;
+    public void applyPoison(double poisonLevel, int durationTicks) {
+        this.poisonLevel = poisonLevel;
         this.poisonTimer = durationTicks;
 
         if (this.poisonTickTimer <= 0)
@@ -139,7 +139,7 @@ public class LivingEntity extends Entity {
             this.poisonTickTimer--;
 
             if (this.poisonTickTimer <= 0) {
-                this.health -= this.poisonDamage;
+                this.health -= this.poisonLevel * 5;
                 this.poisonTickTimer = 20;
             }
         }
