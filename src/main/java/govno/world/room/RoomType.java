@@ -8,6 +8,7 @@ public enum RoomType {
     Exit(false, "exit"),
     Tunnel(false, "tunnel"),
     Combat(true, "combat"),
+    Boss(true, "boss"),
     Lobby(false, "lobby");
 
     public boolean combat;

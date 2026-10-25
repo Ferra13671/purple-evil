@@ -20,7 +20,6 @@ public class Player extends LivingEntity {
                 model,
                 new AABB(-0.5,  -0.5, 0.5, 0.5),
                 new Attributes(game.getAttributesTemplates().templates.get("player")),
-                100,
                 new Vector2d(0.5, 1),
                 weapon
         );

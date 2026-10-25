@@ -7,6 +7,7 @@ import govno.world.upgrades.Upgrade;
 import govno.world.weapon.Weapon;
 import lombok.NonNull;
 import org.joml.Vector2d;
+import org.joml.Vector2dc;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,8 +16,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EnemyEntity extends LivingEntity {
     private static final float UPGRADE_DROP_CHANCE = 0.17f;
 
-    public EnemyEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, double health, Vector2d handPos, Weapon weapon) {
-        super(model, aabb, attributes, health, handPos, weapon);
+    public EnemyEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes,Vector2d handPos, Weapon weapon) {
+        super(model, aabb, attributes, handPos, weapon);
     }
 
     @Override
@@ -40,6 +41,17 @@ public class EnemyEntity extends LivingEntity {
 
                 game.getWorld().currentRoom.entities.add(upgradeEntity);
             }
+        }
+    }
+
+    @Override
+    public void onEntityCollision(Entity other, Vector2dc out) {
+        if (other == game.getGameSession().player) {
+            game.getGameSession().player.damage(getAttributeValue(EnemyAttributes.DAMAGE));
+            game.getGameSession().player.damage(getAttributeValue(EnemyAttributes.KNOCKBACK));
+
+            if (this.model.hasAnimation("strike"))
+                this.model.play("strike");
         }
     }
 }

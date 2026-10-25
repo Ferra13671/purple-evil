@@ -6,5 +6,6 @@
   'ball',
   'diamond',
   'exit',
-  'lobby'
+  'lobby',
+  'boss'
 ]

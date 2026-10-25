@@ -4,5 +4,7 @@
   'magic-staff-charge',
   'slime',
   'portal',
-  'bat'
+  'bat',
+  'slime-boss',
+  'slime-boss-orb'
 ]

@@ -45,20 +45,34 @@ public class DungeonGenerator {
                 "spawn", templates.templates.values().iterator().next());
         Room spawnRoom = new Room(spawn, 0, 0);
 
-        // Для спавна дистанция 0
         placed.add(new PlacedRoom(spawnRoom, new ArrayList<>(spawnRoom.exits), 0.0));
         commitRoom(spawnRoom);
 
-        // Генерируем на 1 комнату меньше, чтобы оставить место для выхода
-        while (placed.size() < this.properties.maxRooms() - 1) {
+        // Если это босс-уровень, оставляем место и для босса, и для выхода (-2)
+        int targetRooms = this.properties.maxRooms() - 1;
+        if (this.properties.isBossLevel()) targetRooms--;
+
+        while (placed.size() < targetRooms) {
             if (!tryPlaceNextRoom()) break;
         }
     }
 
     private void placeExitRoom() {
-        RoomTemplate exitTemplate = templates.templates.get("exit");
-        if (exitTemplate == null) {
-            System.err.println("ВНИМАНИЕ: Шаблон 'exit' не найден в rooms.json5!");
+        // 1. Если это босс-уровень, сначала ставим босс-комнату
+        if (this.properties.isBossLevel()) {
+            placeSpecificRoom("boss", RoomType.Boss);
+        }
+
+        // 2. Затем ставим выход.
+        // Если босс был поставлен, выход пристроится прямо к нему (так как это самая дальняя комната)
+        placeSpecificRoom("exit", RoomType.Exit);
+    }
+
+    /** Универсальный метод для принудительной установки комнаты по ID */
+    private void placeSpecificRoom(String templateId, RoomType expectedType) {
+        RoomTemplate tmpl = templates.templates.get(templateId);
+        if (tmpl == null) {
+            System.err.println("ВНИМАНИЕ: Шаблон '" + templateId + "' не найден!");
             return;
         }
 
@@ -69,11 +83,11 @@ public class DungeonGenerator {
         for (PlacedRoom farthest : sortedRooms) {
             if (farthest.freeExits.isEmpty()) continue;
 
-            if (tryPlaceSpecificFromSource(farthest, exitTemplate)) {
+            if (tryPlaceSpecificFromSource(farthest, tmpl)) {
                 return; // Успешно поставили
             }
         }
-        System.err.println("Не удалось разместить комнату выхода!");
+        System.err.println("Не удалось разместить комнату: " + templateId);
     }
 
     private boolean tryPlaceNextRoom() {
@@ -106,7 +120,7 @@ public class DungeonGenerator {
 
             List<RoomTemplate> templateCandidates = new ArrayList<>();
             for (RoomTemplate t : templates.templates.values()) {
-                if (t.roomType() == RoomType.Exit || t.roomType() == RoomType.Spawn || t.roomType() == RoomType.Lobby)
+                if (t.roomType() == RoomType.Exit || t.roomType() == RoomType.Spawn || t.roomType() == RoomType.Lobby || t.roomType() == RoomType.Boss)
                     continue;
 
                 for (RoomExit e : t.exits())

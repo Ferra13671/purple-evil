@@ -95,7 +95,10 @@ public class WorldRenderer implements GameInstance {
         new BasicTextureBatch(() -> CometRenderer.getShaderColor().setColor(color))
                 .texture(game.getTextures().entityAtlas)
                 .rectSized(
-                        (float) (aabb.getMinX() - (xLength - (xLength * sprite.width())) / 2), (float) aabb.getMinY(), (float) aabb.getXLength() * sprite.width(), (float) aabb.getYLength() * sprite.height(),
+                        (float) (aabb.getMinX() - ((xLength * sprite.width()) - xLength) / 2),
+                        (float) aabb.getMinY(),
+                        (float) aabb.getXLength() * sprite.width(),
+                        (float) aabb.getYLength() * sprite.height(),
                         game.getTextures().entityAtlas.getBorder(
                                 game.getTextures().getEntityTexture(sprite.textureId())
                         )

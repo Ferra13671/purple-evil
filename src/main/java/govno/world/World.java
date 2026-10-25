@@ -101,7 +101,7 @@ public class World implements GameInstance {
 
         for (int step = 0; step < steps; step++) {
             for (Entity e : entities) {
-                if (e.removed) continue; // <-- Пропускаем удалённые при движении
+                if (e.removed) continue;
                 e.position.y += e.velocity.y * stepDelta;
                 e.updateAABB();
             }
@@ -130,7 +130,7 @@ public class World implements GameInstance {
 
             for (int i = 0; i < entities.size(); i++) {
                 Entity e1 = entities.get(i);
-                if (e1.removed) continue; // <-- Пропускаем, если снаряд уже уничтожен
+                if (e1.removed || e1.phasing) continue;
 
                 for (int j = i + 1; j < entities.size(); j++) {
                     Entity e2 = entities.get(j);

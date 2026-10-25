@@ -1,5 +1,6 @@
 [
   'player',
   'slime',
-  'bat'
+  'bat',
+  'slime-boss'
 ]

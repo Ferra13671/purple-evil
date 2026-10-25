@@ -44,6 +44,8 @@ public class GameSession implements GameInstance {
     private static final long SWAP_COOLDOWN_MS = 5000;
     private long lastSwapTime = 0;
 
+    private boolean worldClearPending = false;
+
     public void startGame() {
         this.score = 0;
         startLobby();
@@ -112,12 +114,17 @@ public class GameSession implements GameInstance {
     }
 
     public void tick() {
-        if (Keybinds.PLAYER_SWAP.isPressed()) {
-            trySwapPlayer();
-            Keybinds.PLAYER_SWAP.setPressed(false);
+        if (this.worldClearPending) {
+            game.setWorld(null);
+            this.worldClearPending = false;
         }
 
         if (game.getWorld() != null) {
+            if (Keybinds.PLAYER_SWAP.isPressed()) {
+                trySwapPlayer();
+                Keybinds.PLAYER_SWAP.setPressed(false);
+            }
+
             Room currentRoom = game.getWorld().currentRoom;
             if (currentRoom.roomType.combat) {
                 AABB roomBounds = currentRoom.getBounds();
@@ -165,7 +172,7 @@ public class GameSession implements GameInstance {
     }
 
     public void onPlayerDead(Player deadPlayer) {
-        game.setWorld(null);
+        this.worldClearPending = true;
     }
 
     private void trySwapPlayer() {
@@ -197,16 +204,15 @@ public class GameSession implements GameInstance {
     private DungeonProperties createPropertiesForLevel(int level) {
         int rooms = 5 + level * 2;
         int tunnelLength = 10;
-
-        // Увеличение количества мобов перенесено сюда
         int minMobs = 4 + (level / 2);
         int maxMobs = minMobs + 2 + level;
 
+        boolean isBossLevel = (level % 2 == 0);
+
         Map<EnemyType, SpawnProperty> spawns = new HashMap<>();
-        // Лимит на один тип моба в комнате
         spawns.put(EnemyType.Slime, new SpawnProperty(3 + level, 1.0 + level * 0.2));
         spawns.put(EnemyType.Bat, new SpawnProperty(3 + level, 1.0 + level * 0.2));
 
-        return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, minMobs, maxMobs);
+        return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, minMobs, maxMobs, isBossLevel);
     }
 }

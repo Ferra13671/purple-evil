@@ -11,5 +11,6 @@ public record DungeonProperties(
         double branchChance,
         Map<EnemyType, SpawnProperty> spawnProperties,
         int minMobs,
-        int maxMobs
+        int maxMobs,
+        boolean isBossLevel
 ) { }

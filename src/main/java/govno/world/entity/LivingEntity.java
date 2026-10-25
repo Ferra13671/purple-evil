@@ -37,15 +37,19 @@ public class LivingEntity extends Entity {
     protected double invincibilityTimer = 0;
 
     @Getter
+    @Setter
+    private float speedMultiplier = 1.0f;
+
+    @Getter
     protected int poisonTimer = 0;
     protected int poisonTickTimer = 0;
     protected double poisonLevel = 0;
 
-    public LivingEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, double health, Vector2d handPos, Weapon weapon) {
+    public LivingEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, Vector2d handPos, Weapon weapon) {
         super(model, aabb);
 
         this.attributes = attributes;
-        this.health = Math.clamp(health, 0, getAttributeValue(EntityAttributes.MAX_HEALTH));
+        this.health = getAttributeValue(EntityAttributes.MAX_HEALTH);
         this.handPos = handPos;
         setWeapon(weapon);
     }
@@ -79,6 +83,8 @@ public class LivingEntity extends Entity {
         this.dying = true;
         this.velocity.set(0, 0);
         this.poisonTimer = 0;
+        this.phasing = false;
+        this.speedMultiplier = 1f;
 
         if (this.model != null && this.model.hasAnimation("death"))
             this.model.play("death", true);
@@ -98,6 +104,8 @@ public class LivingEntity extends Entity {
         this.invincibilityTimer = 0;
         this.velocity.set(0, 0);
         this.input.vector.set(0, 0);
+        this.phasing = false;
+        this.speedMultiplier = 1f;
 
         if (this.model != null)
             this.model.play("stay");
@@ -185,20 +193,33 @@ public class LivingEntity extends Entity {
             this.model.setDirection(this.facing);
     }
 
+    public void applyKnockback(Vector2dc sourcePos, double force) {
+        Vector2d dir = new Vector2d(this.position).sub(sourcePos);
+
+        if (dir.lengthSquared() < 0.001)
+            dir.set(1, 0);
+        else
+            dir.normalize();
+
+        // Просто добавляем вектор к текущей скорости
+        this.velocity.add(dir.mul(force));
+    }
+
     protected void tickMovement() {
         double friction = 0.3;
         double acceleration = getAttributeValue(EntityAttributes.ACCELERATION) * friction;
 
         updateFacing();
 
-        Vector2d inputSpeed = new Vector2d(this.input.vector).normalize().mul(getAttributeValue(EntityAttributes.SPEED));
+        Vector2d inputSpeed = new Vector2d(this.input.vector).normalize()
+                .mul(getAttributeValue(EntityAttributes.SPEED) * this.speedMultiplier);
         if (inputSpeed.lengthSquared() > 0.001f) {
             this.velocity.set(
                     this.velocity.x + (inputSpeed.x - this.velocity.x) * acceleration,
                     this.velocity.y + (inputSpeed.y - this.velocity.y) * acceleration
             );
 
-            if (this.model != null)
+            if (this.model != null && this.model.hasAnimation("go"))
                 this.model.play("go");
         } else {
             this.velocity.set(
