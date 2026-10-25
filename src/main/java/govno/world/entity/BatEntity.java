@@ -10,7 +10,7 @@ import org.joml.Vector2dc;
 
 import java.util.HashMap;
 
-public class BatEntity extends LivingEntity {
+public class BatEntity extends EnemyEntity {
 
     public BatEntity(Room room) {
         super(

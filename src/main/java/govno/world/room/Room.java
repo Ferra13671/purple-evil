@@ -114,6 +114,16 @@ public class Room {
             e.tick();
     }
 
+    public List<Block> getBlocks(BlockType blockType) {
+        List<Block> list = new ArrayList<>();
+
+        for (Block block : this.blocks)
+            if (block.blockType == blockType)
+                list.add(block);
+
+        return list;
+    }
+
     @Override
     public String toString() {
         return String.format("Room[%s, %s, %s]", centerX, centerY, blocks);

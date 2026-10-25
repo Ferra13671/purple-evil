@@ -10,7 +10,7 @@ import org.joml.Vector2dc;
 
 import java.util.HashMap;
 
-public class SlimeEntity extends LivingEntity {
+public class SlimeEntity extends EnemyEntity {
 
     public SlimeEntity(Room room) {
         super(

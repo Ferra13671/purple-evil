@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum RoomType {
-    Spawn("spawn"),
-    Exit("exit"),
-    Tunnel("tunnel"),
-    Combat("combat"),
-    Lobby("lobby");
+    Spawn(false, "spawn"),
+    Exit(false, "exit"),
+    Tunnel(false, "tunnel"),
+    Combat(true, "combat"),
+    Lobby(false, "lobby");
 
+    public boolean combat;
     public final String id;
 
     public static RoomType fromId(String id) {

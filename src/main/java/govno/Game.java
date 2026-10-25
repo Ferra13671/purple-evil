@@ -102,6 +102,9 @@ public class Game {
         this.window.setLoopCallback(() -> {
             this.ticker.onStartFrame();
             if (this.ticker.shouldTick()) {
+                if (this.gameSession != null)
+                    this.gameSession.tick();
+
                 if (this.world != null)
                     this.world.tick();
 

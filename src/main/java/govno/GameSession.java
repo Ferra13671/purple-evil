@@ -1,17 +1,25 @@
 package govno;
 
 import govno.model.EntityModel;
+import govno.utils.AABB;
 import govno.world.LobbyWorld;
+import govno.world.block.Block;
+import govno.world.block.BlockType;
 import govno.world.dungeon.DungeonProperties;
 import govno.world.dungeon.DungeonWorld;
 import govno.world.dungeon.spawn.EnemyType;
 import govno.world.dungeon.spawn.SpawnProperty;
+import govno.world.entity.EnemyEntity;
+import govno.world.entity.Entity;
 import govno.world.entity.Player;
+import govno.world.room.Room;
 import govno.world.weapon.MagicStaffWeapon;
 import govno.world.weapon.SwordWeapon;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GameSession implements GameInstance {
     private final Player knight = new Player(
@@ -47,6 +55,50 @@ public class GameSession implements GameInstance {
         this.player.setInvincibilityTimer(0);
 
         startLobby();
+    }
+
+    public void tick() {
+        if (game.getWorld() != null) {
+            Room currentRoom = game.getWorld().currentRoom;
+            if (currentRoom.roomType.combat) {
+                AABB roomBounds = currentRoom.getBounds();
+                List<Block> floorBlocks = currentRoom.getBlocks(BlockType.Floor);
+
+                if (!floorBlocks.isEmpty()) {
+                    for (Entity entity : currentRoom.entities) {
+                        if (entity instanceof EnemyEntity && !entity.removed) {
+                            if (!roomBounds.contains(entity.position.x, entity.position.y)) {
+                                Block targetBlock = floorBlocks.get(ThreadLocalRandom.current().nextInt(floorBlocks.size()));
+
+                                entity.position.set(targetBlock.x + 0.5, targetBlock.y + 0.5);
+                                entity.prevPosition.set(entity.position);
+                                entity.velocity.set(0, 0);
+                                entity.updateAABB();
+                            }
+                        }
+                    }
+                }
+
+                boolean playerInExit = false;
+                for (Block block : currentRoom.blocks) {
+                    if (block.blockType == BlockType.Exit || block.blockType == BlockType.ClosedExit) {
+                        AABB doorAABB = new AABB(block.x, block.y, block.x + 1, block.y + 1);
+                        if (player.worldAABB.getPenetrationVector(doorAABB) != null) {
+                            playerInExit = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (currentRoom.entities.stream().anyMatch(entity -> entity instanceof EnemyEntity && !entity.removed)) {
+                    if (!currentRoom.isClosed() && !playerInExit)
+                        currentRoom.closeRoom();
+                } else {
+                    if (currentRoom.isClosed())
+                        currentRoom.openRoom();
+                }
+            }
+        }
     }
 
     private DungeonProperties createPropertiesForLevel(int level) {
