@@ -32,4 +32,9 @@ public class Keybinds {
             .key(GLFW.GLFW_KEY_D)
             .build()
             .register();
+    public final KeyBind PLAYER_SWAP = KeyBind.builder()
+            .keyType(KeyType.Keyboard)
+            .key(GLFW.GLFW_KEY_R)
+            .build()
+            .register();
 }

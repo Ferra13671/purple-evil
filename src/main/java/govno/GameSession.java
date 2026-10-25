@@ -34,6 +34,9 @@ public class GameSession implements GameInstance {
     public Player player = this.knight;
     public int currentLevel = 1;
 
+    private static final long SWAP_COOLDOWN_MS = 5000;
+    private long lastSwapTime = 0;
+
     public void startGame() {
         startLobby();
     }
@@ -49,15 +52,15 @@ public class GameSession implements GameInstance {
 
     public void completeDungeon() {
         this.currentLevel++;
-
-        this.player = this.currentLevel % 2 == 0 ? this.mage : this.knight;
-        this.player.setHealth(this.player.getAttributeValue("max_health"));
-        this.player.setInvincibilityTimer(0);
-
         startLobby();
     }
 
     public void tick() {
+        if (Keybinds.PLAYER_SWAP.isPressed()) {
+            trySwapPlayer();
+            Keybinds.PLAYER_SWAP.setPressed(false);
+        }
+
         if (game.getWorld() != null) {
             Room currentRoom = game.getWorld().currentRoom;
             if (currentRoom.roomType.combat) {
@@ -99,6 +102,32 @@ public class GameSession implements GameInstance {
                 }
             }
         }
+    }
+
+    private void trySwapPlayer() {
+        long now = System.currentTimeMillis();
+
+        if (now - lastSwapTime < SWAP_COOLDOWN_MS)
+            return;
+
+        Player oldPlayer = this.player;
+
+        this.player = (this.player == knight) ? mage : knight;
+
+        this.player.position.set(oldPlayer.position);
+        this.player.prevPosition.set(oldPlayer.prevPosition);
+        this.player.velocity.set(oldPlayer.velocity);
+        this.player.updateAABB();
+
+        this.player.setInvincibilityTimer(0);
+
+        if (game.getWorld() != null && game.getWorld().currentRoom != null) {
+            Room room = game.getWorld().currentRoom;
+            room.entities.remove(oldPlayer);
+            room.entities.add(this.player);
+        }
+
+        this.lastSwapTime = now;
     }
 
     private DungeonProperties createPropertiesForLevel(int level) {
