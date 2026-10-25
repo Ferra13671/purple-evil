@@ -36,8 +36,24 @@ public class Player extends LivingEntity {
     }
 
     @Override
+    public void onDying() {
+        super.onDying();
+        game.getGameSession().onPlayerDying(this);
+        setWeapon(null);
+    }
+
+    @Override
+    public void onDead() {
+        super.onDead();
+        game.getGameSession().onPlayerDead(this);
+    }
+
+    @Override
     public void tick() {
         super.tick();
+
+        if (this.dying || this.removed)
+            return;
 
         int width = game.getWindow().getFramebufferWidth();
         int height = game.getWindow().getFramebufferHeight();

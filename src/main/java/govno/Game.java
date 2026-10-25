@@ -53,7 +53,8 @@ public class Game {
     @Getter
     private final SoundManager soundManager;
     @Getter
-    private final GameSession gameSession;
+    @Setter
+    private GameSession gameSession;
 
     public Game() {
         instance = this;
@@ -75,8 +76,6 @@ public class Game {
         Overtone.init();
         this.sounds = new Sounds();
         this.soundManager = new SoundManager();
-
-        this.gameSession = new GameSession();
 
         this.window.loop();
     }

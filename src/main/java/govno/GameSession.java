@@ -1,6 +1,7 @@
 package govno;
 
 import govno.model.EntityModel;
+import govno.screen.DeathScreen;
 import govno.utils.AABB;
 import govno.world.LobbyWorld;
 import govno.world.block.Block;
@@ -104,6 +105,14 @@ public class GameSession implements GameInstance {
                 }
             }
         }
+    }
+
+    public void onPlayerDying(Player deadPlayer) {
+        game.setScreen(new DeathScreen());
+    }
+
+    public void onPlayerDead(Player deadPlayer) {
+        game.setWorld(null);
     }
 
     private void trySwapPlayer() {

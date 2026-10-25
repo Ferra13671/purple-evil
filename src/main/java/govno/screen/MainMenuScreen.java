@@ -3,6 +3,7 @@ package govno.screen;
 import com.ferra13671.cometrenderer.plugins.glfw.CometGLFW;
 import com.ferra13671.overtone.Overtone;
 import com.ferra13671.overtone.SoundSource;
+import govno.GameSession;
 import govno.renderer.RectColors;
 import govno.renderer.batch.impl.ColoredRectBatch;
 import org.joml.Vector4f;
@@ -42,6 +43,7 @@ public class MainMenuScreen extends Screen {
 
         this.buttons.add(new Button(
                 "Play", halfWidth - (buttonWidth / 2), halfHeight - (buttonHeight / 2), buttonWidth, buttonHeight, () -> {
+                    game.setGameSession(new GameSession());
                     game.getGameSession().startGame();
                     game.setScreen(null);
                 }

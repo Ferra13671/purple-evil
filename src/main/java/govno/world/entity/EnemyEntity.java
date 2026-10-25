@@ -14,8 +14,8 @@ public class EnemyEntity extends LivingEntity {
     }
 
     @Override
-    public void onDeath() {
-        super.onDeath();
+    public void onDying() {
+        super.onDying();
 
         game.getGameSession().score += (int) getAttributeValue(EnemyAttributes.SCORE);
     }

@@ -29,6 +29,9 @@ public class LivingEntity extends Entity {
     protected final Vector2d handPos;
 
     @Getter
+    protected boolean dying = false;
+
+    @Getter
     @Setter
     protected double invincibilityTimer = 0;
 
@@ -58,7 +61,15 @@ public class LivingEntity extends Entity {
         return Utils.lerp(this.prevYaw, this.yaw, game.getTicker().getTickDelta());
     }
 
-    public void onDeath() {
+    public void onDying() {
+        this.dying = true;
+        this.velocity.set(0, 0);
+
+        if (this.model != null && this.model.hasAnimation("death"))
+            this.model.play("death", true);
+    }
+
+    public void onDead() {
         game.getWorld().removeEntity(this);
     }
 
@@ -69,6 +80,15 @@ public class LivingEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+
+        if (this.dying) {
+            if (this.model == null || !this.model.hasAnimation("death") || this.model.isFinished()) {
+                if (!this.removed)
+                    onDead();
+            }
+
+            return;
+        }
 
         if (this.weapon != null)
             this.weapon.tick(this);
@@ -88,8 +108,8 @@ public class LivingEntity extends Entity {
             this.model.tick(dt * animSpeed);
         }
 
-        if (this.health <= 0)
-            onDeath();
+        if (this.health <= 0 && !this.dying)
+            onDying();
 
         if (this.health < getAttributeValue(EntityAttributes.MAX_HEALTH))
             this.health = Math.min(this.health + getAttributeValue(EntityAttributes.REGENERATION), getAttributeValue(EntityAttributes.MAX_HEALTH));
@@ -106,10 +126,10 @@ public class LivingEntity extends Entity {
     }
 
     public void damage(double damage) {
-        if (isInvincible())
+        if (isInvincible() || this.dying)
             return;
-        this.health -= damage;
 
+        this.health -= damage;
         this.invincibilityTimer = getAttributeValue(EntityAttributes.INVINCIBILITY_TIME);
     }
 
@@ -159,6 +179,9 @@ public class LivingEntity extends Entity {
 
     @Override
     public void onEntityCollision(Entity other, Vector2dc out) {
+        if (this.dying)
+            return;
+
         if (other instanceof LivingEntity && !(other instanceof BatEntity))
             onCollision(new Vector2d(out).mul(0.5f));
     }

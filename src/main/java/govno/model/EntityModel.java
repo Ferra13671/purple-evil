@@ -54,6 +54,10 @@ public class EntityModel {
         play("stay");
     }
 
+    public boolean hasAnimation(String name) {
+        return this.animations.get(this.direction).containsKey(name);
+    }
+
     public void tick(float dt) {
         Animation anim = getCurrentAnimation();
         if (anim == null || this.finished) {

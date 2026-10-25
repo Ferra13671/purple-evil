@@ -81,10 +81,11 @@ public class WorldRenderer implements GameInstance {
         AABB aabb = new AABB(entity.modelAABB).move(Utils.lerp(entity.prevPosition, entity.position, game.getTicker().getTickDelta()));
         Sprite sprite = entity.model.getCurrentSprite();
 
+        double xLength = aabb.getXLength();
         new BasicTextureBatch()
                 .texture(game.getTextures().entityAtlas)
                 .rectSized(
-                        (float) aabb.getMinX(), (float) aabb.getMinY(), (float) aabb.getXLength() * sprite.width(), (float) aabb.getYLength() * sprite.height(),
+                        (float) (aabb.getMinX() - (xLength - (xLength * sprite.width())) / 2), (float) aabb.getMinY(), (float) aabb.getXLength() * sprite.width(), (float) aabb.getYLength() * sprite.height(),
                         game.getTextures().entityAtlas.getBorder(
                                 game.getTextures().getEntityTexture(sprite.textureId())
                         )

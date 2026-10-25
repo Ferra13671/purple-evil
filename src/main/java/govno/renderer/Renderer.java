@@ -19,13 +19,22 @@ public class Renderer implements GameInstance {
     protected final WorldRenderer worldRenderer = new WorldRenderer(this);
     protected final GuiRenderer guiRenderer = new GuiRenderer(this);
 
+    public Font javaFont;
     public TTFFont font;
+    public TTFFont bigFont;
     {
         try {
+            this.javaFont = Font.createFont(Font.TRUETYPE_FONT, GuiRenderer.class.getClassLoader().getResourceAsStream("assets/Classic-Console-Neue-Regular.ttf"));
             this.font = new TTFFont(
                     FontInfo.builder()
-                            .font(Font.createFont(Font.TRUETYPE_FONT, GuiRenderer.class.getClassLoader().getResourceAsStream("assets/Classic-Console-Neue-Regular.ttf")))
+                            .font(javaFont)
                             .fontSize(32)
+                            .build()
+            );
+            this.bigFont = new TTFFont(
+                    FontInfo.builder()
+                            .font(javaFont)
+                            .fontSize(64)
                             .build()
             );
         } catch (Exception e) {
