@@ -1,12 +1,12 @@
 package govno.world.entity;
 
+import govno.Keybinds;
 import govno.model.EntityModel;
 import govno.utils.AABB;
 import govno.world.attribute.Attributes;
 import govno.world.entity.input.PlayerInput;
 import govno.world.weapon.Weapon;
 import org.joml.Vector2d;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -49,7 +49,7 @@ public class Player extends LivingEntity {
         double dy = centerY - mouseY;
         this.yaw = Math.toDegrees(Math.atan2(dy, dx));
 
-        if (game.getWindow().isPressedMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
+        if (Keybinds.ATTACK.isPressed()) {
             if (!this.weapon.isUsingWeapon())
                 this.weapon.startUse(this);
         } else if (this.weapon.isUsingWeapon()) {

@@ -1,16 +1,16 @@
 package govno.world.entity.input;
 
-import org.lwjgl.glfw.GLFW;
+import govno.Keybinds;
 
 public class PlayerInput extends Input {
 
     public void tick() {
         double xDelta = 0, yDelta = 0;
 
-        xDelta += game.getWindow().isPressedKey(GLFW.GLFW_KEY_D) ? 1 : 0;
-        xDelta -= game.getWindow().isPressedKey(GLFW.GLFW_KEY_A) ? 1 : 0;
-        yDelta += game.getWindow().isPressedKey(GLFW.GLFW_KEY_W) ? 1 : 0;
-        yDelta -= game.getWindow().isPressedKey(GLFW.GLFW_KEY_S) ? 1 : 0;
+        xDelta += Keybinds.RIGHT.isPressed() ? 1 : 0;
+        xDelta -= Keybinds.LEFT.isPressed() ? 1 : 0;
+        yDelta += Keybinds.FORWARD.isPressed() ? 1 : 0;
+        yDelta -= Keybinds.BACK.isPressed() ? 1 : 0;
 
         this.vector.set(
                 xDelta,

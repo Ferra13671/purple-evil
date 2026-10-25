@@ -13,6 +13,7 @@ import govno.renderer.ShaderLibraries;
 import govno.renderer.Textures;
 import govno.screen.MainMenuScreen;
 import govno.screen.Screen;
+import govno.utils.KeyBind;
 import govno.utils.Ticker;
 import govno.world.World;
 import govno.world.room.RoomTemplates;
@@ -111,9 +112,10 @@ public class Game {
                 Overtone.tick();
                 this.soundManager.tick();
 
-                if (this.screen != null)
+                if (this.screen != null) {
                     this.screen.tick();
-                else if (this.world == null)
+                    KeyBind.resetAll();
+                } else if (this.world == null)
                     setScreen(new MainMenuScreen());
 
                 this.ticker.reset();
