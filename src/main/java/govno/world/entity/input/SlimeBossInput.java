@@ -103,12 +103,27 @@ public class SlimeBossInput extends Input {
         timer--;
         shootCooldown--;
 
-        if (moveDir.lengthSquared() < 0.001 || random.nextInt(60) == 0) {
-            int dir = random.nextInt(8);
-            double angle = dir * (Math.PI / 4);
-            moveDir.set(Math.cos(angle), Math.sin(angle));
+        Vector2d playerPos = game.getGameSession().player.position;
+        Vector2d toPlayer = new Vector2d(playerPos).sub(owner.position);
+        double distanceToPlayer = toPlayer.length();
+
+        double maxAllowedDistance = 15.0;
+
+        if (distanceToPlayer > maxAllowedDistance) {
+            // Если босс слишком далеко, он начинает преследовать игрока
+            if (toPlayer.lengthSquared() > 0.01) {
+                moveDir.set(toPlayer).normalize();
+            }
+        } else {
+            // Если босс находится в пределах допустимой дистанции, он летает хаотично
+            if (moveDir.lengthSquared() < 0.001 || random.nextInt(60) == 0) {
+                int dir = random.nextInt(8);
+                double angle = dir * (Math.PI / 4);
+                moveDir.set(Math.cos(angle), Math.sin(angle));
+            }
         }
 
+        // Отталкивание от стен комнаты
         double padding = 2.5;
         double nextX = owner.position.x + moveDir.x;
         double nextY = owner.position.y + moveDir.y;

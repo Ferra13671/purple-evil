@@ -6,14 +6,25 @@ import govno.utils.AABB;
 import govno.world.attribute.Attributes;
 import govno.world.entity.input.PlayerInput;
 import govno.world.weapon.Weapon;
+import lombok.Getter;
 import org.joml.Vector2d;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Player extends LivingEntity {
 
     private double stepTimer = 0;
     private final Random random = new Random();
+
+    @Getter
+    private int dashCooldown = 0;
+    @Getter
+    private int ticksSinceDash = 0;
+    @Getter
+    private final List<Vector2d> dashTrail = new ArrayList<>();
+    private static final int DASH_DURATION = 20;
 
     public Player(EntityModel model, Weapon weapon) {
         super(
@@ -46,6 +57,22 @@ public class Player extends LivingEntity {
 
         if (this.dying || this.removed)
             return;
+
+        if (this.dashCooldown > 0)
+            this.dashCooldown--;
+        this.ticksSinceDash++;
+
+        if (Keybinds.DASH.isPressed() && this.dashCooldown <= 0) {
+            startDash();
+            Keybinds.DASH.setPressed(false);
+        }
+
+        if (this.ticksSinceDash < DASH_DURATION) {
+            this.dashTrail.add(new Vector2d(this.position));
+            if (this.dashTrail.size() > 6)
+                this.dashTrail.removeFirst();
+        } else if (!this.dashTrail.isEmpty())
+            this.dashTrail.removeFirst();
 
         int width = game.getWindow().getFramebufferWidth();
         int height = game.getWindow().getFramebufferHeight();
@@ -83,5 +110,18 @@ public class Player extends LivingEntity {
                 this.stepTimer = newStepTimer;
             }
         }
+    }
+
+    private void startDash() {
+        this.dashCooldown = (int) getAttributeValue(PlayerAttributes.DASH_DELAY);
+        this.ticksSinceDash = 0;
+
+        Vector2d dir = new Vector2d(this.input.vector);
+        if (dir.lengthSquared() < 0.1)
+            dir.set(this.facing.dx(), this.facing.dy());
+        dir.normalize();
+
+        double dashSpeed = getAttributeValue(PlayerAttributes.DASH_SPEED);
+        this.velocity.set(dir.mul(dashSpeed));
     }
 }

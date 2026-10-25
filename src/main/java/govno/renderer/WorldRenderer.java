@@ -8,17 +8,17 @@ import govno.renderer.batch.impl.BasicTextureBatch;
 import govno.renderer.batch.impl.ColoredRectBatch;
 import govno.utils.AABB;
 import govno.utils.Utils;
-import govno.world.entity.EnemyEntity;
-import govno.world.entity.Entity;
-import govno.world.entity.EntityAttributes;
-import govno.world.entity.LivingEntity;
+import govno.world.entity.*;
 import govno.world.room.Room;
 import govno.world.block.Block;
 import govno.world.weapon.SwordWeapon;
 import govno.world.weapon.Weapon;
 import org.joml.Matrix4f;
+import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
+
+import java.util.List;
 
 public class WorldRenderer implements GameInstance {
     public static final int MAX_BLOCKS_IN_WIDTH = 30;
@@ -69,7 +69,43 @@ public class WorldRenderer implements GameInstance {
                 renderEntity(entity);
         }
 
-        renderEntity(game.getGameSession().player);
+        Player player = game.getGameSession().player;
+        renderDashTrail(player);
+        renderEntity(player);
+    }
+
+    private void renderDashTrail(Player player) {
+        List<Vector2d> trail = player.getDashTrail();
+        if (trail.isEmpty()) return;
+
+        Sprite sprite = player.model.getCurrentSprite();
+        if (sprite == null) return;
+
+        for (int i = 0; i < trail.size(); i++) {
+            Vector2d pos = trail.get(i);
+
+            // Чем ближе к концу списка (новее), тем более непрозрачный
+            float alpha = (float) (i + 1) / trail.size() * 0.4f; // Максимальная прозрачность 40%
+            Vector4f color = new Vector4f(1f, 0.8f, 1f, alpha); // Слегка фиолетовый оттенок для стиля
+
+            AABB aabb = new AABB(player.modelAABB).move(pos);
+            double xLength = aabb.getXLength();
+
+            new BasicTextureBatch(() -> CometRenderer.getShaderColor().setColor(color))
+                    .texture(game.getTextures().entityAtlas)
+                    .rectSized(
+                            (float) (aabb.getMinX() - ((xLength * sprite.width()) - xLength) / 2),
+                            (float) aabb.getMinY(),
+                            (float) aabb.getXLength() * sprite.width(),
+                            (float) aabb.getYLength() * sprite.height(),
+                            game.getTextures().entityAtlas.getBorder(
+                                    game.getTextures().getEntityTexture(sprite.textureId())
+                            )
+                    )
+                    .build()
+                    .tryDraw()
+                    .close();
+        }
     }
 
     private void renderEntity(Entity entity) {

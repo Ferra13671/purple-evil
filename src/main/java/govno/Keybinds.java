@@ -37,4 +37,9 @@ public class Keybinds {
             .key(GLFW.GLFW_KEY_R)
             .build()
             .register();
+    public final KeyBind DASH = KeyBind.builder()
+            .keyType(KeyType.Keyboard)
+            .key(GLFW.GLFW_KEY_F)
+            .build()
+            .register();
 }
