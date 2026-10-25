@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class MagicStaffWeapon extends Weapon {
 
     public MagicStaffWeapon() {
-        super("magic-staff", 2f, 800, new Attributes(new HashMap<>()), new HashMap<>());
+        super("magic-staff", 1.5f, 800, new Attributes(new HashMap<>()), new HashMap<>());
     }
 
     @Override

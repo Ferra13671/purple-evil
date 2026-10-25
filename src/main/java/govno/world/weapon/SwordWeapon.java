@@ -18,7 +18,7 @@ public class SwordWeapon extends Weapon {
     private boolean hasHit = false;
 
     public SwordWeapon() {
-        super("sword", 1.8f, 500, new Attributes(new HashMap<>()), new HashMap<>());
+        super("sword", 1.3f, 500, new Attributes(new HashMap<>()), new HashMap<>());
         this.damage = 20;
         this.attackRange = 2.0;
         this.attackArc = 120;
