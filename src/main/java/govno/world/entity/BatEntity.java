@@ -23,6 +23,7 @@ public class BatEntity extends EnemyEntity {
                     put(EntityAttributes.SPEED, 0.6);
                     put(EntityAttributes.INVINCIBILITY_TIME, 0d);
                     put(EnemyAttributes.DAMAGE, 15d);
+                    put(EnemyAttributes.SCORE, 15d);
                 }}),
                 30d,
                 new Vector2d(0, 0),

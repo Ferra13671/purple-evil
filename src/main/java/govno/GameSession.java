@@ -33,11 +33,13 @@ public class GameSession implements GameInstance {
 
     public Player player = this.knight;
     public int currentLevel = 1;
+    public int score = 0;
 
     private static final long SWAP_COOLDOWN_MS = 5000;
     private long lastSwapTime = 0;
 
     public void startGame() {
+        this.score = 0;
         startLobby();
     }
 

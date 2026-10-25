@@ -23,6 +23,7 @@ public class SlimeEntity extends EnemyEntity {
                     put(EntityAttributes.SPEED, 0.05);
                     put(EntityAttributes.INVINCIBILITY_TIME, 0d);
                     put(EnemyAttributes.DAMAGE, 25d);
+                    put(EnemyAttributes.SCORE, 10d);
                 }}),
                 60d,
                 new Vector2d(0, 0),
