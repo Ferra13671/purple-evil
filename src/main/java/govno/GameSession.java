@@ -172,13 +172,17 @@ public class GameSession implements GameInstance {
 
     private DungeonProperties createPropertiesForLevel(int level) {
         int rooms = 5 + level * 2;
-        int maxMobs = 2 + level;
         int tunnelLength = 10;
 
+        // Увеличение количества мобов перенесено сюда
+        int minMobs = 4 + (level / 2);
+        int maxMobs = minMobs + 2 + level;
+
         Map<EnemyType, SpawnProperty> spawns = new HashMap<>();
+        // Лимит на один тип моба в комнате
         spawns.put(EnemyType.Slime, new SpawnProperty(3 + level, 1.0 + level * 0.2));
         spawns.put(EnemyType.Bat, new SpawnProperty(3 + level, 1.0 + level * 0.2));
 
-        return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, maxMobs);
+        return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, minMobs, maxMobs);
     }
 }

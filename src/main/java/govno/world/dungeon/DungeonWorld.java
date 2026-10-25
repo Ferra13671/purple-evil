@@ -53,11 +53,6 @@ public class DungeonWorld extends World {
 
         if (spawnProps == null || spawnProps.isEmpty()) return;
 
-        // Вычисляем общий вес популярности для взвешенного рандома
-        double totalPopularity = spawnProps.values().stream()
-                .mapToDouble(SpawnProperty::popularity)
-                .sum();
-
         for (Room room : this.rooms) {
             if (room.roomType != RoomType.Combat) continue;
 
@@ -70,24 +65,35 @@ public class DungeonWorld extends World {
 
             if (floorBlocks.isEmpty()) continue;
 
-            // Спавним от 1 до 4 мобов на комнату (можно тоже вынести в проперти, если нужно)
-            int enemiesToSpawn = 1 + random.nextInt(this.properties.maxMobsInRoom());
+            // Берем диапазон из DungeonProperties
+            int min = this.properties.minMobs();
+            int max = this.properties.maxMobs();
+
+            // Вычисляем случайное число мобов в заданном диапазоне
+            int enemiesToSpawn = min + random.nextInt(Math.max(1, max - min + 1));
+
             Map<EnemyType, Integer> spawnedCounts = new HashMap<>();
 
             for (int i = 0; i < enemiesToSpawn && !floorBlocks.isEmpty(); i++) {
-                // Выбираем тип врага на основе веса (popularity)
-                EnemyType selectedType = pickWeightedEnemy(spawnProps, totalPopularity, random);
-                if (selectedType == null) continue;
+                // Собираем только тех врагов, чей лимит в комнате еще не достигнут
+                Map<EnemyType, SpawnProperty> availableTypes = new HashMap<>();
+                double currentTotalPopularity = 0;
 
-                SpawnProperty prop = spawnProps.get(selectedType);
-                int currentCount = spawnedCounts.getOrDefault(selectedType, 0);
-
-                // Если превысили лимит для этого типа в комнате — пропускаем итерацию
-                if (currentCount >= prop.maxCount()) {
-                    continue;
+                for (Map.Entry<EnemyType, SpawnProperty> entry : spawnProps.entrySet()) {
+                    int currentCount = spawnedCounts.getOrDefault(entry.getKey(), 0);
+                    if (currentCount < entry.getValue().maxCount()) {
+                        availableTypes.put(entry.getKey(), entry.getValue());
+                        currentTotalPopularity += entry.getValue().popularity();
+                    }
                 }
 
-                // Спавним
+                if (availableTypes.isEmpty() || currentTotalPopularity <= 0) {
+                    break;
+                }
+
+                EnemyType selectedType = pickWeightedEnemy(availableTypes, currentTotalPopularity, random);
+                if (selectedType == null) break;
+
                 Block spawnBlock = floorBlocks.remove(random.nextInt(floorBlocks.size()));
                 LivingEntity enemy = selectedType.enemyCreator.apply(room);
 
@@ -96,6 +102,8 @@ public class DungeonWorld extends World {
                 enemy.updateAABB();
 
                 room.entities.add(enemy);
+
+                int currentCount = spawnedCounts.getOrDefault(selectedType, 0);
                 spawnedCounts.put(selectedType, currentCount + 1);
             }
         }
@@ -113,6 +121,7 @@ public class DungeonWorld extends World {
                 return entry.getKey();
             }
         }
-        return null;
+
+        return props.keySet().iterator().next();
     }
 }

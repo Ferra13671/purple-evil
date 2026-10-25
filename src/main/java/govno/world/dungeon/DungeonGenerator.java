@@ -106,7 +106,9 @@ public class DungeonGenerator {
 
             List<RoomTemplate> templateCandidates = new ArrayList<>();
             for (RoomTemplate t : templates.templates.values()) {
-                if (t.roomType() == RoomType.Exit) continue; // Не ставим выход случайно
+                if (t.roomType() == RoomType.Exit || t.roomType() == RoomType.Spawn || t.roomType() == RoomType.Lobby)
+                    continue;
+
                 for (RoomExit e : t.exits())
                     if (e.side() == needed) { templateCandidates.add(t); break; }
             }
