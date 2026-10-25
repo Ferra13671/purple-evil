@@ -6,5 +6,9 @@
   'portal',
   'bat',
   'slime-boss',
-  'slime-boss-orb'
+  'slime-boss-orb',
+  'default-skeleton',
+  'knight-skeleton',
+  'killer-skeleton',
+  'skeleton-orb'
 ]

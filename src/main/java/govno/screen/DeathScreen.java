@@ -50,6 +50,7 @@ public class DeathScreen extends Screen {
         this.buttons.add(new Button(
                 "Main Menu",
                 halfWidth - (buttonWidth / 2), halfHeight + 20 + (buttonHeight + spacing) * 2, buttonWidth, buttonHeight, () -> {
+                    game.setWorld(null);
                     game.setGameSession(null);
                     game.setScreen(new MainMenuScreen());
                 }

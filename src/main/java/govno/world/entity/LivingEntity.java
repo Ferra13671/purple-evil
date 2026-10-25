@@ -121,6 +121,8 @@ public class LivingEntity extends Entity {
                     onDead();
             }
 
+            this.velocity.set(0);
+
             return;
         }
 

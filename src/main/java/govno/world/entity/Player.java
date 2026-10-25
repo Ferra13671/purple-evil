@@ -21,7 +21,7 @@ public class Player extends LivingEntity {
     @Getter
     private int dashCooldown = 0;
     @Getter
-    private int ticksSinceDash = 0;
+    private int ticksSinceDash = 1000;
     @Getter
     private final List<Vector2d> dashTrail = new ArrayList<>();
     private static final int DASH_DURATION = 20;

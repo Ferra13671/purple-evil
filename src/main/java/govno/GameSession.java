@@ -36,7 +36,7 @@ public class GameSession implements GameInstance {
     );
 
     public Player player = this.knight;
-    public int currentLevel = 1;
+    public int currentLevel = 3;
     public int score = 0;
 
     private Checkpoint checkpoint = null;
@@ -210,8 +210,18 @@ public class GameSession implements GameInstance {
         boolean isBossLevel = (level % 2 == 0);
 
         Map<EnemyType, SpawnProperty> spawns = new HashMap<>();
-        spawns.put(EnemyType.Slime, new SpawnProperty(3 + level, 1.0 + level * 0.2));
-        spawns.put(EnemyType.Bat, new SpawnProperty(3 + level, 1.0 + level * 0.2));
+
+        if (level <= 2) {
+            spawns.put(EnemyType.Slime, new SpawnProperty(3 + level, 1.0));
+            spawns.put(EnemyType.Bat, new SpawnProperty(3 + level, 1.0));
+        } else {
+            spawns.put(EnemyType.DefaultSkeleton, new SpawnProperty(2 + (level / 2), 1.5));
+            spawns.put(EnemyType.KillerSkeleton, new SpawnProperty(1 + (level / 2), 1.0));
+            spawns.put(EnemyType.KnightSkeleton, new SpawnProperty(1, 0.4));
+
+            spawns.put(EnemyType.Slime, new SpawnProperty(1, 0.1));
+            spawns.put(EnemyType.Bat, new SpawnProperty(1, 0.1));
+        }
 
         return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, minMobs, maxMobs, isBossLevel);
     }

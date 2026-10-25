@@ -2,5 +2,8 @@
   'player',
   'slime',
   'bat',
-  'slime-boss'
+  'slime-boss',
+  'default-skeleton',
+  'killer-skeleton',
+  'knight-skeleton'
 ]

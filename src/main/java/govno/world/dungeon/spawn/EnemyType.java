@@ -1,8 +1,6 @@
 package govno.world.dungeon.spawn;
 
-import govno.world.entity.BatEntity;
-import govno.world.entity.LivingEntity;
-import govno.world.entity.SlimeEntity;
+import govno.world.entity.*;
 import govno.world.room.Room;
 import lombok.AllArgsConstructor;
 
@@ -11,7 +9,10 @@ import java.util.function.Function;
 @AllArgsConstructor
 public enum EnemyType {
     Slime(SlimeEntity::new),
-    Bat(BatEntity::new);
+    Bat(BatEntity::new),
+    DefaultSkeleton(DefaultSkeletonEntity::new),
+    KillerSkeleton(KillerSkeletonEntity::new),
+    KnightSkeleton(KnightSkeletonEntity::new);
 
-    public Function<Room, LivingEntity> enemyCreator;
+    public final Function<Room, LivingEntity> enemyCreator;
 }
