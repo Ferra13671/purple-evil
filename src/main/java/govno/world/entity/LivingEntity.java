@@ -36,6 +36,11 @@ public class LivingEntity extends Entity {
     @Setter
     protected double invincibilityTimer = 0;
 
+    @Getter
+    protected int poisonTimer = 0;
+    protected int poisonTickTimer = 0;
+    protected double poisonDamage = 0;
+
     public LivingEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, double health, Vector2d handPos, Weapon weapon) {
         super(model, aabb);
 
@@ -51,7 +56,7 @@ public class LivingEntity extends Entity {
 
     public void setWeapon(Weapon weapon) {
         if (this.weapon != null)
-            this.weapon.getEntityModifiers().forEach((attribute, modifier) -> this.attributes.removeModifier(attribute, modifier.id()));
+            this.weapon.getEntityModifiers().forEach(this.attributes::removeModifier);
 
         this.weapon = weapon;
         if (this.weapon != null)
@@ -62,9 +67,18 @@ public class LivingEntity extends Entity {
         return Utils.lerp(this.prevYaw, this.yaw, game.getTicker().getTickDelta());
     }
 
+    public void applyPoison(double damagePerTick, int durationTicks) {
+        this.poisonDamage = damagePerTick;
+        this.poisonTimer = durationTicks;
+
+        if (this.poisonTickTimer <= 0)
+            this.poisonTickTimer = 20;
+    }
+
     public void onDying() {
         this.dying = true;
         this.velocity.set(0, 0);
+        this.poisonTimer = 0;
 
         if (this.model != null && this.model.hasAnimation("death"))
             this.model.play("death", true);
@@ -118,6 +132,16 @@ public class LivingEntity extends Entity {
             }
 
             this.model.tick(dt * animSpeed);
+        }
+
+        if (this.poisonTimer > 0) {
+            this.poisonTimer--;
+            this.poisonTickTimer--;
+
+            if (this.poisonTickTimer <= 0) {
+                this.health -= this.poisonDamage;
+                this.poisonTickTimer = 20;
+            }
         }
 
         if (this.health <= 0 && !this.dying) {

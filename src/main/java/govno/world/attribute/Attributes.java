@@ -3,6 +3,7 @@ package govno.world.attribute;
 
 import govno.world.attribute.modifier.AttributeInstance;
 import govno.world.attribute.modifier.AttributeModifier;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Attributes {
+    @Getter
     private final Map<String, AttributeInstance> attributes;
 
     public Attributes(Map<String, Double> baseValues) {
@@ -29,8 +31,8 @@ public class Attributes {
         get(attribute).addModifier(modifier);
     }
 
-    public void removeModifier(String attribute, String id) {
-        get(attribute).removeModifier(id);
+    public void removeModifier(String attribute, AttributeModifier modifier) {
+        get(attribute).removeModifier(modifier);
     }
 
     public void clearAllModifiers() {

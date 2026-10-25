@@ -4,6 +4,8 @@ import govno.model.EntityModel;
 import govno.screen.DeathScreen;
 import govno.utils.AABB;
 import govno.world.LobbyWorld;
+import govno.world.attribute.Attributes;
+import govno.world.attribute.modifier.AttributeModifier;
 import govno.world.block.Block;
 import govno.world.block.BlockType;
 import govno.world.dungeon.DungeonProperties;
@@ -14,6 +16,7 @@ import govno.world.entity.EnemyEntity;
 import govno.world.entity.Entity;
 import govno.world.entity.Player;
 import govno.world.room.Room;
+import govno.world.upgrades.Upgrade;
 import govno.world.weapon.MagicStaffWeapon;
 import govno.world.weapon.SwordWeapon;
 
@@ -77,6 +80,27 @@ public class GameSession implements GameInstance {
 
             this.player = this.knight;
         }
+    }
+
+    public void applyUpgrade(Upgrade upgrade) {
+        switch (upgrade.type()) {
+            case Player -> applyUpgrade(upgrade, this.player.getAttributes());
+            case Weapon -> {
+                if (this.player.getWeapon() != null)
+                    applyUpgrade(upgrade, this.player.getWeapon().getAttributes());
+            }
+        }
+    }
+
+    private void applyUpgrade(Upgrade upgrade, Attributes attributes) {
+        if (attributes == null) return;
+
+        upgrade.modifiers().forEach((attributeName, modifier) -> {
+            if (attributes.get(attributeName) != null)
+                attributes.addModifier(attributeName, new AttributeModifier(modifier));
+            else
+                System.err.printf("Attribute '%s' not found!%n", attributeName);
+        });
     }
 
     private void saveCheckpoint() {

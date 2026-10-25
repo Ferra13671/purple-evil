@@ -3,11 +3,18 @@ package govno.world.entity;
 import govno.model.EntityModel;
 import govno.utils.AABB;
 import govno.world.attribute.Attributes;
+import govno.world.upgrades.Upgrade;
 import govno.world.weapon.Weapon;
 import lombok.NonNull;
 import org.joml.Vector2d;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 public class EnemyEntity extends LivingEntity {
+    private static final float UPGRADE_DROP_CHANCE = 0.1f;
 
     public EnemyEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, double health, Vector2d handPos, Weapon weapon) {
         super(model, aabb, attributes, health, handPos, weapon);
@@ -18,5 +25,22 @@ public class EnemyEntity extends LivingEntity {
         super.onDying();
 
         game.getGameSession().score += (int) getAttributeValue(EnemyAttributes.SCORE);
+
+        if (ThreadLocalRandom.current().nextFloat() < UPGRADE_DROP_CHANCE) {
+            Collection<Upgrade> allUpgrades = game.getUpgrades().upgrades.values();
+
+            if (!allUpgrades.isEmpty()) {
+                List<Upgrade> upgradeList = new ArrayList<>(allUpgrades);
+                Upgrade randomUpgrade = upgradeList.get(ThreadLocalRandom.current().nextInt(upgradeList.size()));
+
+                UpgradeEntity upgradeEntity = new UpgradeEntity(randomUpgrade);
+
+                upgradeEntity.position.set(this.position);
+                upgradeEntity.prevPosition.set(this.position);
+                upgradeEntity.updateAABB();
+
+                game.getWorld().currentRoom.entities.add(upgradeEntity);
+            }
+        }
     }
 }

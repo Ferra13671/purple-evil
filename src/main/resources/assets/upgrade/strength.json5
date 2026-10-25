@@ -1,0 +1,13 @@
+{
+  price: 40,
+  type: 'weapon',
+  spawning: true,
+
+  modifiers: {
+    damage: {
+      amount: 0.2,
+
+      operation: 'multiply_total'
+    }
+  }
+}

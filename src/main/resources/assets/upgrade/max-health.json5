@@ -1,0 +1,13 @@
+{
+  price: 30,
+  type: 'player',
+  spawning: true,
+
+  modifiers: {
+    max_health: {
+      amount: 25,
+
+      operation: 'add'
+    }
+  }
+}

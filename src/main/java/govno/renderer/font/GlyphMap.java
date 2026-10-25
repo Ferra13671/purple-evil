@@ -14,7 +14,7 @@ import java.io.Closeable;
 import java.util.HashMap;
 
 public class GlyphMap implements Closeable {
-    private static final int CHARS_STEP = 2;
+    private static final int CHARS_STEP = 10;
 
     @Getter
     private final TTFFont font;

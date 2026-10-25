@@ -10,16 +10,18 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SwordWeapon extends Weapon {
-
-    private final double damage;
     private final double attackRange;
     private final double attackArc;
 
     private boolean hasHit = false;
 
     public SwordWeapon() {
-        super("sword", 1.3f, 500, new Attributes(new HashMap<>()), new HashMap<>());
-        this.damage = 20;
+        super("sword", 1.3f, new Attributes(new HashMap<>(){{
+            put(WeaponAttributes.DAMAGE, 20d);
+            put(WeaponAttributes.ATTACK_SPEED, 1d);
+            put(WeaponAttributes.COOLDOWN_MS, 500d);
+            put(WeaponAttributes.POISONING, 0d);
+        }}), new HashMap<>());
         this.attackRange = 2.0;
         this.attackArc = 120;
     }
@@ -78,7 +80,11 @@ public class SwordWeapon extends Weapon {
 
                 if (angleDiff <= attackArc / 2) {
                     game.getSoundManager().playRawSound(game.getSounds().SWING_HIT, 0.3f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
-                    livingTarget.damage(damage);
+                    livingTarget.damage(getAttributeValue(WeaponAttributes.DAMAGE));
+
+                    double poison = getAttributeValue(WeaponAttributes.POISONING);
+                    if (poison > 0)
+                        livingTarget.applyPoison(poison, 60);
 
                     Vector2d knockback = new Vector2d(dx, dy).normalize().mul(0.3);
                     livingTarget.velocity.add(knockback);

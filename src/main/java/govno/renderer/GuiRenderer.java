@@ -7,6 +7,7 @@ import govno.renderer.batch.impl.text.RenderText;
 import govno.renderer.batch.impl.text.TextBatch;
 import govno.utils.AABB;
 import govno.world.World;
+import govno.world.entity.Player;
 import govno.world.room.Room;
 import org.joml.Vector4f;
 
@@ -51,7 +52,35 @@ public class GuiRenderer implements GameInstance {
                 .tryDraw()
                 .close();
 
+        renderAttributes(framebuffer);
+
         renderMinimap(framebuffer);
+    }
+
+    private void renderAttributes(Framebuffer framebuffer) {
+        StringBuilder builder = new StringBuilder();
+
+        Player player = game.getGameSession().player;
+
+        builder.append("Player attributes:\n");
+        player.getAttributes().getAttributes().forEach((name, instance) ->
+            builder.append(String.format("%s: %s\n", name, instance.getCurrentValue()))
+        );
+        builder.append("\nWeapon attributes:\n");
+        if (player.getWeapon() != null)
+            player.getWeapon().getAttributes().getAttributes().forEach((name, instance) ->
+                    builder.append(String.format("%s: %s\n", name, instance.getCurrentValue()))
+            );
+
+        new TextBatch(this.renderer.smallFont)
+                .text(new RenderText(
+                        builder.toString(),
+                        10,
+                        framebuffer.getHeight() / 3f
+                ).withShadow(true))
+                .build()
+                .tryDraw()
+                .close();
     }
 
     private void renderMinimap(Framebuffer framebuffer) {

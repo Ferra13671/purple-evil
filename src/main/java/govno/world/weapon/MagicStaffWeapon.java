@@ -10,7 +10,12 @@ import java.util.HashMap;
 public class MagicStaffWeapon extends Weapon {
 
     public MagicStaffWeapon() {
-        super("magic-staff", 1.5f, 800, new Attributes(new HashMap<>()), new HashMap<>());
+        super("magic-staff", 1.5f, new Attributes(new HashMap<>(){{
+            put(WeaponAttributes.DAMAGE, 20d);
+            put(WeaponAttributes.ATTACK_SPEED, 1d);
+            put(WeaponAttributes.COOLDOWN_MS, 800d);
+            put(WeaponAttributes.POISONING, 0d);
+        }}), new HashMap<>());
     }
 
     @Override
@@ -40,7 +45,8 @@ public class MagicStaffWeapon extends Weapon {
                 new Vector2d(
                         Math.cos(Math.toRadians(entity.yaw)),
                         Math.sin(Math.toRadians(entity.yaw))
-                ).normalize()
+                ).normalize(),
+                this.attributes
         ));
     }
 }

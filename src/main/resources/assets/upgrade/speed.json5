@@ -1,0 +1,13 @@
+{
+  price: 60,
+  type: 'player',
+  spawning: true,
+
+  modifiers: {
+    speed: {
+      amount: 0.1,
+
+      operation: 'multiply_base'
+    }
+  }
+}

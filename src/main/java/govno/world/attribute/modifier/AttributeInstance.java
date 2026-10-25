@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AttributeInstance {
     @Getter
@@ -53,13 +54,13 @@ public class AttributeInstance {
     }
 
     public void addModifier(AttributeModifier modifier) {
-        this.modifiers.removeIf(m -> m.id().equals(modifier.id()));
+        this.modifiers.removeIf(m -> Objects.equals(m, modifier));
         this.modifiers.add(modifier);
         this.dirty = true;
     }
 
-    public boolean removeModifier(String id) {
-        boolean removed = this.modifiers.removeIf(m -> m.id().equals(id));
+    public boolean removeModifier(AttributeModifier modifier) {
+        boolean removed = this.modifiers.removeIf(m -> Objects.equals(m, modifier));
         if (removed)
             this.dirty = true;
 

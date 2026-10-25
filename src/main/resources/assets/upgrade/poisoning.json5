@@ -1,0 +1,13 @@
+{
+  price: 200,
+  type: 'weapon',
+  spawning: false,
+
+  modifiers: {
+    poisoning: {
+      amount: 1,
+
+      operation: 'add'
+    }
+  }
+}

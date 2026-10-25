@@ -1,5 +1,6 @@
 package govno.renderer;
 
+import com.ferra13671.cometrenderer.CometRenderer;
 import com.ferra13671.cometrenderer.texture.atlas.TextureAtlas;
 import govno.GameInstance;
 import govno.model.Sprite;
@@ -14,6 +15,7 @@ import govno.world.weapon.SwordWeapon;
 import govno.world.weapon.Weapon;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector4f;
 
 public class WorldRenderer implements GameInstance {
     public static final int MAX_BLOCKS_IN_WIDTH = 30;
@@ -68,6 +70,8 @@ public class WorldRenderer implements GameInstance {
     }
 
     private void renderEntity(Entity entity) {
+        Vector4f color = new Vector4f(1f);
+
         if (entity instanceof LivingEntity livingEntity) {
             // Если сущность неуязвима, она мигает (пропускает каждый второй кадр)
             if (livingEntity.isInvincible() && !livingEntity.isDying()) {
@@ -76,13 +80,16 @@ public class WorldRenderer implements GameInstance {
                     return; // Пропускаем рендер
                 }
             }
+
+            if (livingEntity.getPoisonTimer() > 0)
+                color.set(0, 0.9f, 0, 1f);
         }
 
         AABB aabb = new AABB(entity.modelAABB).move(Utils.lerp(entity.prevPosition, entity.position, game.getTicker().getTickDelta()));
         Sprite sprite = entity.model.getCurrentSprite();
 
         double xLength = aabb.getXLength();
-        new BasicTextureBatch()
+        new BasicTextureBatch(() -> CometRenderer.getShaderColor().setColor(color))
                 .texture(game.getTextures().entityAtlas)
                 .rectSized(
                         (float) (aabb.getMinX() - (xLength - (xLength * sprite.width())) / 2), (float) aabb.getMinY(), (float) aabb.getXLength() * sprite.width(), (float) aabb.getYLength() * sprite.height(),

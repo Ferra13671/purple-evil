@@ -16,6 +16,7 @@ import java.util.Map;
 
 public class Textures {
     public static final String ROOM_TEXTURES_PATH = "assets/textures/world/";
+    public static final String UPGRADE_TEXTURES_PATH = "assets/textures/upgrade/";
     public static final String WEAPON_TEXTURES_PATH = "assets/textures/weapon/";
 
     private final Map<String, GLTexture> worldTextures = new HashMap<>();
@@ -30,10 +31,15 @@ public class Textures {
     public Textures() {
         this.worldAtlas = loadRoomAtlas();
         this.weaponAtlas = loadWeaponAtlas();
+        loadUpgradeTextures();
     }
 
     public GLTexture getWorldTexture(String id) {
         return this.worldTextures.get(id);
+    }
+
+    public GLTexture getUpgradeTexture(String id) {
+        return this.entityTextures.get("upgrade-" + id);
     }
 
     public GLTexture getEntityTexture(String id) {
@@ -82,5 +88,18 @@ public class Textures {
         TextureAtlas atlas = new TextureAtlas("weapon-atlas", this.weaponTextures.values().stream().toList());
         atlas.setFiltering(TextureFiltering.DEFAULT);
         return atlas;
+    }
+
+    private void loadUpgradeTextures() {
+        try(InputStream inputStream = getClass().getClassLoader().getResourceAsStream(UPGRADE_TEXTURES_PATH + "atlas.json5")) {
+            JArray array = JModel.read(new InputStreamReader(inputStream)).cast(JType.JARRAY, null);
+
+            if (array != null)
+                array.forEach(element -> element.consumeIfExtends(JType.STRING, s -> addEntityTexture(
+                        GLTexture.builder(TextureLoader.IN_JAR).info(UPGRADE_TEXTURES_PATH + s + ".png").name("upgrade-" + s).filtering(TextureFiltering.DEFAULT).build()
+                )));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

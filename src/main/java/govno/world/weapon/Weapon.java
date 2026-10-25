@@ -15,8 +15,6 @@ public class Weapon implements GameInstance {
     @Getter
     protected final float size;
     @Getter
-    protected final long cooldownMs;
-    @Getter
     protected final Attributes attributes;
     @Getter
     protected final Map<String, AttributeModifier> entityModifiers;
@@ -25,22 +23,27 @@ public class Weapon implements GameInstance {
     protected boolean usingWeapon = false;
     protected long lastUseTime = 0;
 
-    public Weapon(@NonNull String textureId, float size, long cooldownMs, @NonNull Attributes attributes, @NonNull Map<String, AttributeModifier> entityModifiers) {
+    public Weapon(@NonNull String textureId, float size, @NonNull Attributes attributes, @NonNull Map<String, AttributeModifier> entityModifiers) {
         this.textureId = textureId;
         this.size = size;
-        this.cooldownMs = cooldownMs;
         this.attributes = attributes;
         this.entityModifiers = entityModifiers;
     }
 
+    public int getCooldownMS() {
+        return (int) (getAttributeValue(WeaponAttributes.COOLDOWN_MS) / getAttributeValue(WeaponAttributes.ATTACK_SPEED));
+    }
+
     public boolean canUse() {
-        return System.currentTimeMillis() - this.lastUseTime >= this.cooldownMs;
+        return System.currentTimeMillis() - this.lastUseTime >= getCooldownMS();
     }
 
     public float getCooldownProgress() {
-        if (this.cooldownMs <= 0) return 1f;
+        if (getCooldownMS() <= 0)
+            return 1f;
+
         long elapsed = System.currentTimeMillis() - this.lastUseTime;
-        return Math.min(1f, elapsed / (float) this.cooldownMs);
+        return Math.min(1f, elapsed / (float) getCooldownMS());
     }
 
     public void tick(LivingEntity entity) {

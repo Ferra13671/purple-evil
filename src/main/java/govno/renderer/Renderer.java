@@ -22,6 +22,7 @@ public class Renderer implements GameInstance {
     public Font javaFont;
     public TTFFont font;
     public TTFFont bigFont;
+    public TTFFont smallFont;
     {
         try {
             this.javaFont = Font.createFont(Font.TRUETYPE_FONT, GuiRenderer.class.getClassLoader().getResourceAsStream("assets/Classic-Console-Neue-Regular.ttf"));
@@ -35,6 +36,12 @@ public class Renderer implements GameInstance {
                     FontInfo.builder()
                             .font(javaFont)
                             .fontSize(64)
+                            .build()
+            );
+            this.smallFont = new TTFFont(
+                    FontInfo.builder()
+                            .font(javaFont)
+                            .fontSize(24)
                             .build()
             );
         } catch (Exception e) {

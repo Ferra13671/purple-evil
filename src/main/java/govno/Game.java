@@ -18,6 +18,7 @@ import govno.utils.Ticker;
 import govno.world.World;
 import govno.world.attribute.AttributesTemplates;
 import govno.world.room.RoomTemplates;
+import govno.world.upgrades.Upgrades;
 import lombok.Getter;
 import govno.renderer.Renderer;
 import lombok.Setter;
@@ -37,6 +38,8 @@ public class Game {
     private final RoomTemplates roomTemplates;
     @Getter
     private final AttributesTemplates attributesTemplates;
+    @Getter
+    private final Upgrades upgrades;
     @Getter
     private Screen screen;
     @Getter
@@ -68,6 +71,7 @@ public class Game {
 
         this.roomTemplates = new RoomTemplates();
         this.attributesTemplates = new AttributesTemplates();
+        this.upgrades = new Upgrades();
 
         this.textures = new Textures();
         this.entityModelTemplates = new EntityModelTemplates();

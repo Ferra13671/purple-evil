@@ -1,0 +1,13 @@
+{
+  price: 40,
+  type: 'weapon',
+  spawning: true,
+
+  modifiers: {
+    "attack_speed": {
+      amount: 0.025,
+
+      operation: 'multiply_base'
+    }
+  }
+}
