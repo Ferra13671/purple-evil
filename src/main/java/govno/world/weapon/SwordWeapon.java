@@ -16,7 +16,7 @@ public class SwordWeapon extends Weapon {
     private final double attackArc;
 
     private long swingStartTime = 0;
-    private final long swingDurationMs = 250;
+    private final long swingDurationMs = 500;
     private boolean hasHit = false;
 
     public SwordWeapon() {

@@ -33,7 +33,7 @@ dependencies {
     library "org.lwjgl:lwjgl"
     library "org.lwjgl:lwjgl-glfw"
     library "org.lwjgl:lwjgl-opengl"
-    implementation "org.lwjgl:lwjgl-openal"
+    library "org.lwjgl:lwjgl-openal"
     library "org.lwjgl:lwjgl-stb"
     library "org.joml:joml:${jomlVersion}"
 
@@ -68,6 +68,110 @@ shadowJar {
     archiveClassifier.set('')
 }
 
+import java.nio.file.Paths
+
+tasks.register('packageSingleExe') {
+    dependsOn shadowJar
+
+    doLast {
+        // --- НАСТРОЙКИ ПРИЛОЖЕНИЯ ---
+        def appName = project.name
+        def mainClassName = "" // Пусто, так как Main-Class уже прописан в jar-манифесте
+        def winRarPath = "C:\\Program Files\\WinRAR\\WinRAR.exe"
+
+        // Куда сохранять финальный результат (как вы и просили - в build/libs)
+        def finalOutputDir = "${project.layout.buildDirectory.get().asFile.absolutePath}/libs"
+        file(finalOutputDir).mkdirs()
+        // ------------------------------------------------
+
+        // 1. Создаем временную папку в системном Temp
+        // Добавляем currentTimeMillis, чтобы избежать конфликтов, если запустить две сборки одновременно
+        def tempDir = file("${System.getProperty('java.io.tmpdir')}/jpackage-temp-${appName}-${System.currentTimeMillis()}")
+        tempDir.mkdirs()
+
+        try {
+            println "=== Шаг 1: Подготовка временной директории ==="
+            println "Рабочая папка: ${tempDir.absolutePath}"
+
+            // Копируем shadowJar во временную папку
+            def originalJar = shadowJar.archiveFile.get().asFile
+            def tempJar = file("${tempDir.absolutePath}/${originalJar.name}")
+            tempJar.bytes = originalJar.bytes
+
+            def mainJarName = tempJar.name
+            def inputDir = tempDir.absolutePath
+
+            def jpackageOutputDir = "${tempDir.absolutePath}/jpackage-out"
+            def finalExeFile = file("${tempDir.absolutePath}/${appName}.exe")
+
+            def javaHome = System.getProperty("java.home")
+            def jpackagePath = Paths.get(javaHome, "bin", "jpackage.exe").toString()
+
+            println "=== Шаг 2: Запуск jpackage ==="
+            def jpackageArgs = [
+                    '--input', inputDir,
+                    '--name', appName,
+                    '--main-jar', mainJarName,
+                    '--type', 'app-image',
+                    '--dest', jpackageOutputDir,
+                    '--win-console' // <-- Добавьте эту строку
+            ]
+
+            if (mainClassName != null && !mainClassName.trim().isEmpty()) {
+                jpackageArgs.add('--main-class')
+                jpackageArgs.add(mainClassName)
+            }
+
+            providers.exec {
+                commandLine jpackagePath
+                args jpackageArgs
+            }.result.get()
+
+            println "=== Шаг 3: Создание sfx-options.txt ==="
+            def sfxOptionsFile = file("${tempDir.absolutePath}/sfxoptions.txt")
+            sfxOptionsFile.text = """Setup=${appName}.exe
+TempMode
+Silent=1
+"""
+
+            println "=== Шаг 4: Упаковка в монолитный .exe через WinRAR ==="
+            def generatedAppFolder = "${jpackageOutputDir}/${appName}"
+
+            if (file(winRarPath).exists()) {
+                def rarResult = providers.exec {
+                    workingDir = tempDir
+                    commandLine winRarPath, 'a', '-sfx', '-ep1', '-r',
+                            "-zsfxoptions.txt", // <-- ИСПРАВЛЕНО: параметр -z вместо -sfxopt
+                            finalExeFile.absolutePath,
+                            "${generatedAppFolder}\\*"
+                }.result.get()
+
+                if (rarResult.exitValue != 0 && rarResult.exitValue != 1) {
+                    throw new GradleException("WinRAR завершился с кодом ${rarResult.exitValue}.\n" +
+                            "STDOUT: ${rarResult.standardOutput.asText.get()}\n" +
+                            "STDERR: ${rarResult.standardError.asText.get()}")
+                }
+
+                // Копируем готовый exe обратно
+                def finalDestination = file("${finalOutputDir}/${appName}.exe")
+                finalDestination.bytes = finalExeFile.bytes
+                println "\n УСПЕХ! Финальный файл собран и возвращен в: ${finalDestination.absolutePath}"
+            } else {
+                throw new GradleException("Ошибка: WinRAR не найден по пути: ${winRarPath}.")
+            }
+
+        } finally {
+            // 3. Обязательная очистка временных файлов (сработает даже при ошибке)
+            println "=== Шаг 5: Очистка временных файлов ==="
+            delete(tempDir)
+        }
+    }
+}
+
 build {
     finalizedBy shadowJar
+}
+
+shadowJar {
+    finalizedBy tasks.getByName('packageSingleExe')
 }

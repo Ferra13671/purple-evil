@@ -1,5 +1,9 @@
+package govno.main;
+
 import govno.Game;
 
-void main() {
-    Game.start();
+public class Main {
+    static void main(String[] args) {
+        Game.start();
+    }
 }

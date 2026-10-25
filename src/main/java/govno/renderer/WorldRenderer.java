@@ -1,6 +1,5 @@
 package govno.renderer;
 
-import com.ferra13671.cometrenderer.CometRenderer;
 import com.ferra13671.cometrenderer.texture.atlas.TextureAtlas;
 import govno.GameInstance;
 import govno.model.Sprite;
