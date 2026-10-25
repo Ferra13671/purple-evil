@@ -12,7 +12,8 @@ public enum EnemyType {
     Bat(BatEntity::new),
     DefaultSkeleton(DefaultSkeletonEntity::new),
     KillerSkeleton(KillerSkeletonEntity::new),
-    KnightSkeleton(KnightSkeletonEntity::new);
+    KnightSkeleton(KnightSkeletonEntity::new),
+    SlimeBoss(SlimeBossEntity::new);
 
     public final Function<Room, LivingEntity> enemyCreator;
 }

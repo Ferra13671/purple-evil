@@ -207,7 +207,11 @@ public class GameSession implements GameInstance {
         int minMobs = 4 + (level / 2);
         int maxMobs = minMobs + 2 + level;
 
-        boolean isBossLevel = (level % 2 == 0);
+
+        EnemyType bossType = null;
+        if (level == 2) {
+            bossType = EnemyType.SlimeBoss;
+        }
 
         Map<EnemyType, SpawnProperty> spawns = new HashMap<>();
 
@@ -223,6 +227,6 @@ public class GameSession implements GameInstance {
             spawns.put(EnemyType.Bat, new SpawnProperty(1, 0.1));
         }
 
-        return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, minMobs, maxMobs, isBossLevel);
+        return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, minMobs, maxMobs, bossType);
     }
 }

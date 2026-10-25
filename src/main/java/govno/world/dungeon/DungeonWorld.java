@@ -8,7 +8,6 @@ import govno.world.dungeon.spawn.EnemyType;
 import govno.world.dungeon.spawn.SpawnProperty;
 import govno.world.entity.LivingEntity;
 import govno.world.entity.PortalEntity;
-import govno.world.entity.SlimeBossEntity;
 import govno.world.room.Room;
 import govno.world.room.RoomType;
 import org.joml.Vector2d;
@@ -29,7 +28,9 @@ public class DungeonWorld extends World {
     }
 
     private void spawnBoss() {
-        if (!this.properties.isBossLevel()) return;
+        EnemyType bossType = this.properties.bossType();
+        if (bossType == null)
+            return;
 
         Room bossRoom = this.rooms.stream()
                 .filter(r -> r.roomType == RoomType.Boss)
@@ -37,9 +38,8 @@ public class DungeonWorld extends World {
                 .orElse(null);
 
         if (bossRoom != null) {
-            SlimeBossEntity boss = new SlimeBossEntity(bossRoom);
+            LivingEntity boss = bossType.enemyCreator.apply(bossRoom);
 
-            // Ставим босса в центр комнаты
             boss.position.set(bossRoom.centerX, bossRoom.centerY);
             boss.prevPosition.set(boss.position);
             boss.updateAABB();

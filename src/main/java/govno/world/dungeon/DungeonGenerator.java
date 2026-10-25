@@ -50,7 +50,7 @@ public class DungeonGenerator {
 
         // Если это босс-уровень, оставляем место и для босса, и для выхода (-2)
         int targetRooms = this.properties.maxRooms() - 1;
-        if (this.properties.isBossLevel()) targetRooms--;
+        if (this.properties.bossType() != null) targetRooms--; // <-- ИЗМЕНЕНО
 
         while (placed.size() < targetRooms) {
             if (!tryPlaceNextRoom()) break;
@@ -59,12 +59,11 @@ public class DungeonGenerator {
 
     private void placeExitRoom() {
         // 1. Если это босс-уровень, сначала ставим босс-комнату
-        if (this.properties.isBossLevel()) {
+        if (this.properties.bossType() != null) { // <-- ИЗМЕНЕНО
             placeSpecificRoom("boss", RoomType.Boss);
         }
 
         // 2. Затем ставим выход.
-        // Если босс был поставлен, выход пристроится прямо к нему (так как это самая дальняя комната)
         placeSpecificRoom("exit", RoomType.Exit);
     }
 
