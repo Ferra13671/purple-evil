@@ -7,6 +7,8 @@ import govno.renderer.batch.impl.text.RenderText;
 import govno.renderer.batch.impl.text.TextBatch;
 import govno.utils.AABB;
 import govno.world.World;
+import govno.world.entity.EnemyEntity;
+import govno.world.entity.Entity;
 import govno.world.entity.Player;
 import govno.world.room.Room;
 import org.joml.Vector4f;
@@ -64,7 +66,7 @@ public class GuiRenderer implements GameInstance {
 
         builder.append("Player attributes:\n");
         player.getAttributes().getAttributes().forEach((name, instance) ->
-            builder.append(String.format("%s: %s\n", name, instance.getCurrentValue()))
+                builder.append(String.format("%s: %s\n", name, instance.getCurrentValue()))
         );
         builder.append("\nWeapon attributes:\n");
         if (player.getWeapon() != null)
@@ -103,55 +105,41 @@ public class GuiRenderer implements GameInstance {
         float worldHeight = (float) (maxY - minY);
         float maxWorldDim = Math.max(worldWidth, worldHeight);
 
-        // --- 2. Настройки миникарты ---
-        float mapSize = 150f; // Размер миникарты в пикселях
-        float margin = 20f;   // Отступ от края экрана
-        float innerPadding = 12f; // <-- НОВЫЙ ОТСТУП: свободное место внутри рамки миникарты
+        float mapSize = 150f;
+        float margin = 20f;
+        float innerPadding = 12f;
 
-        // Позиция в правом верхнем углу
         float mapX = framebuffer.getWidth() - mapSize - margin;
         float mapY = margin;
 
-        // Вычисляем внутренний размер области для карты
         float innerSize = mapSize - innerPadding * 2;
-
-        // Коэффициент масштабирования (считаем от внутреннего размера)
         float scale = innerSize / maxWorldDim;
 
-        // Смещение для центрирования комнат внутри внутренней области
         float offsetX = innerPadding + (innerSize - worldWidth * scale) / 2f;
         float offsetY = innerPadding + (innerSize - worldHeight * scale) / 2f;
 
-        // --- 3. Отрисовка фона и обводки ---
-        // Фон (черный, прозрачность 1/8 = 0.125)
         new ColoredRectBatch()
                 .rectSized(mapX, mapY, mapSize, mapSize,
                         RectColors.verticalGradient(new Vector4f(0, 0, 0, 0.125f), new Vector4f(0, 0, 0, 0.125f)))
                 .build().tryDraw().close();
 
-        // Обводка (белая, прозрачность 1/4 = 0.25)
         float borderThickness = 2f;
         Vector4f borderColor = new Vector4f(1f, 1f, 1f, 0.25f);
         new ColoredRectBatch()
-                // Верхняя линия (на всю ширину)
                 .rectSized(mapX, mapY, mapSize, borderThickness, RectColors.verticalGradient(borderColor, borderColor))
-                // Нижняя линия (на всю ширину)
                 .rectSized(mapX, mapY + mapSize - borderThickness, mapSize, borderThickness, RectColors.verticalGradient(borderColor, borderColor))
-                // Левая линия (сдвинута вниз на толщину рамки и укорочена)
                 .rectSized(mapX, mapY + borderThickness, borderThickness, mapSize - borderThickness * 2, RectColors.verticalGradient(borderColor, borderColor))
-                // Правая линия (сдвинута вниз на толщину рамки и укорочена)
                 .rectSized(mapX + mapSize - borderThickness, mapY + borderThickness, borderThickness, mapSize - borderThickness * 2, RectColors.verticalGradient(borderColor, borderColor))
                 .build().tryDraw().close();
 
-        // --- 4. Отрисовка комнат ---
         ColoredRectBatch roomBatch = new ColoredRectBatch();
-        Vector4f roomColor = new Vector4f(1f, 1f, 1f, 1f); // Белый
+        Vector4f roomColor = new Vector4f(1f, 1f, 1f, 1f);
 
         for (Room room : world.rooms) {
             AABB b = room.getBounds();
 
             float rx = mapX + offsetX + (float) (b.getMinX() - minX) * scale;
-            float ry = mapY + offsetY + (float) (maxY - b.getMaxY()) * scale; // Инвертируем Y для экрана
+            float ry = mapY + offsetY + (float) (maxY - b.getMaxY()) * scale;
             float rw = (float) (b.getMaxX() - b.getMinX()) * scale;
             float rh = (float) (b.getMaxY() - b.getMinY()) * scale;
 
@@ -159,14 +147,36 @@ public class GuiRenderer implements GameInstance {
         }
         roomBatch.build().tryDraw().close();
 
-        // --- 5. Отрисовка игрока (синий квадрат) ---
         float pX = mapX + offsetX + (float) (game.getGameSession().player.position.x - minX) * scale;
         float pY = mapY + offsetY + (float) (maxY - game.getGameSession().player.position.y) * scale;
-        float playerSize = 4f; // Размер точки на миникарте
+        float playerSize = 4f;
 
         new ColoredRectBatch()
                 .rectSized(pX - playerSize / 2, pY - playerSize / 2, playerSize, playerSize,
                         RectColors.verticalGradient(new Vector4f(0, 0, 1, 1), new Vector4f(0, 0, 1, 1)))
                 .build().tryDraw().close();
+
+        ColoredRectBatch enemyBatch = new ColoredRectBatch();
+        Vector4f enemyColor = new Vector4f(1f, 0f, 0f, 1f);
+
+        for (Room room : world.rooms) {
+            for (Entity entity : room.entities) {
+                if (!(entity instanceof EnemyEntity enemy)) continue;
+                if (enemy.removed || enemy.isDying()) continue;
+
+                float ex = mapX + offsetX + (float) (enemy.position.x - minX) * scale;
+                float ey = mapY + offsetY + (float) (maxY - enemy.position.y) * scale;
+
+                double aabbSize = Math.max(
+                        enemy.modelAABB.getXLength(),
+                        enemy.modelAABB.getYLength()
+                );
+                float size = Math.clamp((float) (aabbSize * 2.5f), 3f, 6f);
+
+                enemyBatch.rectSized(ex - size / 2, ey - size / 2, size, size,
+                        RectColors.verticalGradient(enemyColor, enemyColor));
+            }
+        }
+        enemyBatch.build().tryDraw().close();
     }
 }

@@ -36,7 +36,7 @@ public class GameSession implements GameInstance {
     );
 
     public Player player = this.knight;
-    public int currentLevel = 3;
+    public int currentLevel = 4;
     public int score = 0;
 
     private Checkpoint checkpoint = null;
@@ -202,15 +202,16 @@ public class GameSession implements GameInstance {
     }
 
     private DungeonProperties createPropertiesForLevel(int level) {
-        int rooms = 5 + level * 2;
+        int rooms = 1;
         int tunnelLength = 10;
         int minMobs = 4 + (level / 2);
         int maxMobs = minMobs + 2 + level;
 
 
         EnemyType bossType = null;
-        if (level == 2) {
-            bossType = EnemyType.SlimeBoss;
+        switch (level) {
+            case 2 -> bossType = EnemyType.SlimeBoss;
+            case 4 -> bossType = EnemyType.LichBoss;
         }
 
         Map<EnemyType, SpawnProperty> spawns = new HashMap<>();

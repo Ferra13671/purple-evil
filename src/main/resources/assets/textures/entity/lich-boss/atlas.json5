@@ -1,0 +1,93 @@
+[
+  {
+    name: 'stay',
+    loop: true,
+    directional: true,
+
+    frames: [
+      { id: '1', duration: 1, size: [2, 1] },
+      { id: '2', duration: 1, size: [2, 1] },
+      { id: '3', duration: 1, size: [2, 1] },
+      { id: '4', duration: 1, size: [2, 1] }
+    ]
+  },
+  {
+    name: 'go',
+    directional: true,
+
+    frames: [
+      { id: '1', duration: 0.7, size: [2, 1] },
+      { id: '2', duration: 0.7, size: [2, 1] },
+      { id: '3', duration: 0.7, size: [2, 1] },
+      { id: '4', duration: 0.7, size: [2, 1] },
+      { id: '5', duration: 0.7, size: [2, 1] },
+      { id: '6', duration: 0.7, size: [2, 1] },
+      { id: '7', duration: 0.7, size: [2, 1] },
+      { id: '8', duration: 0.7, size: [2, 1] }
+    ]
+  },
+  {
+    name: 'summon',
+    directional: true,
+
+    frames: [
+      { id: '1', duration: 0.4, size: [2, 1] },
+      { id: '2', duration: 0.4, size: [2, 1] },
+      { id: '3', duration: 0.4, size: [2, 1] },
+      { id: '4', duration: 0.4, size: [2, 1] },
+      { id: '5', duration: 0.4, size: [2, 1] },
+      { id: '6', duration: 0.4, size: [2, 1] },
+      { id: '7', duration: 0.4, size: [2, 1] },
+      { id: '8', duration: 0.4, size: [2, 1] },
+      { id: '9', duration: 0.4, size: [2, 1] },
+      { id: '10', duration: 0.4, size: [2, 1] },
+      { id: '11', duration: 0.4, size: [2, 1] },
+      { id: '12', duration: 0.4, size: [2, 1] }
+    ]
+  },
+  {
+    name: 'attack',
+    directional: true,
+
+    frames: [
+      { id: '1', duration: 0.15, size: [2, 1] },
+      { id: '2', duration: 0.15, size: [2, 1] },
+      { id: '3', duration: 0.15, size: [2, 1] },
+      { id: '4', duration: 0.15, size: [2, 1] },
+      { id: '5', duration: 0.15, size: [2, 1] },
+      { id: '6', duration: 0.15, size: [2, 1] },
+      { id: '7', duration: 0.15, size: [2, 1] },
+      { id: '8', duration: 0.15, size: [2, 1] },
+      { id: '9', duration: 0.15, size: [2, 1] },
+      { id: '10', duration: 0.15, size: [2, 1] }
+    ]
+  },
+  {
+    name: 'teleport',
+    directional: true,
+
+    frames: [
+      { id: '1', duration: 0.15, size: [2, 1] },
+      { id: '2', duration: 0.15, size: [2, 1] },
+      { id: '3', duration: 0.15, size: [2, 1] },
+      { id: '4', duration: 0.15, size: [2, 1] },
+      { id: '5', duration: 0.15, size: [2, 1] },
+      { id: '6', duration: 0.15, size: [2, 1] },
+      { id: '7', duration: 0.15, size: [2, 1] },
+      { id: '8', duration: 0.15, size: [2, 1] },
+      { id: '9', duration: 0.15, size: [2, 1] },
+      { id: '10', duration: 0.15, size: [2, 1] },
+      { id: '11', duration: 0.15, size: [2, 1] },
+      { id: '12', duration: 0.15, size: [2, 1] },
+      { id: '13', duration: 0.15, size: [2, 1] },
+      { id: '14', duration: 0.15, size: [2, 1] },
+      { id: '15', duration: 0.15, size: [2, 1] },
+      { id: '16', duration: 0.15, size: [2, 1] },
+      { id: '17', duration: 0.15, size: [2, 1] },
+      { id: '18', duration: 0.15, size: [2, 1] },
+      { id: '19', duration: 0.15, size: [2, 1] },
+      { id: '20', duration: 0.15, size: [2, 1] },
+      { id: '21', duration: 0.15, size: [2, 1] }
+    ]
+  }
+]

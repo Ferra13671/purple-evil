@@ -85,13 +85,19 @@ public class EntityModelTemplates implements GameInstance {
             ) : new Vector2f(1);
 
             String spriteName = modelName + "-" + animationName + (direction != null ? ("-" + direction.id) : "") + (!id.isEmpty() ? "-" + id : "");
-            if (game.getTextures().getEntityTexture(spriteName) == null)
-                game.getTextures().addEntityTexture(GLTexture.builder(TextureLoader.IN_JAR)
-                                .name(spriteName)
-                                .info(ENTITY_TEXTURES_PATH + modelName + "/" + animationName + (direction != null ? ("-" + direction.id) : "") + (!id.isEmpty() ? "-" + id : "") + ".png")
-                                .filtering(TextureFiltering.DEFAULT)
-                        .build()
-                );
+            if (game.getTextures().getEntityTexture(spriteName) == null) {
+                String texturePath = ENTITY_TEXTURES_PATH + modelName + "/" + animationName + (direction != null ? ("-" + direction.id) : "") + (!id.isEmpty() ? "-" + id : "") + ".png";
+                try {
+                    game.getTextures().addEntityTexture(GLTexture.builder(TextureLoader.IN_JAR)
+                            .name(spriteName)
+                            .info(texturePath)
+                            .filtering(TextureFiltering.DEFAULT)
+                            .build()
+                    );
+                } catch (Exception e) {
+                    throw new RuntimeException(String.format("Cannot load texture '%s' from anim '%s'", texturePath, animationName), e);
+                }
+            }
 
             frames.addLast(new Animation.Frame(
                     new Sprite(

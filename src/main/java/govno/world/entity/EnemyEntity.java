@@ -16,7 +16,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EnemyEntity extends LivingEntity {
     private static final float UPGRADE_DROP_CHANCE = 0.17f;
 
-    public EnemyEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes,Vector2d handPos, Weapon weapon) {
+    public boolean canDropUpgrades = true;
+
+    public EnemyEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, Vector2d handPos, Weapon weapon) {
         super(model, aabb, attributes, handPos, weapon);
     }
 
@@ -26,7 +28,8 @@ public class EnemyEntity extends LivingEntity {
 
         game.getGameSession().score += (int) getAttributeValue(EnemyAttributes.SCORE);
 
-        if (ThreadLocalRandom.current().nextFloat() < UPGRADE_DROP_CHANCE) {
+        // Проверяем флаг
+        if (this.canDropUpgrades && ThreadLocalRandom.current().nextFloat() < UPGRADE_DROP_CHANCE) {
             Collection<Upgrade> allUpgrades = game.getUpgrades().upgrades.values();
 
             if (!allUpgrades.isEmpty()) {
