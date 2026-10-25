@@ -8,7 +8,6 @@ import govno.world.weapon.Weapon;
 import lombok.NonNull;
 import org.joml.Vector2d;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -30,7 +29,7 @@ public class EnemyEntity extends LivingEntity {
             Collection<Upgrade> allUpgrades = game.getUpgrades().upgrades.values();
 
             if (!allUpgrades.isEmpty()) {
-                List<Upgrade> upgradeList = new ArrayList<>(allUpgrades);
+                List<Upgrade> upgradeList = allUpgrades.stream().filter(Upgrade::spawning).toList();
                 Upgrade randomUpgrade = upgradeList.get(ThreadLocalRandom.current().nextInt(upgradeList.size()));
 
                 UpgradeEntity upgradeEntity = new UpgradeEntity(randomUpgrade);

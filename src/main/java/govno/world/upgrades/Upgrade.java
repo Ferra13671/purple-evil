@@ -8,6 +8,7 @@ public record Upgrade(
         String name,
         int price,
         UpgradeType type,
+        boolean spawning,
         Map<String, AttributeModifier> modifiers
 ) {
 }

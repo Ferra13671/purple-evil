@@ -31,6 +31,7 @@ public class Upgrades {
 
                     int price = upgradeObject.getElement("price").cast(JType.NUMBER, null).intValue();
                     UpgradeType type = UpgradeType.fromId(upgradeObject.getElement("type").cast(JType.STRING, null));
+                    boolean spawning = upgradeObject.getElement("spawning").cast(JType.BOOLEAN, null);
                     Map<String, AttributeModifier> modifiers = new HashMap<>();
 
                     JObject modifiersObject = upgradeObject.getElement("modifiers").cast(JType.JOBJECT, null);
@@ -43,7 +44,7 @@ public class Upgrades {
                         modifiers.put(name, new AttributeModifier(amount, operation));
                     });
 
-                    this.upgrades.put(id, new Upgrade(id, price, type, modifiers));
+                    this.upgrades.put(id, new Upgrade(id, price, type, spawning, modifiers));
                 }
             }
         } catch (IOException e) {
