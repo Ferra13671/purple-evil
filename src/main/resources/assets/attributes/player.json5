@@ -1,0 +1,7 @@
+{
+  max_health: 100,
+  regeneration: 0.02,
+  speed: 0.25,
+  acceleration: 0.6,
+  invincibility_time: 1
+}

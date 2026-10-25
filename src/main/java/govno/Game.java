@@ -16,6 +16,7 @@ import govno.screen.Screen;
 import govno.utils.KeyBind;
 import govno.utils.Ticker;
 import govno.world.World;
+import govno.world.attribute.AttributesTemplates;
 import govno.world.room.RoomTemplates;
 import lombok.Getter;
 import govno.renderer.Renderer;
@@ -34,6 +35,8 @@ public class Game {
     private Window window;
     @Getter
     private final RoomTemplates roomTemplates;
+    @Getter
+    private final AttributesTemplates attributesTemplates;
     @Getter
     private Screen screen;
     @Getter
@@ -64,6 +67,7 @@ public class Game {
         BetterCompilerPlugin.init();
 
         this.roomTemplates = new RoomTemplates();
+        this.attributesTemplates = new AttributesTemplates();
 
         this.textures = new Textures();
         this.entityModelTemplates = new EntityModelTemplates();
