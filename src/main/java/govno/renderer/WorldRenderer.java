@@ -70,7 +70,7 @@ public class WorldRenderer implements GameInstance {
     private void renderEntity(Entity entity) {
         if (entity instanceof LivingEntity livingEntity) {
             // Если сущность неуязвима, она мигает (пропускает каждый второй кадр)
-            if (livingEntity.isInvincible()) {
+            if (livingEntity.isInvincible() && !livingEntity.isDying()) {
                 int blinkPhase = (int) (livingEntity.getInvincibilityTimer() * 10);
                 if (blinkPhase % 2 == 0) {
                     return; // Пропускаем рендер

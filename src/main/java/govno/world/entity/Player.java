@@ -58,11 +58,13 @@ public class Player extends LivingEntity {
         double dy = centerY - mouseY;
         this.yaw = Math.toDegrees(Math.atan2(dy, dx));
 
-        if (Keybinds.ATTACK.isPressed()) {
-            if (!this.weapon.isUsingWeapon())
-                this.weapon.startUse(this);
-        } else if (this.weapon.isUsingWeapon()) {
-            this.weapon.endUse(this);
+        if (this.weapon != null) {
+            if (Keybinds.ATTACK.isPressed()) {
+                if (!this.weapon.isUsingWeapon())
+                    this.weapon.startUse(this);
+            } else if (this.weapon.isUsingWeapon()) {
+                this.weapon.endUse(this);
+            }
         }
 
 

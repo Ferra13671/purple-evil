@@ -120,8 +120,10 @@ public class LivingEntity extends Entity {
             this.model.tick(dt * animSpeed);
         }
 
-        if (this.health <= 0 && !this.dying)
+        if (this.health <= 0 && !this.dying) {
             onDying();
+            return;
+        }
 
         if (this.health < getAttributeValue(EntityAttributes.MAX_HEALTH))
             this.health = Math.min(this.health + getAttributeValue(EntityAttributes.REGENERATION), getAttributeValue(EntityAttributes.MAX_HEALTH));
