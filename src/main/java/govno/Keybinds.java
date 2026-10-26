@@ -42,4 +42,9 @@ public class Keybinds {
             .key(GLFW.GLFW_KEY_F)
             .build()
             .register();
+    public final KeyBind PAUSE = KeyBind.builder()
+            .keyType(KeyType.Keyboard)
+            .key(GLFW.GLFW_KEY_ESCAPE)
+            .build()
+            .register();
 }

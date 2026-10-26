@@ -34,7 +34,7 @@ public class DemonBossEntity extends EnemyEntity {
 
     @Override
     public void onEntityCollision(Entity other, Vector2dc out) {
-        if (this.phasing || this.dying) return;
+        if (this.dying) return;
 
         if (other == game.getGameSession().player) {
             game.getGameSession().player.damage(getAttributeValue(EnemyAttributes.DAMAGE));

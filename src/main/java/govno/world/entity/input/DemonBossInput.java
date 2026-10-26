@@ -95,7 +95,6 @@ public class DemonBossInput extends Input {
         timer = TRANSITION_DURATION;
         vector.set(0, 0);
         owner.velocity.set(0, 0);
-        owner.phasing = false;
         owner.setSpeedMultiplier(1f);
 
         // Кратковременная неуязвимость во время рёва.
@@ -219,7 +218,6 @@ public class DemonBossInput extends Input {
             state = State.CHARGE;
             timer = CHARGE_MAX_TICKS;
             chargeHit = false;
-            owner.phasing = true;
             owner.setSpeedMultiplier(getChargeSpeedMult());
             vector.set(chargeDir);
         }
@@ -249,7 +247,6 @@ public class DemonBossInput extends Input {
     }
 
     private void endCharge() {
-        owner.phasing = false;
         owner.setSpeedMultiplier(1f);
         owner.velocity.set(0, 0);
         vector.set(0, 0);

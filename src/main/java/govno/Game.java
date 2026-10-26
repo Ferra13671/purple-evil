@@ -12,6 +12,7 @@ import govno.renderer.Programs;
 import govno.renderer.ShaderLibraries;
 import govno.renderer.Textures;
 import govno.screen.MainMenuScreen;
+import govno.screen.PauseScreen;
 import govno.screen.Screen;
 import govno.utils.KeyBind;
 import govno.utils.Ticker;
@@ -110,11 +111,13 @@ public class Game {
         this.window.setLoopCallback(() -> {
             this.ticker.onStartFrame();
             if (this.ticker.shouldTick()) {
-                if (this.gameSession != null)
-                    this.gameSession.tick();
+                if (!isGamePaused()) {
+                    if (this.gameSession != null)
+                        this.gameSession.tick();
 
-                if (this.world != null)
-                    this.world.tick();
+                    if (this.world != null)
+                        this.world.tick();
+                }
 
                 Overtone.tick();
                 this.soundManager.tick();
@@ -122,14 +125,24 @@ public class Game {
                 if (this.screen != null) {
                     this.screen.tick();
                     KeyBind.resetAll();
-                } else if (this.world == null)
-                    setScreen(new MainMenuScreen());
+                } else {
+                    if (this.world == null)
+                        setScreen(new MainMenuScreen());
+                    else if (Keybinds.PAUSE.isPressed()) {
+                        Keybinds.PAUSE.setPressed(false);
+                        setScreen(new PauseScreen());
+                    }
+                }
 
                 this.ticker.reset();
             }
 
             this.renderer.render();
         });
+    }
+
+    public boolean isGamePaused() {
+        return this.screen != null && this.screen.shouldPause();
     }
 
     public void setScreen(Screen screen) {

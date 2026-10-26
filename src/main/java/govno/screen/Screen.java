@@ -26,6 +26,10 @@ public class Screen implements GameInstance {
         game.setScreen(null);
     }
 
+    public boolean shouldPause() {
+        return false;
+    }
+
     public boolean shouldCloseOnEsc() {
         return true;
     }
