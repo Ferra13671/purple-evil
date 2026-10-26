@@ -61,6 +61,11 @@ public class GameSession implements GameInstance {
     public void startLobby() {
         saveCheckpoint();
         game.setWorld(new LobbyWorld());
+
+        this.knight.revive();
+        this.mage.revive();
+        this.knight.setHealth(this.checkpoint.knightHealth());
+        this.mage.setHealth(this.checkpoint.mageHealth());
     }
 
     public void startDungeon() {
