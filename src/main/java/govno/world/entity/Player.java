@@ -50,6 +50,16 @@ public class Player extends LivingEntity {
         game.getGameSession().onPlayerDead(this);
     }
 
+    @Override
+    public void damage(double damage) {
+        if (isInvincible() || this.dying)
+            return;
+
+        game.getSoundManager().playSound(game.getSounds().PLAYER_DAMAGE, 1f, 0.8f + random.nextFloat() * 0.6f);
+
+        super.damage(damage);
+    }
+
     public float getDashCooldownProgress() {
         if (this.dashCooldown <= 0) return 0f;
         double max = getAttributeValue(PlayerAttributes.DASH_DELAY);

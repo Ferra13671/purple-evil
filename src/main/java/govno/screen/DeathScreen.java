@@ -1,8 +1,11 @@
 package govno.screen;
 
 import govno.GameSession;
+import govno.renderer.RectColors;
+import govno.renderer.batch.impl.ColoredRectBatch;
 import govno.renderer.batch.impl.text.RenderText;
 import govno.renderer.batch.impl.text.TextBatch;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +69,15 @@ public class DeathScreen extends Screen {
     public void render(double mouseX, double mouseY) {
         long elapsed = System.currentTimeMillis() - openTime;
         float bgAlpha = Math.min(1.0f, elapsed / 3000f);
+        int width = game.getWindow().getFramebufferWidth();
+        int height = game.getWindow().getFramebufferHeight();
 
-        renderBackground(bgAlpha);
+        new ColoredRectBatch()
+                .rectSized(0, 0, width, height,
+                        RectColors.verticalGradient(
+                                new Vector4f(0, 0, 0, bgAlpha),
+                                new Vector4f(0, 0, 0, bgAlpha)))
+                .build().tryDraw().close();
 
         if (elapsed > 1000) {
             String text = "GAME OVER";
