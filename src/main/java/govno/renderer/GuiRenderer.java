@@ -5,7 +5,7 @@ import com.ferra13671.cometrenderer.texture.GLTex;
 import com.ferra13671.cometrenderer.texture.GLTexture;
 import com.ferra13671.cometrenderer.texture.atlas.TextureBorder;
 import govno.GameInstance;
-import govno.Keybinds;
+import govno.Settings;
 import govno.renderer.batch.impl.BasicTextureBatch;
 import govno.renderer.batch.impl.ColoredRectBatch;
 import govno.renderer.batch.impl.text.RenderText;
@@ -314,35 +314,35 @@ public class GuiRenderer implements GameInstance {
         boolean inLobby = game.getWorld() instanceof LobbyWorld;
 
         float x = margin;
-        renderActionButton(x, upperY, size, Keybinds.PAUSE.getDisplayName(), "Pause",
-                0f, false, Keybinds.PAUSE.isPressed());
+        renderActionButton(x, upperY, size, Settings.PAUSE.getDisplayName(), "Pause",
+                0f, false, Settings.PAUSE.isPressed());
         x += size + gap;
 
-        renderActionButton(x, upperY, size, Keybinds.PLAYER_SWAP.getDisplayName(), "Swap",
-                game.getGameSession().getSwapCooldownProgress(), true, Keybinds.PLAYER_SWAP.isPressed());
+        renderActionButton(x, upperY, size, Settings.PLAYER_SWAP.getDisplayName(), "Swap",
+                game.getGameSession().getSwapCooldownProgress(), true, Settings.PLAYER_SWAP.isPressed());
         x += size + gap;
 
-        renderActionButton(x, upperY, size, Keybinds.DASH.getDisplayName(), "Dash",
-                game.getGameSession().player.getDashCooldownProgress(), true, Keybinds.DASH.isPressed());
+        renderActionButton(x, upperY, size, Settings.DASH.getDisplayName(), "Dash",
+                game.getGameSession().player.getDashCooldownProgress(), true, Settings.DASH.isPressed());
         x += size + gap;
 
         if (inLobby) {
-            renderActionButton(x, upperY, size, Keybinds.SHOP.getDisplayName(), "Shop",
-                    0f, false, Keybinds.SHOP.isPressed());
+            renderActionButton(x, upperY, size, Settings.SHOP.getDisplayName(), "Shop",
+                    0f, false, Settings.SHOP.isPressed());
         }
 
         float buttonswidth = 3 * size + 2 * gap;
 
-        renderActionButton(margin + size + gap, lowerY, size, Keybinds.FORWARD.getDisplayName(),
-                null, 0f, false, Keybinds.FORWARD.isPressed());
+        renderActionButton(margin + size + gap, lowerY, size, Settings.FORWARD.getDisplayName(),
+                null, 0f, false, Settings.FORWARD.isPressed());
 
         float lowerRowY = lowerY + size + gap;
-        renderActionButton(margin, lowerRowY, size, Keybinds.LEFT.getDisplayName(),
-                null, 0f, false, Keybinds.LEFT.isPressed());
-        renderActionButton(margin + size + gap, lowerRowY, size, Keybinds.BACK.getDisplayName(),
-                null, 0f, false, Keybinds.BACK.isPressed());
-        renderActionButton(margin + 2 * (size + gap), lowerRowY, size, Keybinds.RIGHT.getDisplayName(),
-                null, 0f, false, Keybinds.RIGHT.isPressed());
+        renderActionButton(margin, lowerRowY, size, Settings.LEFT.getDisplayName(),
+                null, 0f, false, Settings.LEFT.isPressed());
+        renderActionButton(margin + size + gap, lowerRowY, size, Settings.BACK.getDisplayName(),
+                null, 0f, false, Settings.BACK.isPressed());
+        renderActionButton(margin + 2 * (size + gap), lowerRowY, size, Settings.RIGHT.getDisplayName(),
+                null, 0f, false, Settings.RIGHT.isPressed());
 
         String movementText = "Movement";
         float movementTextWidth = this.renderer.tinyFont.getTextWidth(movementText);
@@ -352,8 +352,8 @@ public class GuiRenderer implements GameInstance {
                         lowerRowY + size + labelGap).withShadow(true))
                 .build().tryDraw().close();
 
-        renderActionButton(margin + buttonswidth + gap * 2, lowerRowY, size, Keybinds.ATTACK.getDisplayName(),
-                "Attack", 0f, false, Keybinds.ATTACK.isPressed());
+        renderActionButton(margin + buttonswidth + gap * 2, lowerRowY, size, Settings.ATTACK.getDisplayName(),
+                "Attack", 0f, false, Settings.ATTACK.isPressed());
     }
 
     private void renderActionButton(float x, float y, float size,

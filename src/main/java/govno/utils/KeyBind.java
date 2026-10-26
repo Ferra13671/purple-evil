@@ -19,10 +19,10 @@ public class KeyBind implements GameInstance {
     }};
 
     @Getter
-    private final int key;
+    private int key;
     @Getter
     @NonNull
-    private final KeyType keyType;
+    private KeyType keyType;
     @Getter
     @Setter
     private boolean pressed;
@@ -31,6 +31,15 @@ public class KeyBind implements GameInstance {
         keybinds.get(this.keyType).add(this);
 
         return this;
+    }
+
+    public void setBinding(int key, @NonNull KeyType type) {
+        if (type != this.keyType) {
+            keybinds.get(this.keyType).remove(this);
+            keybinds.get(type).add(this);
+            this.keyType = type;
+        }
+        this.key = key;
     }
 
     public String getDisplayName() {

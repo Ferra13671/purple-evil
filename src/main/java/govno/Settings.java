@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 import org.lwjgl.glfw.GLFW;
 
 @UtilityClass
-public class Keybinds {
+public class Settings {
     public final KeyBind ATTACK = KeyBind.builder()
             .keyType(KeyType.Mouse)
             .key(GLFW.GLFW_MOUSE_BUTTON_LEFT)

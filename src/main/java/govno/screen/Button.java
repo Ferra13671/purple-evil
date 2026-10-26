@@ -31,11 +31,11 @@ public class Button implements GameInstance {
     }
 
     public void render(double mouseX, double mouseY) {
-        Vector4f backGroundColor = this.aabb.contains(mouseX, mouseY) ?
+        Vector4f backGroundColor = contains(mouseX, mouseY) ?
                 new Vector4f(0.5f, 0.5f, 0.5f, 1f)
                 :
                 new Vector4f(0.35f, 0.35f, 0.35f, 1f);
-        Vector4f outlineColor = this.aabb.contains(mouseX, mouseY) ?
+        Vector4f outlineColor = contains(mouseX, mouseY) ?
                 new Vector4f(1f, 1f, 1f, 1f)
                 :
                 new Vector4f(1f, 1f, 1f, 0.3f);
@@ -65,7 +65,11 @@ public class Button implements GameInstance {
     }
 
     public void onMouseRelease(double mouseX, double mouseY, int button) {
-        if (this.aabb.contains(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+        if (contains(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT)
             pressRunnable.run();
+    }
+
+    public boolean contains(double mouseX, double mouseY) {
+        return this.aabb.contains(mouseX, mouseY);
     }
 }

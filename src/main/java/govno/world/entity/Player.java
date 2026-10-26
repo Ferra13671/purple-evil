@@ -1,6 +1,6 @@
 package govno.world.entity;
 
-import govno.Keybinds;
+import govno.Settings;
 import govno.model.EntityModel;
 import govno.utils.AABB;
 import govno.world.attribute.Attributes;
@@ -68,9 +68,9 @@ public class Player extends LivingEntity {
             this.dashCooldown--;
         this.ticksSinceDash++;
 
-        if (Keybinds.DASH.isPressed() && this.dashCooldown <= 0) {
+        if (Settings.DASH.isPressed() && this.dashCooldown <= 0) {
             startDash();
-            Keybinds.DASH.setPressed(false);
+            Settings.DASH.setPressed(false);
         }
 
         if (this.ticksSinceDash < DASH_DURATION) {
@@ -91,7 +91,7 @@ public class Player extends LivingEntity {
         this.yaw = Math.toDegrees(Math.atan2(dy, dx));
 
         if (this.weapon != null) {
-            if (Keybinds.ATTACK.isPressed()) {
+            if (Settings.ATTACK.isPressed()) {
                 if (!this.weapon.isUsingWeapon())
                     this.weapon.startUse(this);
             } else if (this.weapon.isUsingWeapon()) {

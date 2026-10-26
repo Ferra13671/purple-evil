@@ -168,14 +168,14 @@ public class GameSession implements GameInstance {
         }
 
         if (game.getWorld() != null) {
-            if (Keybinds.PLAYER_SWAP.isPressed()) {
+            if (Settings.PLAYER_SWAP.isPressed()) {
                 trySwapPlayer();
-                Keybinds.PLAYER_SWAP.setPressed(false);
+                Settings.PLAYER_SWAP.setPressed(false);
             }
 
-            if (game.getWorld() instanceof LobbyWorld && game.getScreen() == null && Keybinds.SHOP.isPressed()) {
+            if (game.getWorld() instanceof LobbyWorld && game.getScreen() == null && Settings.SHOP.isPressed()) {
                 game.setScreen(new ShopScreen());
-                Keybinds.SHOP.setPressed(false);
+                Settings.SHOP.setPressed(false);
             }
 
             Room currentRoom = game.getWorld().currentRoom;

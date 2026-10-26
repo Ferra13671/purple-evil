@@ -37,12 +37,11 @@ public class MainMenuScreen extends Screen {
 
         float halfWidth = width / 2f;
         float halfHeight = height / 2f;
-
         float buttonWidth = 200;
         float buttonHeight = 50;
         float spacing = 15;
 
-        float totalHeight = buttonHeight * 2 + spacing;
+        float totalHeight = buttonHeight * 3 + spacing * 2;
         float startY = halfHeight - totalHeight / 2;
 
         this.buttons.add(new Button(
@@ -53,7 +52,13 @@ public class MainMenuScreen extends Screen {
         }
         ));
         this.buttons.add(new Button(
-                "Quit", halfWidth - (buttonWidth / 2), startY + buttonHeight + spacing, buttonWidth, buttonHeight, CometGLFW::close
+                "Settings", halfWidth - (buttonWidth / 2), startY + buttonHeight + spacing,
+                buttonWidth, buttonHeight,
+                () -> game.setScreen(new SettingsScreen(this))
+        ));
+        this.buttons.add(new Button(
+                "Quit", halfWidth - (buttonWidth / 2), startY + (buttonHeight + spacing) * 2,
+                buttonWidth, buttonHeight, CometGLFW::close
         ));
     }
 

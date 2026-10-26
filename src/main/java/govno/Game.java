@@ -128,8 +128,8 @@ public class Game {
                 } else {
                     if (this.world == null)
                         setScreen(new MainMenuScreen());
-                    else if (Keybinds.PAUSE.isPressed()) {
-                        Keybinds.PAUSE.setPressed(false);
+                    else if (Settings.PAUSE.isPressed()) {
+                        Settings.PAUSE.setPressed(false);
                         setScreen(new PauseScreen());
                     }
                 }

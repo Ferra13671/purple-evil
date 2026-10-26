@@ -37,24 +37,29 @@ public class PauseScreen extends Screen {
 
         this.buttons.add(new Button(
                 "Restart",
-                halfWidth - (buttonWidth / 2), firstButtonY + (buttonHeight + spacing), buttonWidth, buttonHeight,
-                () -> {
-                    game.setScreen(new ConfirmScreen(
-                            this,
-                            "RESTART?",
-                            "Are you sure you want to restart?",
-                            () -> {
-                                game.getGameSession().loadCheckpoint();
-                                game.getGameSession().startLobby();
-                                game.setScreen(null);
-                            }
-                    ));
-                }
+                halfWidth - (buttonWidth / 2), firstButtonY + (buttonHeight + spacing),
+                buttonWidth, buttonHeight,
+                () -> game.setScreen(new ConfirmScreen(
+                        this, "RESTART?", "Are you sure you want to restart?",
+                        () -> {
+                            game.getGameSession().loadCheckpoint();
+                            game.getGameSession().startLobby();
+                            game.setScreen(null);
+                        }
+                ))
+        ));
+
+        this.buttons.add(new Button(
+                "Settings",
+                halfWidth - (buttonWidth / 2), firstButtonY + (buttonHeight + spacing) * 2,
+                buttonWidth, buttonHeight,
+                () -> game.setScreen(new SettingsScreen(this))
         ));
 
         this.buttons.add(new Button(
                 "Main Menu",
-                halfWidth - (buttonWidth / 2), firstButtonY + (buttonHeight + spacing) * 2, buttonWidth, buttonHeight,
+                halfWidth - (buttonWidth / 2), firstButtonY + (buttonHeight + spacing) * 3,
+                buttonWidth, buttonHeight,
                 () -> {
                     game.setWorld(null);
                     game.setGameSession(null);
