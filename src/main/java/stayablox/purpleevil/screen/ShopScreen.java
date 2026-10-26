@@ -95,6 +95,8 @@ public class ShopScreen extends Screen {
                 .text(new RenderText(title, (width - titleWidth) / 2f, 20f).withShadow(true))
                 .build().tryDraw().close();
 
+        renderCoins();
+
         renderCards(width, height, mouseX, mouseY);
 
         for (Button b : buttons) b.render(mouseX, mouseY);
@@ -106,6 +108,34 @@ public class ShopScreen extends Screen {
                     .text(new RenderText(p, (width - pW) / 2f, height - 40f).withShadow(true))
                     .build().tryDraw().close();
         }
+    }
+
+    private void renderCoins() {
+        final float iconSize = 52f;
+        final float gap = 12f;
+        final float margin = 24f;
+
+        String scoreText = String.valueOf(game.getGameSession().score);
+        float textHeight = game.getRenderer().bigFont.getTextHeight();
+
+        float startX = margin;
+        float startY = margin;
+
+        if (game.getTextures().coinTexture != null) {
+            new BasicTextureBatch()
+                    .texture(game.getTextures().coinTexture)
+                    .rectSized(startX, startY, iconSize, iconSize,
+                            new TextureBorder(0f, 0f, 1f, 1f))
+                    .build().tryDraw().close();
+        }
+
+        new TextBatch(game.getRenderer().bigFont)
+                .text(new RenderText(
+                        scoreText,
+                        startX + iconSize + gap,
+                        startY + (iconSize - textHeight) / 2f
+                ).withShadow(true))
+                .build().tryDraw().close();
     }
 
     private void renderCards(int width, int height, double mouseX, double mouseY) {
@@ -218,11 +248,11 @@ public class ShopScreen extends Screen {
 
         if (hovered) {
             String hint = affordable ? "Click to buy" : "Not enough coins";
-            float hintW = game.getRenderer().smallFont.getTextWidth(hint);
+            float hintW = game.getRenderer().tinyFont.getTextWidth(hint);
             Vector4f hintColor = affordable
                     ? new Vector4f(0.7f, 1f, 0.7f, 1f)
                     : new Vector4f(1f, 0.6f, 0.6f, 1f);
-            new TextBatch(game.getRenderer().smallFont)
+            new TextBatch(game.getRenderer().tinyFont)
                     .text(new RenderText(hint,
                             x + (CARD_W - hintW) / 2f,
                             y + CARD_H - 24f).withShadow(true).withColor(hintColor))

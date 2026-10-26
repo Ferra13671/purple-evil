@@ -10,6 +10,7 @@ import stayablox.purpleevil.renderer.batch.impl.BasicTextureBatch;
 import stayablox.purpleevil.renderer.batch.impl.ColoredRectBatch;
 import stayablox.purpleevil.renderer.batch.impl.text.RenderText;
 import stayablox.purpleevil.renderer.batch.impl.text.TextBatch;
+import stayablox.purpleevil.screen.ShopScreen;
 import stayablox.purpleevil.utils.AABB;
 import stayablox.purpleevil.world.LobbyWorld;
 import stayablox.purpleevil.world.World;
@@ -45,7 +46,10 @@ public class GuiRenderer implements GameInstance {
 
         framebuffer.bind(true);
 
-        if (game.getGameSession() != null && game.getWorld() != null && !game.getGameSession().player.isDying())
+        if (game.getGameSession() != null
+                && game.getWorld() != null
+                && !game.getGameSession().player.isDying()
+                && !(game.getScreen() instanceof ShopScreen))
             renderOverlay(framebuffer);
 
         if (game.getScreen() != null)
