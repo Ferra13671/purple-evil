@@ -3,6 +3,7 @@ plugins {
     id 'com.gradleup.shadow' version '9.0.0-beta4'
 }
 
+group = "stayablox.purpleevil"
 version = '0.1'
 
 repositories {
@@ -58,7 +59,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'govno.main.Main'
+        attributes 'Main-Class': 'stayablox.purpleevil.main.Main'
     }
 }
 
