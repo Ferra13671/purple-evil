@@ -1,8 +1,10 @@
 package govno.world;
 
+import govno.utils.AABB;
 import govno.world.block.Block;
 import govno.world.block.BlockType;
 import govno.world.entity.PortalEntity;
+import govno.world.entity.ShopEntity;
 import govno.world.room.Room;
 import govno.world.room.RoomTemplate;
 import org.joml.Vector2d;
@@ -15,11 +17,12 @@ public class LobbyWorld extends World {
         super(createLobbyRooms());
 
         spawnLobbyPortal();
+        spawnShop();
     }
 
     private static List<Room> createLobbyRooms() {
         RoomTemplate lobbyTemplate = game.getRoomTemplates().templates.get("lobby");
-        
+
         Room lobbyRoom = new Room(lobbyTemplate, 0, 0);
         return List.of(lobbyRoom);
     }
@@ -38,6 +41,17 @@ public class LobbyWorld extends World {
             );
             room.entities.add(portal);
         }
+    }
+
+    private void spawnShop() {
+        Room room = this.rooms.getFirst();
+        AABB bounds = room.getBounds();
+
+        double shopX = (bounds.getMinX() + bounds.getMaxX()) / 2.0;
+        double shopY = bounds.getMaxY() - 2.0;
+
+        ShopEntity shop = new ShopEntity(new Vector2d(shopX, shopY));
+        room.entities.add(shop);
     }
 
     public static Block findPortalBlock(List<Block> blocks) {
