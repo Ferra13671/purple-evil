@@ -16,7 +16,8 @@ public class DeathScreen extends Screen {
 
     @Override
     public void onOpen(int width, int height) {
-        this.openTime = System.currentTimeMillis();
+        if (this.openTime == 0)
+            this.openTime = System.currentTimeMillis();
         resize(width, height);
     }
 
@@ -32,28 +33,35 @@ public class DeathScreen extends Screen {
         this.buttons.add(new Button(
                 "Restart",
                 halfWidth - (buttonWidth / 2), halfHeight + 20, buttonWidth, buttonHeight, () -> {
-                    game.setGameSession(new GameSession());
-                    game.getGameSession().startGame();
-                    game.setScreen(null);
-                }
+            game.setScreen(new ConfirmScreen(
+                    this,
+                    "RESTART?",
+                    "Are you sure you want to restart?",
+                    () -> {
+                        game.setGameSession(new GameSession());
+                        game.getGameSession().startGame();
+                        game.setScreen(null);
+                    }
+            ));
+        }
         ));
 
         this.buttons.add(new Button(
                 "Continue",
                 halfWidth - (buttonWidth / 2), halfHeight + 20 + buttonHeight + spacing, buttonWidth, buttonHeight, () -> {
-                    game.getGameSession().loadCheckpoint();
-                    game.getGameSession().startLobby();
-                    game.setScreen(null);
-                }
+            game.getGameSession().loadCheckpoint();
+            game.getGameSession().startLobby();
+            game.setScreen(null);
+        }
         ));
 
         this.buttons.add(new Button(
                 "Main Menu",
                 halfWidth - (buttonWidth / 2), halfHeight + 20 + (buttonHeight + spacing) * 2, buttonWidth, buttonHeight, () -> {
-                    game.setWorld(null);
-                    game.setGameSession(null);
-                    game.setScreen(new MainMenuScreen());
-                }
+            game.setWorld(null);
+            game.setGameSession(null);
+            game.setScreen(new MainMenuScreen());
+        }
         ));
     }
 

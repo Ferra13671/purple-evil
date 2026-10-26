@@ -39,9 +39,16 @@ public class PauseScreen extends Screen {
                 "Restart",
                 halfWidth - (buttonWidth / 2), firstButtonY + (buttonHeight + spacing), buttonWidth, buttonHeight,
                 () -> {
-                    game.getGameSession().loadCheckpoint();
-                    game.getGameSession().startLobby();
-                    game.setScreen(null);
+                    game.setScreen(new ConfirmScreen(
+                            this,
+                            "RESTART?",
+                            "Are you sure you want to restart?",
+                            () -> {
+                                game.getGameSession().loadCheckpoint();
+                                game.getGameSession().startLobby();
+                                game.setScreen(null);
+                            }
+                    ));
                 }
         ));
 
