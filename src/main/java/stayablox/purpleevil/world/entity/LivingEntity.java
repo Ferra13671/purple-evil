@@ -1,5 +1,6 @@
 package stayablox.purpleevil.world.entity;
 
+import com.ferra13671.overtone.SoundBuffer;
 import stayablox.purpleevil.model.EntityModel;
 import stayablox.purpleevil.utils.AABB;
 import stayablox.purpleevil.utils.Direction;
@@ -12,6 +13,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class LivingEntity extends Entity {
     @NonNull
@@ -197,6 +200,12 @@ public class LivingEntity extends Entity {
     public void damage(double damage) {
         if (isInvincible() || this.dying)
             return;
+
+        if (this.model != null) {
+            SoundBuffer damageBuffer = game.getSounds().entityDamageSounds.get(this.model.getName());
+            if (damageBuffer != null)
+                game.getSoundManager().playSound(damageBuffer, 1f, 0.8f + ThreadLocalRandom.current().nextFloat() * 0.6f);
+        }
 
         this.health -= damage;
         this.invincibilityTimer = getAttributeValue(EntityAttributes.INVINCIBILITY_TIME);

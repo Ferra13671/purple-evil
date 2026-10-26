@@ -7,10 +7,6 @@ group = "stayablox.purpleevil"
 version = '0.1'
 
 repositories {
-    maven {
-        name = 'ferra13671-maven'
-        url = 'https://ferra13671.github.io/maven/'
-    }
     mavenCentral()
     mavenLocal()
 }
@@ -80,13 +76,17 @@ tasks.register('packageSingleExe') {
         def mainClassName = "" // Пусто, так как Main-Class уже прописан в jar-манифесте
         def winRarPath = "C:\\Program Files\\WinRAR\\WinRAR.exe"
 
-        // Куда сохранять финальный результат (как вы и просили - в build/libs)
+        // Иконка — должна лежать в ресурсах проекта. Используется для:
+        //   1) jpackage --icon (иконка встроенного exe)
+        //   2) WinRAR -iicon (иконка SFX-обёртки)
+        def iconSource = file("${projectDir}/src/main/resources/window-icon.ico")
+
+        // Куда сохранять финальный результат
         def finalOutputDir = "${project.layout.buildDirectory.get().asFile.absolutePath}/libs"
         file(finalOutputDir).mkdirs()
         // ------------------------------------------------
 
         // 1. Создаем временную папку в системном Temp
-        // Добавляем currentTimeMillis, чтобы избежать конфликтов, если запустить две сборки одновременно
         def tempDir = file("${System.getProperty('java.io.tmpdir')}/jpackage-temp-${appName}-${System.currentTimeMillis()}")
         tempDir.mkdirs()
 
@@ -102,6 +102,17 @@ tasks.register('packageSingleExe') {
             def mainJarName = tempJar.name
             def inputDir = tempDir.absolutePath
 
+            // Копируем иконку в temp под простым именем (без пробелов в пути —
+            // WinRAR -iicon не парсит пути с пробелами).
+            File sfxIcon = file("${tempDir.absolutePath}/app.ico")
+            boolean hasIcon = iconSource.exists()
+            if (hasIcon) {
+                sfxIcon.bytes = iconSource.bytes
+                println "Иконка скопирована: ${sfxIcon.absolutePath}"
+            } else {
+                println "WARN: Иконка не найдена по пути ${iconSource.absolutePath} — будет использована дефолтная"
+            }
+
             def jpackageOutputDir = "${tempDir.absolutePath}/jpackage-out"
             def finalExeFile = file("${tempDir.absolutePath}/${appName}.exe")
 
@@ -115,8 +126,13 @@ tasks.register('packageSingleExe') {
                     '--main-jar', mainJarName,
                     '--type', 'app-image',
                     '--dest', jpackageOutputDir,
-                    '--win-console' // <-- Добавьте эту строку
+                    '--win-console'
             ]
+
+            if (hasIcon) {
+                jpackageArgs.add('--icon')
+                jpackageArgs.add(sfxIcon.absolutePath)
+            }
 
             if (mainClassName != null && !mainClassName.trim().isEmpty()) {
                 jpackageArgs.add('--main-class')
@@ -139,12 +155,21 @@ Silent=1
             def generatedAppFolder = "${jpackageOutputDir}/${appName}"
 
             if (file(winRarPath).exists()) {
+                // Собираем команду WinRAR. Если есть иконка — добавляем -iicon,
+                // чтобы SFX-обёртка тоже получила нашу иконку (а не стандартную WinRAR).
+                List<String> rarArgs = [
+                        winRarPath, 'a', '-sfx', '-ep1', '-r',
+                        '-zsfxoptions.txt'
+                ]
+                if (hasIcon) {
+                    rarArgs.add("-iicon${sfxIcon.absolutePath}")
+                }
+                rarArgs.add(finalExeFile.absolutePath)
+                rarArgs.add("${generatedAppFolder}\\*")
+
                 def rarResult = providers.exec {
                     workingDir = tempDir
-                    commandLine winRarPath, 'a', '-sfx', '-ep1', '-r',
-                            "-zsfxoptions.txt", // <-- ИСПРАВЛЕНО: параметр -z вместо -sfxopt
-                            finalExeFile.absolutePath,
-                            "${generatedAppFolder}\\*"
+                    commandLine rarArgs
                 }.result.get()
 
                 if (rarResult.exitValue != 0 && rarResult.exitValue != 1) {
@@ -162,7 +187,6 @@ Silent=1
             }
 
         } finally {
-            // 3. Обязательная очистка временных файлов (сработает даже при ошибке)
             println "=== Шаг 5: Очистка временных файлов ==="
             delete(tempDir)
         }

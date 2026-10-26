@@ -1,5 +1,6 @@
 package stayablox.purpleevil.world.entity;
 
+import com.ferra13671.overtone.SoundBuffer;
 import stayablox.purpleevil.Settings;
 import stayablox.purpleevil.model.EntityModel;
 import stayablox.purpleevil.utils.AABB;
@@ -16,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Player extends LivingEntity {
 
@@ -66,16 +68,6 @@ public class Player extends LivingEntity {
     public void onDead() {
         super.onDead();
         game.getGameSession().onPlayerDead(this);
-    }
-
-    @Override
-    public void damage(double damage) {
-        if (isInvincible() || this.dying)
-            return;
-
-        game.getSoundManager().playSound(game.getSounds().PLAYER_DAMAGE, 1f, 0.8f + random.nextFloat() * 0.6f);
-
-        super.damage(damage);
     }
 
     public float getDashCooldownProgress() {
@@ -175,6 +167,21 @@ public class Player extends LivingEntity {
                 this.stepTimer = newStepTimer;
             }
         }
+    }
+
+    @Override
+    public void damage(double damage) {
+        if (isInvincible() || this.dying)
+            return;
+
+        if (this.model != null) {
+            SoundBuffer damageBuffer = game.getSounds().entityDamageSounds.get("player");
+            if (damageBuffer != null)
+                game.getSoundManager().playSound(damageBuffer, 1f, 0.8f + ThreadLocalRandom.current().nextFloat() * 0.6f);
+        }
+
+        this.health -= damage;
+        this.invincibilityTimer = getAttributeValue(EntityAttributes.INVINCIBILITY_TIME);
     }
 
     @Override
