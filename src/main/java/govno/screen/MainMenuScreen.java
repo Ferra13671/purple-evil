@@ -1,7 +1,10 @@
 package govno.screen;
 
 import com.ferra13671.cometrenderer.plugins.glfw.CometGLFW;
+import com.ferra13671.cometrenderer.texture.GLTex;
+import com.ferra13671.cometrenderer.texture.atlas.TextureBorder;
 import govno.GameSession;
+import govno.renderer.batch.impl.BasicTextureBatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +51,41 @@ public class MainMenuScreen extends Screen {
     @Override
     public void render(double mouseX, double mouseY) {
         renderBackground();
+        renderTitle();
 
         for (Button button : buttons)
             button.render(mouseX, mouseY);
+    }
+
+    private void renderTitle() {
+        GLTex titleTex = game.getTextures().titleTexture;
+        if (titleTex == null) return;
+
+        int screenWidth = game.getWindow().getFramebufferWidth();
+        int screenHeight = game.getWindow().getFramebufferHeight();
+
+        float texW = titleTex.getWidth();
+        float texH = titleTex.getHeight();
+        float texAspect = texW / texH;
+
+        float drawW = screenWidth * 0.6f;
+        float drawH = drawW / texAspect;
+
+        float maxH = screenHeight * 0.30f;
+        if (drawH > maxH) {
+            drawH = maxH;
+            drawW = drawH * texAspect;
+        }
+
+        float drawX = (screenWidth - drawW) / 2f;
+        float drawY = screenHeight * 0.08f;
+
+        new BasicTextureBatch()
+                .texture(titleTex)
+                .rectSized(drawX, drawY, drawW, drawH, TextureBorder.DEFAULT)
+                .build()
+                .tryDraw()
+                .close();
     }
 
     @Override

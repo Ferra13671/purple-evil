@@ -40,6 +40,10 @@ public class Textures {
             .name("menu")
             .info("assets/textures/menu.png")
             .build();
+    public final GLTexture titleTexture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("title")
+            .info("assets/textures/title.png")
+            .build();
 
     public Textures() {
         this.worldAtlas = loadRoomAtlas();
