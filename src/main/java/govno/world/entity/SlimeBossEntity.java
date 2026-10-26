@@ -24,6 +24,8 @@ public class SlimeBossEntity extends EnemyEntity {
 
     @Override
     public void onEntityCollision(Entity other, Vector2dc out) {
+        if (this.isShocked() || this.dying) return;
+
         if (other == game.getGameSession().player && !this.phasing)
             game.getGameSession().player.damage(getAttributeValue(EnemyAttributes.DAMAGE));
     }

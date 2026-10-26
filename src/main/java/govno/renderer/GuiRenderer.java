@@ -326,6 +326,12 @@ public class GuiRenderer implements GameInstance {
                 game.getGameSession().player.getDashCooldownProgress(), true, Settings.DASH.isPressed());
         x += size + gap;
 
+        if (game.getGameSession().player.isMage()) {
+            renderActionButton(x, upperY, size, Settings.SHOCK_DASH.getDisplayName(), "Shock",
+                    game.getGameSession().player.getShockDashCooldownProgress(), true, Settings.SHOCK_DASH.isPressed());
+            x += size + gap;
+        }
+
         if (inLobby) {
             renderActionButton(x, upperY, size, Settings.SHOP.getDisplayName(), "Shop",
                     0f, false, Settings.SHOP.isPressed());

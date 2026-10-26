@@ -5,15 +5,21 @@ import govno.model.EntityModel;
 import govno.utils.AABB;
 import govno.world.attribute.Attributes;
 import govno.world.entity.input.PlayerInput;
+import govno.world.weapon.SwordWeapon;
 import govno.world.weapon.Weapon;
 import lombok.Getter;
 import org.joml.Vector2d;
+import org.joml.Vector2dc;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class Player extends LivingEntity {
+
+    private static final double SHOCK_DURATION_SECONDS = 10.0;
 
     private double stepTimer = 0;
     private final Random random = new Random();
@@ -26,6 +32,13 @@ public class Player extends LivingEntity {
     private final List<Vector2d> dashTrail = new ArrayList<>();
     private static final int DASH_DURATION = 20;
 
+    @Getter
+    private int shockDashCooldown = 0;
+    @Getter
+    private boolean shockDashing = false;
+    private int shockDashTicks = 0;
+    private final Set<Entity> shockedThisDash = new HashSet<>();
+
     public Player(EntityModel model, Weapon weapon) {
         super(
                 model,
@@ -36,6 +49,11 @@ public class Player extends LivingEntity {
         );
 
         setInput(new PlayerInput());
+    }
+
+    /** Маг — тот, у кого меч (см. GameSession: knight=staff, mage=sword). */
+    public boolean isMage() {
+        return this.weapon instanceof SwordWeapon;
     }
 
     @Override
@@ -67,6 +85,19 @@ public class Player extends LivingEntity {
         return (float) Math.clamp(this.dashCooldown / max, 0.0, 1.0);
     }
 
+    public float getShockDashCooldownProgress() {
+        if (this.shockDashCooldown <= 0) return 0f;
+        double max = getAttributeValue(PlayerAttributes.SHOCK_DASH_DELAY);
+        if (max <= 0) return 0f;
+        return (float) Math.clamp(this.shockDashCooldown / max, 0.0, 1.0);
+    }
+
+    public boolean canUseShockDash() {
+        return isMage()
+                && this.shockDashCooldown <= 0
+                && this.dashCooldown <= 0;
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -76,11 +107,30 @@ public class Player extends LivingEntity {
 
         if (this.dashCooldown > 0)
             this.dashCooldown--;
+        if (this.shockDashCooldown > 0)
+            this.shockDashCooldown--;
         this.ticksSinceDash++;
 
-        if (Settings.DASH.isPressed() && this.dashCooldown <= 0) {
-            startDash();
-            Settings.DASH.setPressed(false);
+        // Завершение окна shock dash
+        if (this.shockDashTicks > 0) {
+            this.shockDashTicks--;
+            if (this.shockDashTicks <= 0) {
+                this.shockDashing = false;
+                this.shockedThisDash.clear();
+            }
+        }
+
+        // Триггеры деша (блокируются шоком)
+        if (!this.isShocked()) {
+            if (Settings.DASH.isPressed() && this.dashCooldown <= 0) {
+                startDash();
+                Settings.DASH.setPressed(false);
+            }
+
+            if (Settings.SHOCK_DASH.isPressed() && canUseShockDash()) {
+                startShockDash();
+                Settings.SHOCK_DASH.setPressed(false);
+            }
         }
 
         if (this.ticksSinceDash < DASH_DURATION) {
@@ -109,7 +159,6 @@ public class Player extends LivingEntity {
             }
         }
 
-
         float dt = game.getTicker().getTickDelay() / 1000f;
         double speed = this.velocity.length();
 
@@ -128,8 +177,28 @@ public class Player extends LivingEntity {
         }
     }
 
+    @Override
+    public void onEntityCollision(Entity other, Vector2dc out) {
+        super.onEntityCollision(other, out);
+
+        if (!this.shockDashing)
+            return;
+        if (!(other instanceof EnemyEntity enemy))
+            return;
+        if (this.shockedThisDash.contains(enemy))
+            return;
+
+        enemy.applyShock(SHOCK_DURATION_SECONDS);
+        this.shockedThisDash.add(enemy);
+    }
+
     private void startDash() {
-        this.dashCooldown = (int) getAttributeValue(PlayerAttributes.DASH_DELAY);
+        int dashDelay = (int) getAttributeValue(PlayerAttributes.DASH_DELAY);
+
+        this.dashCooldown = dashDelay;
+
+        this.shockDashCooldown += dashDelay;
+
         this.ticksSinceDash = 0;
 
         Vector2d dir = new Vector2d(this.input.vector);
@@ -138,6 +207,24 @@ public class Player extends LivingEntity {
         dir.normalize();
 
         double dashSpeed = getAttributeValue(PlayerAttributes.DASH_SPEED);
+        this.velocity.set(dir.mul(dashSpeed));
+    }
+
+    private void startShockDash() {
+        this.dashCooldown = (int) getAttributeValue(PlayerAttributes.DASH_DELAY);
+        this.shockDashCooldown = (int) getAttributeValue(PlayerAttributes.SHOCK_DASH_DELAY);
+        this.ticksSinceDash = 0;
+        this.shockDashing = true;
+        this.shockDashTicks = DASH_DURATION;
+        this.shockedThisDash.clear();
+        this.invincibilityTimer = getAttributeValue(EntityAttributes.INVINCIBILITY_TIME);
+
+        Vector2d dir = new Vector2d(this.input.vector);
+        if (dir.lengthSquared() < 0.1)
+            dir.set(this.facing.dx(), this.facing.dy());
+        dir.normalize();
+
+        double dashSpeed = getAttributeValue(PlayerAttributes.DASH_SPEED) * 2.5;
         this.velocity.set(dir.mul(dashSpeed));
     }
 }

@@ -59,6 +59,8 @@ public class EnemyEntity extends LivingEntity {
 
     @Override
     public void onEntityCollision(Entity other, Vector2dc out) {
+        if (this.isShocked() || this.dying) return;
+
         if (other == game.getGameSession().player) {
             game.getGameSession().player.damage(getAttributeValue(EnemyAttributes.DAMAGE));
             game.getGameSession().player.damage(getAttributeValue(EnemyAttributes.KNOCKBACK));

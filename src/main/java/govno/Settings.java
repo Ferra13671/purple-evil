@@ -44,6 +44,11 @@ public class Settings {
             .key(GLFW.GLFW_KEY_F)
             .build()
             .register();
+    public final KeyBind SHOCK_DASH = KeyBind.builder()
+            .keyType(KeyType.Keyboard)
+            .key(GLFW.GLFW_KEY_X)
+            .build()
+            .register();
     public final KeyBind PAUSE = KeyBind.builder()
             .keyType(KeyType.Keyboard)
             .key(GLFW.GLFW_KEY_ESCAPE)

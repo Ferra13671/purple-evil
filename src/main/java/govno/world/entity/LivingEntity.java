@@ -41,6 +41,9 @@ public class LivingEntity extends Entity {
     private float speedMultiplier = 1.0f;
 
     @Getter
+    protected double shockTimer = 0;
+
+    @Getter
     protected int poisonTimer = 0;
     protected int poisonTickTimer = 0;
     protected double poisonLevel = 0;
@@ -56,6 +59,14 @@ public class LivingEntity extends Entity {
 
     public double getAttributeValue(String id) {
         return this.attributes.getCurrentValue(id);
+    }
+
+    public boolean isShocked() {
+        return shockTimer > 0;
+    }
+
+    public void applyShock(double seconds) {
+        this.shockTimer = Math.max(this.shockTimer, seconds);
     }
 
     public void setWeapon(Weapon weapon) {
@@ -85,6 +96,7 @@ public class LivingEntity extends Entity {
         this.poisonTimer = 0;
         this.phasing = false;
         this.speedMultiplier = 1f;
+        this.shockTimer = 0;
 
         if (this.model != null && this.model.hasAnimation("death"))
             this.model.play("death", true);
@@ -106,6 +118,7 @@ public class LivingEntity extends Entity {
         this.input.vector.set(0, 0);
         this.phasing = false;
         this.speedMultiplier = 1f;
+        this.shockTimer = 0;
 
         if (this.model != null)
             this.model.play("stay");
@@ -167,6 +180,14 @@ public class LivingEntity extends Entity {
             if (this.invincibilityTimer < 0) {
                 this.invincibilityTimer = 0;
             }
+        }
+
+        if (this.shockTimer > 0) {
+            this.shockTimer -= game.getTicker().getTickDelay() / 1000.0;
+            if (this.shockTimer < 0) this.shockTimer = 0;
+            this.velocity.set(0, 0);
+            this.input.vector.set(0, 0);
+            return;
         }
 
         this.input.tick();

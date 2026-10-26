@@ -84,9 +84,11 @@ public class WorldRenderer implements GameInstance {
         for (int i = 0; i < trail.size(); i++) {
             Vector2d pos = trail.get(i);
 
-            // Чем ближе к концу списка (новее), тем более непрозрачный
-            float alpha = (float) (i + 1) / trail.size() * 0.4f; // Максимальная прозрачность 40%
-            Vector4f color = new Vector4f(1f, 0.8f, 1f, alpha); // Слегка фиолетовый оттенок для стиля
+            float alpha = (float) (i + 1) / trail.size() * 0.4f;
+
+            Vector4f color = player.isShockDashing()
+                    ? new Vector4f(0.5f, 0.8f, 1f, alpha)
+                    : new Vector4f(1f, 0.8f, 1f, alpha);
 
             AABB aabb = new AABB(player.modelAABB).move(pos);
             double xLength = aabb.getXLength();
@@ -114,13 +116,13 @@ public class WorldRenderer implements GameInstance {
         if (entity instanceof LivingEntity livingEntity) {
             if (livingEntity.isInvincible() && !livingEntity.isDying()) {
                 int blinkPhase = (int) (livingEntity.getInvincibilityTimer() * 10);
-                if (blinkPhase % 2 == 0) {
-                    return;
-                }
+                if (blinkPhase % 2 == 0) return;
             }
 
             if (livingEntity.getPoisonTimer() > 0)
                 color.set(0, 0.9f, 0, 1f);
+            else if (livingEntity.isShocked())
+                color.set(0.4f, 0.7f, 1f, 1f);   // ← синий тинт для шокированных
         }
 
         AABB aabb = new AABB(entity.modelAABB).move(Utils.lerp(entity.prevPosition, entity.position, game.getTicker().getTickDelta()));
