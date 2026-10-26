@@ -7,7 +7,7 @@ import org.lwjgl.glfw.GLFW;
 
 @UtilityClass
 public class Settings {
-    public float SOUNDS_VOLUME = 1f;
+    public float SOUNDS_VOLUME = 0.75f;
 
     public final KeyBind ATTACK = KeyBind.builder()
             .keyType(KeyType.Mouse)

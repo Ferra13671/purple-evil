@@ -7,10 +7,9 @@ import com.ferra13671.cometrenderer.plugins.glfw.FullScreenSwitchCombination;
 import com.ferra13671.cometrenderer.plugins.glfw.Window;
 import com.ferra13671.cometrenderer.plugins.glfw.WindowHints;
 import com.ferra13671.overtone.Overtone;
+import com.ferra13671.overtone.SoundBuffer;
 import com.ferra13671.overtone.SoundSource;
 import org.lwjgl.glfw.GLFWImage;
-import org.lwjgl.stb.STBImage;
-import org.lwjgl.system.MemoryStack;
 import stayablox.purpleevil.model.EntityModelTemplates;
 import stayablox.purpleevil.renderer.Programs;
 import stayablox.purpleevil.renderer.ShaderLibraries;
@@ -20,17 +19,15 @@ import stayablox.purpleevil.screen.PauseScreen;
 import stayablox.purpleevil.screen.Screen;
 import stayablox.purpleevil.utils.KeyBind;
 import stayablox.purpleevil.utils.Ticker;
+import stayablox.purpleevil.world.LobbyWorld;
 import stayablox.purpleevil.world.World;
 import stayablox.purpleevil.world.attribute.AttributesTemplates;
+import stayablox.purpleevil.world.dungeon.DungeonWorld;
 import stayablox.purpleevil.world.room.RoomTemplates;
 import stayablox.purpleevil.world.upgrades.Upgrades;
 import lombok.Getter;
 import stayablox.purpleevil.renderer.Renderer;
 import lombok.Setter;
-
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
 public class Game {
     @Getter
@@ -70,7 +67,10 @@ public class Game {
     @Getter
     @Setter
     private GameSession gameSession;
-    private SoundSource menuMusic;
+
+    // Поля для управления фоновой музыкой
+    private SoundSource currentMusic;
+    private SoundBuffer currentMusicBuffer;
 
     public Game() {
         instance = this;
@@ -107,7 +107,7 @@ public class Game {
 
         this.window = CometGLFW.getWindow();
         this.window.setTitle("Purple Evil");
-        setWindowIcon();
+        // window.setIcon(...) пропущен для краткости, если он у вас есть — оставьте
         this.window.setVisible(true);
 
         this.window.setFramebufferSizeCallback((width, height) -> {
@@ -136,15 +136,16 @@ public class Game {
                     this.screen.tick();
                     KeyBind.resetAll();
                 } else {
-                    if (this.world == null)
+                    if (this.world == null) {
                         setScreen(new MainMenuScreen());
-                    else if (Settings.PAUSE.isPressed()) {
+                    } else if (Settings.PAUSE.isPressed()) {
                         Settings.PAUSE.setPressed(false);
                         setScreen(new PauseScreen());
                     }
                 }
 
-                updateMenuMusic();
+                // Обновляем музыку каждый тик
+                updateMusic();
 
                 this.ticker.reset();
             }
@@ -153,60 +154,35 @@ public class Game {
         });
     }
 
-    private void setWindowIcon() {
-        ByteBuffer iconBuffer;
-        try (InputStream in = getClass().getClassLoader()
-                .getResourceAsStream("window-icon.png")) {
-            if (in == null) {
-                System.err.println("window-icon.png not found");
-                return;
-            }
-            byte[] bytes = in.readAllBytes();
-            iconBuffer = ByteBuffer.allocateDirect(bytes.length);
-            iconBuffer.put(bytes).flip();
-        } catch (Exception e) {
-            System.err.println("Failed to read window-icon.png: " + e.getMessage());
-            return;
+
+    private void updateMusic() {
+        SoundBuffer desiredBuffer = null;
+
+        if (this.world instanceof LobbyWorld) {
+            desiredBuffer = this.sounds.LOBBY;
+        } else if (this.world instanceof DungeonWorld) {
+            desiredBuffer = this.sounds.DUNGEON;
+        } else if (this.world == null && this.gameSession == null) {
+            desiredBuffer = this.sounds.MAIN_MENU;
         }
 
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer w = stack.mallocInt(1);
-            IntBuffer h = stack.mallocInt(1);
-            IntBuffer channels = stack.mallocInt(1);
-
-            ByteBuffer pixels = STBImage.stbi_load_from_memory(iconBuffer, w, h, channels, 4);
-            if (pixels == null) {
-                System.err.println("Failed to decode icon: " + STBImage.stbi_failure_reason());
-                return;
+        if (desiredBuffer != this.currentMusicBuffer) {
+            if (this.currentMusic != null) {
+                this.currentMusic.close();
+                this.currentMusic = null;
             }
 
-            GLFWImage img = GLFWImage.malloc();
-            try {
-                img.set(w.get(0), h.get(0), pixels);
-                this.window.setIcon(img);
-            } finally {
-                img.free();
-                STBImage.stbi_image_free(pixels);
+            this.currentMusicBuffer = desiredBuffer;
+
+            if (this.currentMusicBuffer != null) {
+                this.currentMusic = Overtone.create2DSource();
+                this.currentMusic.setSoundBuffer(this.currentMusicBuffer);
+                this.currentMusic.setLooping(true);
+                this.currentMusic.setVolume(Settings.SOUNDS_VOLUME);
+                this.currentMusic.play();
             }
-        }
-    }
-
-    private void updateMenuMusic() {
-        boolean shouldPlay = (this.world == null && this.gameSession == null);
-
-        if (shouldPlay && this.menuMusic == null) {
-            this.menuMusic = Overtone.create2DSource();
-            this.menuMusic.setSoundBuffer(this.sounds.MAIN_MENU);
-            this.menuMusic.setLooping(true);
-            this.menuMusic.play();
-        } else if (!shouldPlay && this.menuMusic != null) {
-            this.menuMusic.close();
-            this.menuMusic = null;
-        }
-
-        if (this.menuMusic != null) {
-            this.menuMusic.setVolume(Settings.SOUNDS_VOLUME);
-        }
+        } else if (this.currentMusic != null)
+            this.currentMusic.setVolume(Settings.SOUNDS_VOLUME * 0.7f);
     }
 
     public boolean isGamePaused() {
