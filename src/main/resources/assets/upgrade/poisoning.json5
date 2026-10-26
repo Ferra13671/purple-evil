@@ -1,5 +1,5 @@
 {
-  price: 200,
+  price: 100,
   type: 'weapon',
   spawning: false,
 

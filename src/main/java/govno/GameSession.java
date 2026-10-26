@@ -2,9 +2,11 @@ package govno;
 
 import govno.model.EntityModel;
 import govno.screen.DeathScreen;
+import govno.screen.ShopScreen;
 import govno.utils.AABB;
 import govno.world.LobbyWorld;
 import govno.world.attribute.Attributes;
+import govno.world.attribute.modifier.AttributeInstance;
 import govno.world.attribute.modifier.AttributeModifier;
 import govno.world.block.Block;
 import govno.world.block.BlockType;
@@ -110,6 +112,41 @@ public class GameSession implements GameInstance {
         });
     }
 
+    public int getUpgradePurchaseCount(String upgradeId) {
+        Upgrade upgrade = game.getUpgrades().upgrades.get(upgradeId);
+        if (upgrade == null || upgrade.modifiers().isEmpty()) return 0;
+
+        Attributes attrs = switch (upgrade.type()) {
+            case Player -> knight.getAttributes();
+            case Weapon -> {
+                if (knight.getWeapon() != null) yield knight.getWeapon().getAttributes();
+                yield mage.getWeapon() != null ? mage.getWeapon().getAttributes() : null;
+            }
+        };
+        if (attrs == null) return 0;
+
+        int raw = 0;
+        for (AttributeInstance inst : attrs.getAttributes().values()) {
+            for (AttributeModifier mod : inst.getModifiers()) {
+                if (mod.id().equals(upgradeId)) raw++;
+            }
+        }
+        return raw / upgrade.modifiers().size();
+    }
+
+    public int getCurrentPrice(Upgrade upgrade) {
+        int purchased = getUpgradePurchaseCount(upgrade.name());
+        return (int) Math.round(upgrade.price() * Math.pow(2, purchased));
+    }
+
+    public boolean purchaseUpgrade(Upgrade upgrade) {
+        int price = getCurrentPrice(upgrade);
+        if (score < price) return false;
+        score -= price;
+        applyUpgrade(upgrade);
+        return true;
+    }
+
     private void saveCheckpoint() {
         this.checkpoint = new Checkpoint(
                 this.knight.getHealth(), this.mage.getHealth(),
@@ -128,6 +165,11 @@ public class GameSession implements GameInstance {
             if (Keybinds.PLAYER_SWAP.isPressed()) {
                 trySwapPlayer();
                 Keybinds.PLAYER_SWAP.setPressed(false);
+            }
+
+            if (game.getWorld() instanceof LobbyWorld && game.getScreen() == null && Keybinds.SHOP.isPressed()) {
+                game.setScreen(new ShopScreen());
+                Keybinds.SHOP.setPressed(false);
             }
 
             Room currentRoom = game.getWorld().currentRoom;

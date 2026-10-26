@@ -5,6 +5,6 @@
   acceleration: 2,
   invincibility_time: 0,
   damage: 15,
-  score: 15,
+  score: 30,
   knockback: 0.6
 }

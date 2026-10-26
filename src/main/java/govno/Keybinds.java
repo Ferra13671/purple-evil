@@ -47,4 +47,9 @@ public class Keybinds {
             .key(GLFW.GLFW_KEY_ESCAPE)
             .build()
             .register();
+    public final KeyBind SHOP = KeyBind.builder()
+            .keyType(KeyType.Keyboard)
+            .key(GLFW.GLFW_KEY_B)
+            .build()
+            .register();
 }

@@ -1,5 +1,5 @@
 {
-  max_health: 200,
+  max_health: 400,
   regeneration: 0.0,
   speed: 0.16,
   acceleration: 0.2,
