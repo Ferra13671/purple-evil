@@ -1,7 +1,9 @@
 package stayablox.purpleevil;
 
 import stayablox.purpleevil.model.EntityModel;
+import stayablox.purpleevil.screen.ComicsScreen;
 import stayablox.purpleevil.screen.DeathScreen;
+import stayablox.purpleevil.screen.MainMenuScreen;
 import stayablox.purpleevil.screen.ShopScreen;
 import stayablox.purpleevil.utils.AABB;
 import stayablox.purpleevil.world.LobbyWorld;
@@ -50,7 +52,10 @@ public class GameSession implements GameInstance {
 
     public void startGame() {
         this.score = 0;
-        startLobby();
+        game.setScreen(new ComicsScreen(null, () -> {
+            startLobby();
+            game.setScreen(null);
+        }, "1", "2"));
     }
 
     public void startLobby() {
@@ -64,8 +69,31 @@ public class GameSession implements GameInstance {
     }
 
     public void completeDungeon() {
+        int completedLevel = this.currentLevel;
         this.currentLevel++;
-        startLobby();
+
+        switch (completedLevel) {
+            case 3 -> {
+                game.setScreen(new ComicsScreen(null, () -> {
+                    startLobby();
+                    game.setScreen(null);
+                }, "3"));
+            }
+            case 6 -> {
+                game.setScreen(new ComicsScreen(null, () -> {
+                    startLobby();
+                    game.setScreen(null);
+                }, "4"));
+            }
+            case 9 -> {
+                game.setScreen(new ComicsScreen(null, () -> {
+                    game.setWorld(null);
+                    game.setGameSession(null);
+                    game.setScreen(new MainMenuScreen());
+                }, "5"));
+            }
+            default -> startLobby();
+        }
     }
 
     public void loadCheckpoint() {

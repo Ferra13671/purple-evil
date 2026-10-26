@@ -40,7 +40,6 @@ public class DeathScreen extends Screen {
                     () -> {
                         game.setGameSession(new GameSession());
                         game.getGameSession().startGame();
-                        game.setScreen(null);
                     }
             ));
         }

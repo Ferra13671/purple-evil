@@ -34,7 +34,6 @@ public class MainMenuScreen extends Screen {
                 "Play", halfWidth - (buttonWidth / 2), startY, buttonWidth, buttonHeight, () -> {
             game.setGameSession(new GameSession());
             game.getGameSession().startGame();
-            game.setScreen(null);
         }
         ));
         this.buttons.add(new Button(
