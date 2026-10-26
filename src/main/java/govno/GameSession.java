@@ -86,6 +86,12 @@ public class GameSession implements GameInstance {
         }
     }
 
+    public float getSwapCooldownProgress() {
+        long elapsed = System.currentTimeMillis() - lastSwapTime;
+        if (elapsed >= SWAP_COOLDOWN_MS) return 0f;
+        return 1f - (float) elapsed / SWAP_COOLDOWN_MS;
+    }
+
     public void applyUpgrade(Upgrade upgrade) {
         switch (upgrade.type()) {
             case Player -> {

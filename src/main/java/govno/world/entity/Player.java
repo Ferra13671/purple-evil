@@ -51,6 +51,13 @@ public class Player extends LivingEntity {
         game.getGameSession().onPlayerDead(this);
     }
 
+    public float getDashCooldownProgress() {
+        if (this.dashCooldown <= 0) return 0f;
+        double max = getAttributeValue(PlayerAttributes.DASH_DELAY);
+        if (max <= 0) return 0f;
+        return (float) Math.clamp(this.dashCooldown / max, 0.0, 1.0);
+    }
+
     @Override
     public void tick() {
         super.tick();

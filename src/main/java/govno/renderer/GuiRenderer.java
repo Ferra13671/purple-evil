@@ -5,11 +5,13 @@ import com.ferra13671.cometrenderer.texture.GLTex;
 import com.ferra13671.cometrenderer.texture.GLTexture;
 import com.ferra13671.cometrenderer.texture.atlas.TextureBorder;
 import govno.GameInstance;
+import govno.Keybinds;
 import govno.renderer.batch.impl.BasicTextureBatch;
 import govno.renderer.batch.impl.ColoredRectBatch;
 import govno.renderer.batch.impl.text.RenderText;
 import govno.renderer.batch.impl.text.TextBatch;
 import govno.utils.AABB;
+import govno.world.LobbyWorld;
 import govno.world.World;
 import govno.world.attribute.Attributes;
 import govno.world.attribute.modifier.AttributeInstance;
@@ -56,6 +58,7 @@ public class GuiRenderer implements GameInstance {
     private void renderOverlay(Framebuffer framebuffer) {
         renderStats(framebuffer);
         renderUpgrades(framebuffer);
+        renderActionButtons(framebuffer);
         renderMinimap(framebuffer);
     }
 
@@ -292,5 +295,120 @@ public class GuiRenderer implements GameInstance {
         new TextBatch(this.renderer.smallFont)
                 .text(new RenderText(text, x, y).withShadow(true))
                 .build().tryDraw().close();
+    }
+
+    private void renderActionButtons(Framebuffer framebuffer) {
+        final float size = 56f;
+        final float gap = 12f;
+        final float rowGap = 12f;
+        final float margin = 20f;
+        final float labelGap = 4f;
+
+        float labelHeight = this.renderer.tinyFont.getTextHeight();
+        float buttonBlockH = size + labelGap + labelHeight;
+        float clusterH = 2 * size + gap + labelGap + labelHeight;
+
+        float lowerY = framebuffer.getHeight() - margin - clusterH;
+        float upperY = lowerY - rowGap - buttonBlockH;
+
+        boolean inLobby = game.getWorld() instanceof LobbyWorld;
+
+        float x = margin;
+        renderActionButton(x, upperY, size, "ESC", "Pause",
+                0f, false, Keybinds.PAUSE.isPressed());
+        x += size + gap;
+
+        renderActionButton(x, upperY, size, "R", "Swap",
+                game.getGameSession().getSwapCooldownProgress(), true, Keybinds.PLAYER_SWAP.isPressed());
+        x += size + gap;
+
+        renderActionButton(x, upperY, size, "F", "Dash",
+                game.getGameSession().player.getDashCooldownProgress(), true, Keybinds.DASH.isPressed());
+        x += size + gap;
+
+        if (inLobby) {
+            renderActionButton(x, upperY, size, "B", "Shop",
+                    0f, false, Keybinds.SHOP.isPressed());
+        }
+
+        float buttonswidth    = 3 * size + 2 * gap;
+
+        renderActionButton(margin + size + gap, lowerY, size, "W",
+                null, 0f, false, Keybinds.FORWARD.isPressed());
+
+        float lowerRowY = lowerY + size + gap;
+        renderActionButton(margin,                      lowerRowY, size, "A",
+                null, 0f, false, Keybinds.LEFT.isPressed());
+        renderActionButton(margin + size + gap,         lowerRowY, size, "S",
+                null, 0f, false, Keybinds.BACK.isPressed());
+        renderActionButton(margin + 2 * (size + gap),   lowerRowY, size, "D",
+                null, 0f, false, Keybinds.RIGHT.isPressed());
+
+        String movementText  = "Movement";
+        float  movementTextWidth = this.renderer.tinyFont.getTextWidth(movementText);
+        new TextBatch(this.renderer.tinyFont)
+                .text(new RenderText(movementText,
+                        margin + (buttonswidth - movementTextWidth) / 2f,
+                        lowerRowY + size + labelGap).withShadow(true))
+                .build().tryDraw().close();
+
+        renderActionButton(margin + buttonswidth + gap * 2, lowerRowY, size, "LMB",
+                "Attack", 0f, false, Keybinds.ATTACK.isPressed());
+    }
+
+    private void renderActionButton(float x, float y, float size,
+                                    String keyText,
+                                    String name,
+                                    float cooldownProgress,
+                                    boolean showFill,
+                                    boolean pressed) {
+        Vector4f bg = new Vector4f(0.1f, 0.1f, 0.1f, 0.75f);
+        new ColoredRectBatch()
+                .rectSized(x, y, size, size, RectColors.verticalGradient(bg, bg))
+                .build().tryDraw().close();
+
+        if (showFill && cooldownProgress > 0.001f) {
+            float fillHeight = size * Math.clamp(cooldownProgress, 0f, 1f);
+            Vector4f fill = new Vector4f(1f, 1f, 1f, 0.4f);
+            new ColoredRectBatch()
+                    .rectSized(x, y, size, fillHeight, RectColors.verticalGradient(fill, fill))
+                    .build().tryDraw().close();
+        }
+
+        if (pressed) {
+            Vector4f glow = new Vector4f(0.4f, 0.7f, 1f, 0.35f);
+            new ColoredRectBatch()
+                    .rectSized(x, y, size, size, RectColors.verticalGradient(glow, glow))
+                    .build().tryDraw().close();
+        }
+
+        float bt = 2f;
+        Vector4f border = pressed
+                ? new Vector4f(0.6f, 0.85f, 1f, 0.95f)
+                : new Vector4f(1f, 1f, 1f, 0.55f);
+        new ColoredRectBatch()
+                .rectSized(x, y, size, bt, RectColors.verticalGradient(border, border))
+                .rectSized(x, y + size - bt, size, bt, RectColors.verticalGradient(border, border))
+                .rectSized(x, y + bt, bt, size - bt * 2, RectColors.verticalGradient(border, border))
+                .rectSized(x + size - bt, y + bt, bt, size - bt * 2, RectColors.verticalGradient(border, border))
+                .build().tryDraw().close();
+
+        float keyWidth  = this.renderer.smallFont.getTextWidth(keyText);
+        float keyHeight = this.renderer.smallFont.getTextHeight();
+        float keyX = x + (size - keyWidth) / 2f;
+        float keyY = y + (size - keyHeight) / 2f;
+
+        new TextBatch(this.renderer.smallFont)
+                .text(new RenderText(keyText, keyX, keyY).withShadow(true))
+                .build().tryDraw().close();
+
+        if (name != null && !name.isEmpty()) {
+            float nameWidth = this.renderer.tinyFont.getTextWidth(name);
+            float nameX = x + (size - nameWidth) / 2f;
+            float nameY = y + size + 4f;
+            new TextBatch(this.renderer.tinyFont)
+                    .text(new RenderText(name, nameX, nameY).withShadow(true))
+                    .build().tryDraw().close();
+        }
     }
 }
