@@ -114,6 +114,8 @@ public class Game {
         this.window = CometGLFW.getWindow();
         this.window.setTitle("Purple Evil");
         setWindowIcon();
+        this.window.setSize(1300, 750);
+        this.window.setMonitorCenterPosition();
         this.window.setVisible(true);
 
         this.window.setFramebufferSizeCallback((width, height) -> {
