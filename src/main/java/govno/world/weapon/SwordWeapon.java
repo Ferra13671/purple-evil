@@ -39,7 +39,7 @@ public class SwordWeapon extends Weapon {
         super.attack(entity);
 
         this.hasHit = false;
-        game.getSoundManager().playRawSound(game.getSounds().SWING, 0.5f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
+        game.getSoundManager().playSound(game.getSounds().SWING, 0.5f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
     }
 
     @Override
@@ -79,7 +79,7 @@ public class SwordWeapon extends Weapon {
                 if (angleDiff > 180) angleDiff = 360 - angleDiff;
 
                 if (angleDiff <= attackArc / 2) {
-                    game.getSoundManager().playRawSound(game.getSounds().SWING_HIT, 0.3f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
+                    game.getSoundManager().playSound(game.getSounds().SWING_HIT, 0.3f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
                     livingTarget.damage(getAttributeValue(WeaponAttributes.DAMAGE));
 
                     double poison = getAttributeValue(WeaponAttributes.POISONING);

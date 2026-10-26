@@ -111,7 +111,7 @@ public class Player extends LivingEntity {
 
             if (this.stepTimer <= 0) {
                 float pitch = 0.8f + random.nextFloat() * 0.4f;
-                game.getSoundManager().playRawSound(game.getSounds().STEP, 0.4f, pitch);
+                game.getSoundManager().playSound(game.getSounds().STEP, 0.4f, pitch);
 
                 this.stepTimer = newStepTimer;
             }

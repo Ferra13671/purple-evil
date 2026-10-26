@@ -22,6 +22,9 @@ public class SettingsScreen extends Screen {
     private static final float ROW_W = 500f;
     private static final float PADDING = 20f;
 
+    private final List<Slider> sliders = new ArrayList<>();
+    private float bindsStartY;
+
     private final Screen previousScreen;
     private final List<KeyBind> binds = new ArrayList<>();
     private final List<String> bindLabels = new ArrayList<>();
@@ -52,16 +55,39 @@ public class SettingsScreen extends Screen {
     @Override
     public void resize(int width, int height) {
         buttons.clear();
+        sliders.clear();
+
         float btnW = 200f;
         float btnH = 50f;
         float bottomY = height - btnH - 30f;
         float centerX = width / 2f;
         buttons.add(new Button("Back", centerX - btnW / 2f, bottomY, btnW, btnH,
                 () -> game.setScreen(previousScreen)));
+
+        // Раскладка: [slider block] + gap + [binds block]
+        int count = binds.size();
+        float bindsBlockH = count > 0 ? count * ROW_H + (count - 1) * ROW_GAP : 0f;
+        float sliderBlockH = ROW_H;
+        float sectionGap = 20f;
+        float totalH = sliderBlockH + sectionGap + bindsBlockH;
+
+        float startY = (height - totalH) / 2f - 30f;
+        float startX = (width - ROW_W) / 2f;
+
+        sliders.add(new Slider(
+                "Sounds Volume", startX, startY, ROW_W, ROW_H,
+                () -> Settings.SOUNDS_VOLUME,
+                v -> Settings.SOUNDS_VOLUME = (float) v
+        ));
+
+        this.bindsStartY = startY + sliderBlockH + sectionGap;
     }
 
     @Override
     public void render(double mouseX, double mouseY) {
+        // Обновляем драг слайдера ДО отрисовки — чтобы knob попал в актуальную позицию
+        for (Slider s : sliders) s.updateIfDragging(mouseX);
+
         int width = game.getWindow().getFramebufferWidth();
         int height = game.getWindow().getFramebufferHeight();
 
@@ -77,6 +103,8 @@ public class SettingsScreen extends Screen {
         new TextBatch(game.getRenderer().bigFont)
                 .text(new RenderText(title, (width - titleW) / 2f, 20f).withShadow(true))
                 .build().tryDraw().close();
+
+        for (Slider s : sliders) s.render(mouseX, mouseY);
 
         renderBinds(width, height, mouseX, mouseY);
 
@@ -96,8 +124,7 @@ public class SettingsScreen extends Screen {
         int count = binds.size();
         if (count == 0) return;
 
-        float totalH = count * ROW_H + (count - 1) * ROW_GAP;
-        float startY = (height - totalH) / 2f - 30f;
+        float startY = this.bindsStartY;
         float startX = (width - ROW_W) / 2f;
 
         for (int i = 0; i < count; i++) {
@@ -148,7 +175,20 @@ public class SettingsScreen extends Screen {
     }
 
     @Override
+    public void onMousePress(double mouseX, double mouseY, int button) {
+        for (Slider s : sliders) s.onMousePress(mouseX, mouseY, button);
+    }
+
+    @Override
     public void onMouseRelease(double mouseX, double mouseY, int button) {
+        boolean anySliderHit = sliders.stream().anyMatch(s -> s.contains(mouseX, mouseY));
+        boolean wasDragging  = sliders.stream().anyMatch(Slider::isDragging);
+
+        for (Slider s : sliders) s.onMouseRelease(mouseX, mouseY, button);
+
+        if (anySliderHit || wasDragging)
+            return;
+
         for (Button b : buttons) {
             if (b.contains(mouseX, mouseY)) {
                 if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {

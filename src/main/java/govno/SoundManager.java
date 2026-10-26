@@ -19,13 +19,19 @@ public class SoundManager {
         this.rawSounds.removeIf(soundSource -> soundSource.getState() == SoundState.Stopped);
     }
 
-    public void playRawSound(SoundBuffer buffer, float volume, float pitch) {
+    public SoundSource playSound(SoundBuffer buffer, float volume, float pitch) {
+        return playSound(buffer, volume, pitch, false);
+    }
+
+    public SoundSource playSound(SoundBuffer buffer, float volume, float pitch, boolean loop) {
         SoundSource soundSource = Overtone.create2DSource();
         soundSource.setSoundBuffer(buffer);
-        soundSource.setVolume(volume);
+        soundSource.setVolume(volume * Settings.SOUNDS_VOLUME);
         soundSource.setPitch(pitch);
 
         this.rawSounds.add(soundSource);
         soundSource.play();
+
+        return soundSource;
     }
 }
