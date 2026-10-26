@@ -10,6 +10,8 @@ import com.ferra13671.overtone.Overtone;
 import com.ferra13671.overtone.SoundBuffer;
 import com.ferra13671.overtone.SoundSource;
 import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
 import stayablox.purpleevil.model.EntityModelTemplates;
 import stayablox.purpleevil.renderer.Programs;
 import stayablox.purpleevil.renderer.ShaderLibraries;
@@ -28,6 +30,10 @@ import stayablox.purpleevil.world.upgrades.Upgrades;
 import lombok.Getter;
 import stayablox.purpleevil.renderer.Renderer;
 import lombok.Setter;
+
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 public class Game {
     @Getter
@@ -107,7 +113,7 @@ public class Game {
 
         this.window = CometGLFW.getWindow();
         this.window.setTitle("Purple Evil");
-        // window.setIcon(...) пропущен для краткости, если он у вас есть — оставьте
+        setWindowIcon();
         this.window.setVisible(true);
 
         this.window.setFramebufferSizeCallback((width, height) -> {
@@ -154,6 +160,43 @@ public class Game {
         });
     }
 
+    private void setWindowIcon() {
+        ByteBuffer iconBuffer;
+        try (InputStream in = getClass().getClassLoader()
+                .getResourceAsStream("window-icon.png")) {
+            if (in == null) {
+                System.err.println("window-icon.png not found");
+                return;
+            }
+            byte[] bytes = in.readAllBytes();
+            iconBuffer = ByteBuffer.allocateDirect(bytes.length);
+            iconBuffer.put(bytes).flip();
+        } catch (Exception e) {
+            System.err.println("Failed to read window-icon.png: " + e.getMessage());
+            return;
+        }
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer w = stack.mallocInt(1);
+            IntBuffer h = stack.mallocInt(1);
+            IntBuffer channels = stack.mallocInt(1);
+
+            ByteBuffer pixels = STBImage.stbi_load_from_memory(iconBuffer, w, h, channels, 4);
+            if (pixels == null) {
+                System.err.println("Failed to decode icon: " + STBImage.stbi_failure_reason());
+                return;
+            }
+
+            GLFWImage img = GLFWImage.malloc();
+            try {
+                img.set(w.get(0), h.get(0), pixels);
+                this.window.setIcon(img);
+            } finally {
+                img.free();
+                STBImage.stbi_image_free(pixels);
+            }
+        }
+    }
 
     private void updateMusic() {
         SoundBuffer desiredBuffer = null;

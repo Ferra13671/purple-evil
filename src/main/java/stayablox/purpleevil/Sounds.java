@@ -23,6 +23,8 @@ public class Sounds implements GameInstance {
     public final SoundBuffer SWING_HIT = Overtone.createBuffer(Overtone.OGG_DECODER, getClass().getClassLoader().getResourceAsStream(SOUNDS_PATH + "swing-hit.ogg"));
     public final SoundBuffer LOBBY = Overtone.createBuffer(Overtone.OGG_DECODER, getClass().getClassLoader().getResourceAsStream(SOUNDS_PATH + "lobby.ogg"));
     public final SoundBuffer DUNGEON = Overtone.createBuffer(Overtone.OGG_DECODER, getClass().getClassLoader().getResourceAsStream(SOUNDS_PATH + "dungeon.ogg"));
+    public final SoundBuffer BUY = Overtone.createBuffer(Overtone.OGG_DECODER, getClass().getClassLoader().getResourceAsStream(SOUNDS_PATH + "buy.ogg"));
+    public final SoundBuffer STAFF = Overtone.createBuffer(Overtone.OGG_DECODER, getClass().getClassLoader().getResourceAsStream(SOUNDS_PATH + "staff.ogg"));
 
     public Sounds() {
         loadEntityDamageSounds();

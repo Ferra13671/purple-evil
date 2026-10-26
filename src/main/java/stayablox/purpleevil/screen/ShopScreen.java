@@ -15,6 +15,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ShopScreen extends Screen {
     private static final int COLS = 4;
@@ -265,7 +266,8 @@ public class ShopScreen extends Screen {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             for (int i = 0; i < cardAABBs.size(); i++) {
                 if (cardAABBs.get(i).contains(mouseX, mouseY)) {
-                    game.getGameSession().purchaseUpgrade(pageUpgrades.get(i));
+                    if (game.getGameSession().purchaseUpgrade(pageUpgrades.get(i)))
+                        game.getSoundManager().playSound(game.getSounds().BUY, 0.3f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
                     return;
                 }
             }

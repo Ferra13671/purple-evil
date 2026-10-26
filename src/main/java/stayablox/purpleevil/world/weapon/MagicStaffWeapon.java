@@ -6,6 +6,7 @@ import stayablox.purpleevil.world.entity.MagicStaffChargeEntity;
 import org.joml.Vector2d;
 
 import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MagicStaffWeapon extends Weapon {
 
@@ -21,6 +22,8 @@ public class MagicStaffWeapon extends Weapon {
     @Override
     protected void attack(LivingEntity entity) {
         super.attack(entity);
+
+        game.getSoundManager().playSound(game.getSounds().STAFF, 0.5f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
 
         float angleRad = (float) Math.toRadians(entity.yaw - 45);
         float halfSize = getSize() / 2.0f;

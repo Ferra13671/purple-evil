@@ -179,7 +179,8 @@ public class GameSession implements GameInstance {
 
     public boolean purchaseUpgrade(Upgrade upgrade) {
         int price = getCurrentPrice(upgrade);
-        if (score < price) return false;
+        if (score < price)
+            return false;
         score -= price;
         applyUpgrade(upgrade);
         return true;
