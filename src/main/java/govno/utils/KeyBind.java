@@ -33,6 +33,10 @@ public class KeyBind implements GameInstance {
         return this;
     }
 
+    public String getDisplayName() {
+        return KeyNames.of(this.keyType, this.key);
+    }
+
     public static void resetAll() {
         keybinds.values().forEach(l -> l.forEach(k -> k.setPressed(false)));
     }

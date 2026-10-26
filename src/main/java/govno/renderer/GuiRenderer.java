@@ -314,45 +314,45 @@ public class GuiRenderer implements GameInstance {
         boolean inLobby = game.getWorld() instanceof LobbyWorld;
 
         float x = margin;
-        renderActionButton(x, upperY, size, "ESC", "Pause",
+        renderActionButton(x, upperY, size, Keybinds.PAUSE.getDisplayName(), "Pause",
                 0f, false, Keybinds.PAUSE.isPressed());
         x += size + gap;
 
-        renderActionButton(x, upperY, size, "R", "Swap",
+        renderActionButton(x, upperY, size, Keybinds.PLAYER_SWAP.getDisplayName(), "Swap",
                 game.getGameSession().getSwapCooldownProgress(), true, Keybinds.PLAYER_SWAP.isPressed());
         x += size + gap;
 
-        renderActionButton(x, upperY, size, "F", "Dash",
+        renderActionButton(x, upperY, size, Keybinds.DASH.getDisplayName(), "Dash",
                 game.getGameSession().player.getDashCooldownProgress(), true, Keybinds.DASH.isPressed());
         x += size + gap;
 
         if (inLobby) {
-            renderActionButton(x, upperY, size, "B", "Shop",
+            renderActionButton(x, upperY, size, Keybinds.SHOP.getDisplayName(), "Shop",
                     0f, false, Keybinds.SHOP.isPressed());
         }
 
-        float buttonswidth    = 3 * size + 2 * gap;
+        float buttonswidth = 3 * size + 2 * gap;
 
-        renderActionButton(margin + size + gap, lowerY, size, "W",
+        renderActionButton(margin + size + gap, lowerY, size, Keybinds.FORWARD.getDisplayName(),
                 null, 0f, false, Keybinds.FORWARD.isPressed());
 
         float lowerRowY = lowerY + size + gap;
-        renderActionButton(margin,                      lowerRowY, size, "A",
+        renderActionButton(margin, lowerRowY, size, Keybinds.LEFT.getDisplayName(),
                 null, 0f, false, Keybinds.LEFT.isPressed());
-        renderActionButton(margin + size + gap,         lowerRowY, size, "S",
+        renderActionButton(margin + size + gap, lowerRowY, size, Keybinds.BACK.getDisplayName(),
                 null, 0f, false, Keybinds.BACK.isPressed());
-        renderActionButton(margin + 2 * (size + gap),   lowerRowY, size, "D",
+        renderActionButton(margin + 2 * (size + gap), lowerRowY, size, Keybinds.RIGHT.getDisplayName(),
                 null, 0f, false, Keybinds.RIGHT.isPressed());
 
-        String movementText  = "Movement";
-        float  movementTextWidth = this.renderer.tinyFont.getTextWidth(movementText);
+        String movementText = "Movement";
+        float movementTextWidth = this.renderer.tinyFont.getTextWidth(movementText);
         new TextBatch(this.renderer.tinyFont)
                 .text(new RenderText(movementText,
                         margin + (buttonswidth - movementTextWidth) / 2f,
                         lowerRowY + size + labelGap).withShadow(true))
                 .build().tryDraw().close();
 
-        renderActionButton(margin + buttonswidth + gap * 2, lowerRowY, size, "LMB",
+        renderActionButton(margin + buttonswidth + gap * 2, lowerRowY, size, Keybinds.ATTACK.getDisplayName(),
                 "Attack", 0f, false, Keybinds.ATTACK.isPressed());
     }
 
