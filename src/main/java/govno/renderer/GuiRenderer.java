@@ -1,17 +1,27 @@
 package govno.renderer;
 
 import com.ferra13671.cometrenderer.buffer.framebuffer.Framebuffer;
+import com.ferra13671.cometrenderer.texture.GLTex;
+import com.ferra13671.cometrenderer.texture.GLTexture;
+import com.ferra13671.cometrenderer.texture.atlas.TextureBorder;
 import govno.GameInstance;
+import govno.renderer.batch.impl.BasicTextureBatch;
 import govno.renderer.batch.impl.ColoredRectBatch;
 import govno.renderer.batch.impl.text.RenderText;
 import govno.renderer.batch.impl.text.TextBatch;
 import govno.utils.AABB;
 import govno.world.World;
+import govno.world.attribute.Attributes;
+import govno.world.attribute.modifier.AttributeInstance;
+import govno.world.attribute.modifier.AttributeModifier;
 import govno.world.entity.EnemyEntity;
 import govno.world.entity.Entity;
 import govno.world.entity.Player;
 import govno.world.room.Room;
+import govno.world.upgrades.Upgrade;
 import org.joml.Vector4f;
+
+import java.util.*;
 
 public class GuiRenderer implements GameInstance {
     private final Renderer renderer;
@@ -44,45 +54,52 @@ public class GuiRenderer implements GameInstance {
     }
 
     private void renderOverlay(Framebuffer framebuffer) {
-        new TextBatch(this.renderer.font)
-                .text(new RenderText(
-                        String.format("Health: %s\nLevel: %s\nScore: %s", (int) game.getGameSession().player.getHealth(), game.getGameSession().currentLevel, game.getGameSession().score),
-                        10,
-                        10
-                ).withShadow(true))
-                .build()
-                .tryDraw()
-                .close();
-
-        renderAttributes(framebuffer);
-
+        renderStats(framebuffer);
+        renderUpgrades(framebuffer);
         renderMinimap(framebuffer);
     }
 
-    private void renderAttributes(Framebuffer framebuffer) {
-        StringBuilder builder = new StringBuilder();
-
+    private void renderStats(Framebuffer framebuffer) {
         Player player = game.getGameSession().player;
 
-        builder.append("Player attributes:\n");
-        player.getAttributes().getAttributes().forEach((name, instance) ->
-                builder.append(String.format("%s: %s\n", name, instance.getCurrentValue()))
-        );
-        builder.append("\nWeapon attributes:\n");
-        if (player.getWeapon() != null)
-            player.getWeapon().getAttributes().getAttributes().forEach((name, instance) ->
-                    builder.append(String.format("%s: %s\n", name, instance.getCurrentValue()))
-            );
+        final float iconSize = 32f;
+        final float gap = 8f;
+        final float lineHeight = iconSize + gap;
+        final float startX = 10f;
+        final float startY = 10f;
 
+        renderIcon(game.getTextures().healthTexture, startX, startY, iconSize);
+        renderValueText(String.valueOf((int) player.getHealth()),
+                startX + iconSize + gap, startY, iconSize);
+
+        float scoreY = startY + lineHeight;
+        renderIcon(game.getTextures().coinTexture, startX, scoreY, iconSize);
+        renderValueText(String.valueOf(game.getGameSession().score),
+                startX + iconSize + gap, scoreY, iconSize);
+
+        float levelY = scoreY + lineHeight;
         new TextBatch(this.renderer.smallFont)
-                .text(new RenderText(
-                        builder.toString(),
-                        10,
-                        framebuffer.getHeight() / 3f
-                ).withShadow(true))
-                .build()
-                .tryDraw()
-                .close();
+                .text(new RenderText("Level: " + game.getGameSession().currentLevel, startX, levelY)
+                        .withShadow(true))
+                .build().tryDraw().close();
+    }
+
+    private void renderIcon(GLTex texture, float x, float y, float size) {
+        if (texture == null) return;
+
+        new BasicTextureBatch()
+                .texture(texture)
+                .rectSized(x, y, size, size, new TextureBorder(0f, 0f, 1f, 1f))
+                .build().tryDraw().close();
+    }
+
+    private void renderValueText(String value, float x, float iconY, float iconSize) {
+        float textHeight = this.renderer.font.getTextHeight();
+        float textY = iconY + (iconSize - textHeight) / 2f;
+
+        new TextBatch(this.renderer.font)
+                .text(new RenderText(value, x, textY).withShadow(true))
+                .build().tryDraw().close();
     }
 
     private void renderMinimap(Framebuffer framebuffer) {
@@ -178,5 +195,102 @@ public class GuiRenderer implements GameInstance {
             }
         }
         enemyBatch.build().tryDraw().close();
+    }
+
+    private void renderUpgrades(Framebuffer framebuffer) {
+        Player player = game.getGameSession().player;
+
+        Map<String, Integer> counts = collectUpgradeCounts(player);
+        if (counts.isEmpty()) return;
+
+        List<Map.Entry<String, Integer>> entries = new ArrayList<>(counts.entrySet());
+        entries.sort(Map.Entry.comparingByKey());
+
+        final float iconSize = 40f;
+        final float gap = 8f;
+        final float margin = 20f;
+        final int iconsPerRow = 8;
+
+        int totalCount = entries.size();
+        int rows = (totalCount + iconsPerRow - 1) / iconsPerRow;
+
+        float rightEdge = framebuffer.getWidth() - margin;
+        float bottomEdge = framebuffer.getHeight() - margin;
+        float startY = bottomEdge - rows * iconSize - (rows - 1) * gap;
+
+        for (int row = 0; row < rows; row++) {
+            int rowStart = row * iconsPerRow;
+            int rowEnd = Math.min(rowStart + iconsPerRow, totalCount);
+            int rowCount = rowEnd - rowStart;
+
+            float rowWidth = rowCount * iconSize + (rowCount - 1) * gap;
+            float rowX = rightEdge - rowWidth;
+            float rowY = startY + row * (iconSize + gap);
+
+            for (int i = 0; i < rowCount; i++) {
+                Map.Entry<String, Integer> entry = entries.get(rowStart + i);
+                float x = rowX + i * (iconSize + gap);
+                renderUpgradeIcon(entry.getKey(), x, rowY, iconSize);
+                renderUpgradeCountBadge(entry.getValue(), x, rowY, iconSize);
+            }
+        }
+    }
+
+    private Map<String, Integer> collectUpgradeCounts(Player player) {
+        Map<String, Integer> rawCounts = new HashMap<>();
+        countModifiers(player.getAttributes(), rawCounts);
+
+        if (player.getWeapon() != null)
+            countModifiers(player.getWeapon().getAttributes(), rawCounts);
+
+        Map<String, Integer> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> e : rawCounts.entrySet()) {
+            Upgrade u = game.getUpgrades().upgrades.get(e.getKey());
+            if (u == null || u.modifiers().isEmpty())
+                continue;
+
+            int perApply = u.modifiers().size();
+            int count = e.getValue() / perApply;
+            if (count > 0)
+                result.put(e.getKey(), count);
+        }
+        return result;
+    }
+
+    private void countModifiers(Attributes attributes, Map<String, Integer> target) {
+        for (AttributeInstance instance : attributes.getAttributes().values()) {
+            for (AttributeModifier modifier : instance.getModifiers()) {
+                if (game.getUpgrades().upgrades.containsKey(modifier.id()))
+                    target.merge(modifier.id(), 1, Integer::sum);
+            }
+        }
+    }
+
+    private void renderUpgradeIcon(String id, float x, float y, float size) {
+        GLTexture texture = game.getTextures().getUpgradeTexture(id);
+        if (texture == null)
+            return;
+
+        new BasicTextureBatch()
+                .texture(game.getTextures().entityAtlas)
+                .rectSized(x, y, size, size,
+                        game.getTextures().entityAtlas.getBorder(texture))
+                .build().tryDraw().close();
+    }
+
+    private void renderUpgradeCountBadge(int count, float iconX, float iconY, float iconSize) {
+        if (count < 2)
+            return;
+
+        String text = "x" + count;
+        float textWidth  = this.renderer.smallFont.getTextWidth(text);
+        float textHeight = this.renderer.smallFont.getTextHeight();
+
+        float x = iconX + iconSize - textWidth;
+        float y = iconY + iconSize - textHeight;
+
+        new TextBatch(this.renderer.smallFont)
+                .text(new RenderText(text, x, y).withShadow(true))
+                .build().tryDraw().close();
     }
 }

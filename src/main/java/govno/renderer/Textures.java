@@ -28,6 +28,15 @@ public class Textures {
     public TextureAtlas entityAtlas;
     public TextureAtlas weaponAtlas;
 
+    public final GLTexture healthTexture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("health")
+            .info("assets/textures/health.png")
+            .build();
+    public final GLTexture coinTexture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("coin")
+            .info("assets/textures/coin.png")
+            .build();
+
     public Textures() {
         this.worldAtlas = loadRoomAtlas();
         this.weaponAtlas = loadWeaponAtlas();

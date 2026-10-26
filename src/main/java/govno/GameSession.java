@@ -36,7 +36,7 @@ public class GameSession implements GameInstance {
     );
 
     public Player player = this.knight;
-    public int currentLevel = 9;
+    public int currentLevel = 1;
     public int score = 0;
 
     private Checkpoint checkpoint = null;
@@ -86,10 +86,15 @@ public class GameSession implements GameInstance {
 
     public void applyUpgrade(Upgrade upgrade) {
         switch (upgrade.type()) {
-            case Player -> applyUpgrade(upgrade, this.player.getAttributes());
+            case Player -> {
+                applyUpgrade(upgrade, this.knight.getAttributes());
+                applyUpgrade(upgrade, this.mage.getAttributes());
+            }
             case Weapon -> {
-                if (this.player.getWeapon() != null)
-                    applyUpgrade(upgrade, this.player.getWeapon().getAttributes());
+                if (this.knight.getWeapon() != null)
+                    applyUpgrade(upgrade, this.knight.getWeapon().getAttributes());
+                if (this.mage.getWeapon() != null)
+                    applyUpgrade(upgrade, this.mage.getWeapon().getAttributes());
             }
         }
     }
@@ -183,8 +188,9 @@ public class GameSession implements GameInstance {
 
         Player oldPlayer = this.player;
 
-        this.player = (this.player == knight) ? mage : knight;
+        this.player = (this.player == knight) ? this.mage : this.knight;
 
+        this.player.setHealth(oldPlayer.getHealth());
         this.player.position.set(oldPlayer.position);
         this.player.prevPosition.set(oldPlayer.prevPosition);
         this.player.velocity.set(oldPlayer.velocity);
@@ -212,7 +218,7 @@ public class GameSession implements GameInstance {
 
         switch (level) {
             case 1, 2 -> {
-                rooms = 2 + level;
+                rooms = 3 + level;
                 minMobs = 4 + (level / 2);
                 maxMobs = minMobs + 2 + level;
 
@@ -221,7 +227,7 @@ public class GameSession implements GameInstance {
             }
             case 3 -> bossType = EnemyType.SlimeBoss;
             case 4, 5 -> {
-                rooms = 3 + level / 4;
+                rooms = 4 + level / 4;
                 minMobs = 4 + (level / 3);
                 maxMobs = minMobs + 2 + (int) (level / 1.5);
 
@@ -234,7 +240,7 @@ public class GameSession implements GameInstance {
             }
             case 6 -> bossType = EnemyType.LichBoss;
             case 7, 8 -> {
-                rooms = 3 + level / 3;
+                rooms = 5 + level / 3;
                 minMobs = 4 + (level / 4);
                 maxMobs = minMobs + 2 + (level / 8);
 

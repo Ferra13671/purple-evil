@@ -41,7 +41,7 @@ public class Upgrades {
                         double amount = modifierObject.getElement("amount").cast(JType.NUMBER, null).doubleValue();
                         Operation operation = Operation.fromId(modifierObject.getElement("operation").cast(JType.STRING, null));
 
-                        modifiers.put(name, new AttributeModifier(amount, operation));
+                        modifiers.put(name, new AttributeModifier(id, amount, operation));
                     });
 
                     this.upgrades.put(id, new Upgrade(id, price, type, spawning, modifiers));

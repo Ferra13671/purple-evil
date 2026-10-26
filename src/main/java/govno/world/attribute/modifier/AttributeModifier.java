@@ -1,9 +1,9 @@
 package govno.world.attribute.modifier;
 
-public record AttributeModifier(double amount, Operation operation) {
+public record AttributeModifier(String id, double amount, Operation operation) {
 
     public AttributeModifier(AttributeModifier modifier) {
-        this(modifier.amount, modifier.operation);
+        this(modifier.id, modifier.amount, modifier.operation);
     }
 
     @Override
