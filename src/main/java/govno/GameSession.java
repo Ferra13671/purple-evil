@@ -206,8 +206,12 @@ public class GameSession implements GameInstance {
                 boolean playerInExit = false;
                 for (Block block : currentRoom.blocks) {
                     if (block.blockType == BlockType.Exit || block.blockType == BlockType.ClosedExit) {
-                        AABB doorAABB = new AABB(block.x, block.y, block.x + 1, block.y + 1);
-                        if (player.worldAABB.getPenetrationVector(doorAABB) != null) {
+                        final double padding = 0.5;
+                        AABB doorZone = new AABB(
+                                block.x - padding, block.y - padding,
+                                block.x + 1.0 + padding, block.y + 1.0 + padding
+                        );
+                        if (doorZone.contains(player.position.x, player.position.y)) {
                             playerInExit = true;
                             break;
                         }
