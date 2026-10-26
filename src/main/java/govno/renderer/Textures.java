@@ -36,6 +36,10 @@ public class Textures {
             .name("coin")
             .info("assets/textures/coin.png")
             .build();
+    public final GLTexture menuTexture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("menu")
+            .info("assets/textures/menu.png")
+            .build();
 
     public Textures() {
         this.worldAtlas = loadRoomAtlas();
