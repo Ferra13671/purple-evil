@@ -36,7 +36,7 @@ public class GameSession implements GameInstance {
     );
 
     public Player player = this.knight;
-    public int currentLevel = 7;
+    public int currentLevel = 9;
     public int score = 0;
 
     private Checkpoint checkpoint = null;
@@ -247,6 +247,7 @@ public class GameSession implements GameInstance {
 
                 spawns.put(EnemyType.Bat, new SpawnProperty(1, 0.05));
             }
+            case 9 -> bossType = EnemyType.DemonBoos;
         }
 
         return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, minMobs, maxMobs, bossType);

@@ -16,7 +16,8 @@ public enum EnemyType {
     FlyingDemon(FlyingDemonEntity::new),
     CrossbowmanDemon(CrossbowmanDemonEntity::new),
     SlimeBoss(SlimeBossEntity::new),
-    LichBoss(LichBossEntity::new);
+    LichBoss(LichBossEntity::new),
+    DemonBoos(DemonBossEntity::new);
 
     public final Function<Room, LivingEntity> enemyCreator;
 }
