@@ -36,7 +36,7 @@ public class GameSession implements GameInstance {
     );
 
     public Player player = this.knight;
-    public int currentLevel = 4;
+    public int currentLevel = 7;
     public int score = 0;
 
     private Checkpoint checkpoint = null;
@@ -204,28 +204,49 @@ public class GameSession implements GameInstance {
     private DungeonProperties createPropertiesForLevel(int level) {
         int rooms = 1;
         int tunnelLength = 10;
-        int minMobs = 4 + (level / 2);
-        int maxMobs = minMobs + 2 + level;
-
+        int minMobs = 1;
+        int maxMobs = 1;
 
         EnemyType bossType = null;
-        switch (level) {
-            case 2 -> bossType = EnemyType.SlimeBoss;
-            case 4 -> bossType = EnemyType.LichBoss;
-        }
-
         Map<EnemyType, SpawnProperty> spawns = new HashMap<>();
 
-        if (level <= 2) {
-            spawns.put(EnemyType.Slime, new SpawnProperty(3 + level, 1.0));
-            spawns.put(EnemyType.Bat, new SpawnProperty(3 + level, 1.0));
-        } else {
-            spawns.put(EnemyType.DefaultSkeleton, new SpawnProperty(2 + (level / 2), 1.5));
-            spawns.put(EnemyType.KillerSkeleton, new SpawnProperty(1 + (level / 2), 1.0));
-            spawns.put(EnemyType.KnightSkeleton, new SpawnProperty(1, 0.4));
+        switch (level) {
+            case 1, 2 -> {
+                rooms = 2 + level;
+                minMobs = 4 + (level / 2);
+                maxMobs = minMobs + 2 + level;
 
-            spawns.put(EnemyType.Slime, new SpawnProperty(1, 0.1));
-            spawns.put(EnemyType.Bat, new SpawnProperty(1, 0.1));
+                spawns.put(EnemyType.Slime, new SpawnProperty(3 + level, 1.0));
+                spawns.put(EnemyType.Bat, new SpawnProperty(3 + level, 1.0));
+            }
+            case 3 -> bossType = EnemyType.SlimeBoss;
+            case 4, 5 -> {
+                rooms = 3 + level / 4;
+                minMobs = 4 + (level / 3);
+                maxMobs = minMobs + 2 + (int) (level / 1.5);
+
+                spawns.put(EnemyType.DefaultSkeleton, new SpawnProperty(2 + (level / 2), 1.5));
+                spawns.put(EnemyType.KillerSkeleton, new SpawnProperty(1 + (level / 2), 1.0));
+                spawns.put(EnemyType.KnightSkeleton, new SpawnProperty(1, 0.4));
+
+                spawns.put(EnemyType.Slime, new SpawnProperty(1, 0.1));
+                spawns.put(EnemyType.Bat, new SpawnProperty(1, 0.1));
+            }
+            case 6 -> bossType = EnemyType.LichBoss;
+            case 7, 8 -> {
+                rooms = 3 + level / 3;
+                minMobs = 4 + (level / 4);
+                maxMobs = minMobs + 2 + (level / 8);
+
+                spawns.put(EnemyType.FlyingDemon, new SpawnProperty(2 + (level / 2), 2));
+                spawns.put(EnemyType.CrossbowmanDemon, new SpawnProperty(2 + (level / 2), 1));
+
+                spawns.put(EnemyType.DefaultSkeleton, new SpawnProperty(1, 0.15));
+                spawns.put(EnemyType.KillerSkeleton, new SpawnProperty(1, 0.10));
+                spawns.put(EnemyType.KnightSkeleton, new SpawnProperty(1, 0.05));
+
+                spawns.put(EnemyType.Bat, new SpawnProperty(1, 0.05));
+            }
         }
 
         return new DungeonProperties(tunnelLength, rooms, 0.05, spawns, minMobs, maxMobs, bossType);

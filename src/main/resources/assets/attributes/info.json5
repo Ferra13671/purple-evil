@@ -6,5 +6,7 @@
   'default-skeleton',
   'killer-skeleton',
   'knight-skeleton',
-  'lich-boss'
+  'lich-boss',
+  'flying-demon',
+  'crossbowman-demon'
 ]

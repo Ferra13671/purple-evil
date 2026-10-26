@@ -1,0 +1,13 @@
+[
+  {
+    name: 'stay',
+    loop: true,
+
+    frames: [{
+      id: '',
+      duration: 1,
+
+      size: [3, 1]
+    }]
+  }
+]

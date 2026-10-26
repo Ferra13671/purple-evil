@@ -13,6 +13,8 @@ public enum EnemyType {
     DefaultSkeleton(DefaultSkeletonEntity::new),
     KillerSkeleton(KillerSkeletonEntity::new),
     KnightSkeleton(KnightSkeletonEntity::new),
+    FlyingDemon(FlyingDemonEntity::new),
+    CrossbowmanDemon(CrossbowmanDemonEntity::new),
     SlimeBoss(SlimeBossEntity::new),
     LichBoss(LichBossEntity::new);
 

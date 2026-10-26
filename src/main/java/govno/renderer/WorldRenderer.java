@@ -112,11 +112,10 @@ public class WorldRenderer implements GameInstance {
         Vector4f color = new Vector4f(1f);
 
         if (entity instanceof LivingEntity livingEntity) {
-            // Если сущность неуязвима, она мигает (пропускает каждый второй кадр)
             if (livingEntity.isInvincible() && !livingEntity.isDying()) {
                 int blinkPhase = (int) (livingEntity.getInvincibilityTimer() * 10);
                 if (blinkPhase % 2 == 0) {
-                    return; // Пропускаем рендер
+                    return;
                 }
             }
 
@@ -126,6 +125,12 @@ public class WorldRenderer implements GameInstance {
 
         AABB aabb = new AABB(entity.modelAABB).move(Utils.lerp(entity.prevPosition, entity.position, game.getTicker().getTickDelta()));
         Sprite sprite = entity.model.getCurrentSprite();
+
+        // ===== Проектили рендерятся с поворотом по yaw =====
+        if (entity instanceof DemonArrowEntity) {
+            renderRotatedEntity(entity, aabb, sprite, color);
+            return;
+        }
 
         double xLength = aabb.getXLength();
         new BasicTextureBatch(() -> CometRenderer.getShaderColor().setColor(color))
@@ -149,6 +154,35 @@ public class WorldRenderer implements GameInstance {
             if (le instanceof EnemyEntity)
                 renderHealthBar(le, aabb);
         }
+    }
+
+    private void renderRotatedEntity(Entity entity, AABB aabb, Sprite sprite, Vector4f color) {
+        double cx = aabb.getMinX() + aabb.getXLength() / 2;
+        double cy = aabb.getMinY() + aabb.getYLength() / 2;
+
+        float renderW = (float) (aabb.getXLength() * sprite.width());
+        float renderH = (float) (aabb.getYLength() * sprite.height());
+        float yaw = (float) Utils.lerp(entity.prevYaw, entity.yaw, game.getTicker().getTickDelta());
+
+        this.renderer.view.pushMatrix().translate((float) cx, (float) cy, 0);
+
+        new BasicTextureBatch(() -> CometRenderer.getShaderColor().setColor(color))
+                .texture(game.getTextures().entityAtlas)
+                .rectPositioned(
+                        -renderW / 2,
+                        -renderH / 2,
+                        renderW,
+                        renderH,
+                        game.getTextures().entityAtlas.getBorder(
+                                game.getTextures().getEntityTexture(sprite.textureId())
+                        ),
+                        new Matrix4f().rotateZ((float) Math.toRadians(yaw))
+                )
+                .build()
+                .tryDraw()
+                .close();
+
+        this.renderer.view.popMatrix();
     }
 
     private void renderHealthBar(LivingEntity entity, AABB aabb) {

@@ -1,0 +1,10 @@
+{
+  max_health: 100,
+  regeneration: 0.1,
+  speed: 0.3,
+  acceleration: 2.5,
+  invincibility_time: 0,
+  damage: 35,
+  score: 70,
+  knockback: 0.5
+}
