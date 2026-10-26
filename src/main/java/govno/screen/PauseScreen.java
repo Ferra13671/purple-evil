@@ -1,10 +1,7 @@
 package govno.screen;
 
-import govno.renderer.RectColors;
-import govno.renderer.batch.impl.ColoredRectBatch;
 import govno.renderer.batch.impl.text.RenderText;
 import govno.renderer.batch.impl.text.TextBatch;
-import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,12 +67,7 @@ public class PauseScreen extends Screen {
 
     @Override
     public void render(double mouseX, double mouseY) {
-        new ColoredRectBatch()
-                .rectSized(0, 0, game.getWindow().getFramebufferWidth(), game.getWindow().getFramebufferHeight(),
-                        RectColors.verticalGradient(
-                                new Vector4f(0, 0, 0, 0.6f),
-                                new Vector4f(0, 0, 0, 0.6f)))
-                .build().tryDraw().close();
+        renderBackground();
 
         String text = "PAUSED";
         float textWidth = game.getRenderer().bigFont.getTextWidth(text);

@@ -85,18 +85,12 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void render(double mouseX, double mouseY) {
-        // Обновляем драг слайдера ДО отрисовки — чтобы knob попал в актуальную позицию
         for (Slider s : sliders) s.updateIfDragging(mouseX);
 
         int width = game.getWindow().getFramebufferWidth();
         int height = game.getWindow().getFramebufferHeight();
 
-        new ColoredRectBatch()
-                .rectSized(0, 0, width, height,
-                        RectColors.verticalGradient(
-                                new Vector4f(0, 0, 0, 0.75f),
-                                new Vector4f(0, 0, 0, 0.75f)))
-                .build().tryDraw().close();
+        renderBackground();
 
         String title = "SETTINGS";
         float titleW = game.getRenderer().bigFont.getTextWidth(title);
@@ -115,7 +109,7 @@ public class SettingsScreen extends Screen {
                 : "Click a keybind to rebind";
         float hintW = game.getRenderer().smallFont.getTextWidth(hint);
         new TextBatch(game.getRenderer().smallFont)
-                .text(new RenderText(hint, (width - hintW) / 2f, height - 100f).withShadow(true))
+                .text(new RenderText(hint, (width - hintW) / 2f, height - 110f).withShadow(true))
                 .build().tryDraw().close();
     }
 

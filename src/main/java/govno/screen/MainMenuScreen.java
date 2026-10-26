@@ -1,30 +1,17 @@
 package govno.screen;
 
 import com.ferra13671.cometrenderer.plugins.glfw.CometGLFW;
-import com.ferra13671.overtone.SoundSource;
 import govno.GameSession;
-import govno.renderer.RectColors;
-import govno.renderer.batch.impl.ColoredRectBatch;
-import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainMenuScreen extends Screen {
-    private SoundSource mainMenuSound;
     private final List<Button> buttons = new ArrayList<>();
 
     @Override
     public void onOpen(int width, int height) {
         resize(width, height);
-
-        this.mainMenuSound = game.getSoundManager().playSound(game.getSounds().MAIN_MENU, 1f, 1f, true);
-    }
-
-    @Override
-    public void onClose() {
-        this.mainMenuSound.close();
-        this.mainMenuSound = null;
     }
 
     @Override
@@ -60,11 +47,7 @@ public class MainMenuScreen extends Screen {
 
     @Override
     public void render(double mouseX, double mouseY) {
-        new ColoredRectBatch()
-                .rectSized(0, 0, game.getWindow().getFramebufferWidth(), game.getWindow().getFramebufferHeight(), RectColors.verticalGradient(new Vector4f(0f, 0f, 0f, 1f), new Vector4f(0.6823f, 0, 1f, 1f)))
-                .build()
-                .tryDraw()
-                .close();
+        renderBackground();
 
         for (Button button : buttons)
             button.render(mouseX, mouseY);

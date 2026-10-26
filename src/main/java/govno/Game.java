@@ -7,6 +7,7 @@ import com.ferra13671.cometrenderer.plugins.glfw.FullScreenSwitchCombination;
 import com.ferra13671.cometrenderer.plugins.glfw.Window;
 import com.ferra13671.cometrenderer.plugins.glfw.WindowHints;
 import com.ferra13671.overtone.Overtone;
+import com.ferra13671.overtone.SoundSource;
 import govno.model.EntityModelTemplates;
 import govno.renderer.Programs;
 import govno.renderer.ShaderLibraries;
@@ -62,6 +63,7 @@ public class Game {
     @Getter
     @Setter
     private GameSession gameSession;
+    private SoundSource menuMusic;
 
     public Game() {
         instance = this;
@@ -134,11 +136,31 @@ public class Game {
                     }
                 }
 
+                updateMenuMusic();
+
                 this.ticker.reset();
             }
 
             this.renderer.render();
         });
+    }
+
+    private void updateMenuMusic() {
+        boolean shouldPlay = (this.world == null && this.gameSession == null);
+
+        if (shouldPlay && this.menuMusic == null) {
+            this.menuMusic = Overtone.create2DSource();
+            this.menuMusic.setSoundBuffer(this.sounds.MAIN_MENU);
+            this.menuMusic.setLooping(true);
+            this.menuMusic.play();
+        } else if (!shouldPlay && this.menuMusic != null) {
+            this.menuMusic.close();
+            this.menuMusic = null;
+        }
+
+        if (this.menuMusic != null) {
+            this.menuMusic.setVolume(Settings.SOUNDS_VOLUME);
+        }
     }
 
     public boolean isGamePaused() {

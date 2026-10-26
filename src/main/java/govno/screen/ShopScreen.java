@@ -87,13 +87,7 @@ public class ShopScreen extends Screen {
         int width = game.getWindow().getFramebufferWidth();
         int height = game.getWindow().getFramebufferHeight();
 
-        // Полупрозрачный затемняющий слой — мир просвечивает сквозь
-        new ColoredRectBatch()
-                .rectSized(0, 0, width, height,
-                        RectColors.verticalGradient(
-                                new Vector4f(0f, 0f, 0f, 0.65f),
-                                new Vector4f(0.05f, 0.02f, 0.1f, 0.75f)))
-                .build().tryDraw().close();
+        renderBackground();
 
         String title = "SHOP";
         float titleWidth = game.getRenderer().bigFont.getTextWidth(title);

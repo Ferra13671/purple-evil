@@ -1,10 +1,7 @@
 package govno.screen;
 
-import govno.renderer.RectColors;
-import govno.renderer.batch.impl.ColoredRectBatch;
 import govno.renderer.batch.impl.text.RenderText;
 import govno.renderer.batch.impl.text.TextBatch;
-import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,12 +53,7 @@ public class ConfirmScreen extends Screen {
         int width = game.getWindow().getFramebufferWidth();
         int height = game.getWindow().getFramebufferHeight();
 
-        new ColoredRectBatch()
-                .rectSized(0, 0, width, height,
-                        RectColors.verticalGradient(
-                                new Vector4f(0, 0, 0, 0.75f),
-                                new Vector4f(0, 0, 0, 0.75f)))
-                .build().tryDraw().close();
+        renderBackground();
 
         float titleW = game.getRenderer().bigFont.getTextWidth(title);
         float titleH = game.getRenderer().bigFont.getTextHeight();

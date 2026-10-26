@@ -28,6 +28,7 @@ public class SoundManager {
         soundSource.setSoundBuffer(buffer);
         soundSource.setVolume(volume * Settings.SOUNDS_VOLUME);
         soundSource.setPitch(pitch);
+        soundSource.setLooping(loop);
 
         this.rawSounds.add(soundSource);
         soundSource.play();
