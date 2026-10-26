@@ -38,7 +38,7 @@ public class GameSession implements GameInstance {
     );
 
     public Player player = this.knight;
-    public int currentLevel = 9;
+    public int currentLevel = 1;
     public int score = 0;
 
     private Checkpoint checkpoint = null;

@@ -125,6 +125,9 @@ public class WorldRenderer implements GameInstance {
                 color.set(0.4f, 0.7f, 1f, 1f);   // ← синий тинт для шокированных
         }
 
+        if (entity instanceof SlimeEntity se)
+            color.mul(se.color);
+
         AABB aabb = new AABB(entity.modelAABB).move(Utils.lerp(entity.prevPosition, entity.position, game.getTicker().getTickDelta()));
         Sprite sprite = entity.model.getCurrentSprite();
 
