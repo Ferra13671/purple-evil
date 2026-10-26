@@ -38,7 +38,7 @@ public class GameSession implements GameInstance {
     );
 
     public Player player = this.knight;
-    public int currentLevel = 9;
+    public int currentLevel = 1;
     public int score = 0;
 
     private Checkpoint checkpoint = null;
@@ -80,7 +80,11 @@ public class GameSession implements GameInstance {
             this.mage.setHealth(this.checkpoint.mageHealth());
 
             this.knight.getAttributes().loadModifiers(this.checkpoint.knightMods());
+            if (this.knight.getWeapon() != null)
+                this.knight.getWeapon().getAttributes().loadModifiers(this.checkpoint.knightWeaponMods());
             this.mage.getAttributes().loadModifiers(this.checkpoint.mageMods());
+            if (this.mage.getWeapon() != null)
+                this.mage.getWeapon().getAttributes().loadModifiers(this.checkpoint.mageWeaponMods());
 
             this.player = this.knight;
         }
@@ -157,6 +161,7 @@ public class GameSession implements GameInstance {
         this.checkpoint = new Checkpoint(
                 this.knight.getHealth(), this.mage.getHealth(),
                 this.knight.getAttributes().saveModifiers(), this.mage.getAttributes().saveModifiers(),
+                this.knight.getWeapon() != null ? this.knight.getWeapon().getAttributes().saveModifiers() : new HashMap<>(), this.mage.getWeapon() != null ? this.mage.getWeapon().getAttributes().saveModifiers() : new HashMap<>(),
                 this.score, this.currentLevel
         );
     }

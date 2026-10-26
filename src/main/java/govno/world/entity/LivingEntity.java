@@ -149,7 +149,7 @@ public class LivingEntity extends Entity {
             this.poisonTickTimer--;
 
             if (this.poisonTickTimer <= 0) {
-                this.health -= this.poisonLevel * 5;
+                damage(this.poisonLevel * 5);
                 this.poisonTickTimer = 20;
             }
         }

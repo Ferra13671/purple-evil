@@ -22,14 +22,30 @@ public class DemonBossEntity extends EnemyEntity {
                 new Vector2d(0, 0),
                 null
         );
-
         setInput(new DemonBossInput(this, room));
     }
 
     @Override
     public void damage(double damage) {
         summonedMinions.removeIf(e -> e.removed);
+
+        if (hasAliveMinions())
+            return;
         super.damage(damage);
+    }
+
+    @Override
+    public boolean isInvincible() {
+        return !hasAliveMinions() && super.isInvincible();
+    }
+
+    private boolean hasAliveMinions() {
+        for (Entity e : summonedMinions) {
+            if (e.removed) continue;
+            if (e instanceof LivingEntity le && le.isDying()) continue;
+            return true;
+        }
+        return false;
     }
 
     @Override
