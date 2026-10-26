@@ -42,7 +42,6 @@ public class Player extends LivingEntity {
     public void onDying() {
         super.onDying();
         game.getGameSession().onPlayerDying(this);
-        setWeapon(null);
     }
 
     @Override

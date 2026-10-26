@@ -148,7 +148,7 @@ public class WorldRenderer implements GameInstance {
                 .tryDraw()
                 .close();
 
-        if (entity instanceof LivingEntity le) {
+        if (entity instanceof LivingEntity le && !le.isDying()) {
             renderLivingEntityWeapon(aabb, le);
 
             if (le instanceof EnemyEntity)
