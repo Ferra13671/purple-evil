@@ -48,6 +48,16 @@ public class EnemyEntity extends LivingEntity {
     }
 
     @Override
+    public void damage(double damage) {
+        if (game.getWorld() == null || game.getWorld().currentRoom == null)
+            return;
+        if (!game.getWorld().currentRoom.entities.contains(this))
+            return;
+
+        super.damage(damage);
+    }
+
+    @Override
     public void onEntityCollision(Entity other, Vector2dc out) {
         if (other == game.getGameSession().player) {
             game.getGameSession().player.damage(getAttributeValue(EnemyAttributes.DAMAGE));
