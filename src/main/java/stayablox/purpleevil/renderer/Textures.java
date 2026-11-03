@@ -68,6 +68,11 @@ public class Textures {
             .info("assets/textures/title.png")
             .filtering(TextureFiltering.DEFAULT)
             .build();
+    public final GLTexture vignetteTexture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("vignette")
+            .info("assets/textures/vignette.png")
+            .filtering(TextureFiltering.DEFAULT)
+            .build();
 
     public Textures() {
         this.worldAtlas = loadRoomAtlas();

@@ -1,5 +1,6 @@
 package stayablox.purpleevil.renderer;
 
+import com.ferra13671.cometrenderer.CometRenderer;
 import com.ferra13671.cometrenderer.buffer.framebuffer.Framebuffer;
 import com.ferra13671.cometrenderer.texture.GLTex;
 import com.ferra13671.cometrenderer.texture.GLTexture;
@@ -64,11 +65,21 @@ public class GuiRenderer implements GameInstance {
     }
 
     private void renderOverlay(Framebuffer framebuffer) {
+        renderVignette(framebuffer);
         renderStats(framebuffer);
         renderUpgrades(framebuffer);
         renderActionButtons(framebuffer);
         renderMinimap(framebuffer);
         renderFPS(framebuffer);
+    }
+
+    private void renderVignette(Framebuffer framebuffer) {
+        new BasicTextureBatch(() -> CometRenderer.getShaderColor().setColor(new Vector4f(0f, 0f, 0f, 0.5f)))
+                .texture(game.getTextures().vignetteTexture)
+                .rectSized(0, 0, framebuffer.getWidth(), framebuffer.getHeight(), TextureBorder.DEFAULT)
+                .build()
+                .tryDraw()
+                .close();
     }
 
     private void renderStats(Framebuffer framebuffer) {
