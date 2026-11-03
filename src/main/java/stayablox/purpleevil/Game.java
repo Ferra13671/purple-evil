@@ -19,6 +19,7 @@ import stayablox.purpleevil.renderer.Textures;
 import stayablox.purpleevil.screen.MainMenuScreen;
 import stayablox.purpleevil.screen.PauseScreen;
 import stayablox.purpleevil.screen.Screen;
+import stayablox.purpleevil.utils.FPSCounter;
 import stayablox.purpleevil.utils.KeyBind;
 import stayablox.purpleevil.utils.Ticker;
 import stayablox.purpleevil.world.LobbyWorld;
@@ -44,6 +45,8 @@ public class Game {
     private final MouseListener mouseListener = new MouseListener();
     @Getter
     private final KeyboardListener keyboardListener = new KeyboardListener();
+    @Getter
+    private final FPSCounter fpsCounter = new FPSCounter(1000);
     @Getter
     private Window window;
     @Getter
@@ -159,6 +162,7 @@ public class Game {
             }
 
             this.renderer.render();
+            this.fpsCounter.onEndFrame();
         });
     }
 
