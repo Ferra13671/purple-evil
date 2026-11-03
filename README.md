@@ -2,6 +2,8 @@
     <img src="https://raw.githubusercontent.com/Ferra13671/purple-evil/main/title.png" style="width: 50%" alt="title">
 </p>
 
+> The code for the game version created for the game jam can be viewed here: https://github.com/Ferra13671/purple-evil/tree/1.0-jam-version
+
 **Purple Evil** is a pixel-art fantasy roguelike where you must explore a dark ancient dungeon, fight hordes of monsters, defeat powerful bosses, and uncover the mystery of the mysterious purple energy that is consuming the world.
 
 ## Showcase
