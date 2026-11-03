@@ -34,18 +34,22 @@ public class Textures {
     public final GLTexture healthTexture = GLTexture.builder(TextureLoader.IN_JAR)
             .name("health")
             .info("assets/textures/health.png")
+            .filtering(TextureFiltering.DEFAULT)
             .build();
     public final GLTexture coinTexture = GLTexture.builder(TextureLoader.IN_JAR)
             .name("coin")
             .info("assets/textures/coin.png")
+            .filtering(TextureFiltering.DEFAULT)
             .build();
     public final GLTexture menuTexture = GLTexture.builder(TextureLoader.IN_JAR)
             .name("menu")
             .info("assets/textures/menu.png")
+            .filtering(TextureFiltering.DEFAULT)
             .build();
     public final GLTexture titleTexture = GLTexture.builder(TextureLoader.IN_JAR)
             .name("title")
             .info("assets/textures/title.png")
+            .filtering(TextureFiltering.DEFAULT)
             .build();
 
     public Textures() {
