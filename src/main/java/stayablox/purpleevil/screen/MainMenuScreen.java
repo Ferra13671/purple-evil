@@ -49,7 +49,7 @@ public class MainMenuScreen extends Screen {
 
     @Override
     public void render(double mouseX, double mouseY) {
-        renderBackground();
+        renderBackground(mouseX, mouseY);
         renderTitle();
 
         for (Button button : buttons)

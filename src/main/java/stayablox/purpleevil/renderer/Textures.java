@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Textures {
@@ -30,6 +31,7 @@ public class Textures {
     public TextureAtlas entityAtlas;
     public TextureAtlas weaponAtlas;
     public TextureAtlas comicsAtlas;
+    public final TextureAtlas menuAtlas;
 
     public final GLTexture healthTexture = GLTexture.builder(TextureLoader.IN_JAR)
             .name("health")
@@ -41,9 +43,24 @@ public class Textures {
             .info("assets/textures/coin.png")
             .filtering(TextureFiltering.DEFAULT)
             .build();
-    public final GLTexture menuTexture = GLTexture.builder(TextureLoader.IN_JAR)
-            .name("menu")
-            .info("assets/textures/menu.png")
+    public final GLTexture menuNear1Texture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("menu-near-1")
+            .info("assets/textures/menu/menu-near-1.png")
+            .filtering(TextureFiltering.DEFAULT)
+            .build();
+    public final GLTexture menuNear2Texture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("menu-near-2")
+            .info("assets/textures/menu/menu-near-2.png")
+            .filtering(TextureFiltering.DEFAULT)
+            .build();
+    public final GLTexture menuMiddleTexture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("menu-middle")
+            .info("assets/textures/menu/menu-middle.png")
+            .filtering(TextureFiltering.DEFAULT)
+            .build();
+    public final GLTexture menuFarTexture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("menu-far")
+            .info("assets/textures/menu/menu-far.png")
             .filtering(TextureFiltering.DEFAULT)
             .build();
     public final GLTexture titleTexture = GLTexture.builder(TextureLoader.IN_JAR)
@@ -57,6 +74,17 @@ public class Textures {
         this.weaponAtlas = loadWeaponAtlas();
         this.comicsAtlas = loadComicsAtlas();
         loadUpgradeTextures();
+
+        this.menuAtlas = new TextureAtlas(
+                "menu-atlas",
+                List.of(
+                        this.menuNear1Texture,
+                        this.menuNear2Texture,
+                        this.menuMiddleTexture,
+                        this.menuFarTexture
+                )
+        );
+        this.menuAtlas.setFiltering(TextureFiltering.DEFAULT);
     }
 
     public GLTexture getWorldTexture(String id) {

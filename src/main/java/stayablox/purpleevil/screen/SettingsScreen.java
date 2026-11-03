@@ -90,7 +90,7 @@ public class SettingsScreen extends Screen {
         int width = game.getWindow().getFramebufferWidth();
         int height = game.getWindow().getFramebufferHeight();
 
-        renderBackground();
+        renderBackground(mouseX, mouseY);
 
         String title = "SETTINGS";
         float titleW = game.getRenderer().bigFont.getTextWidth(title);
