@@ -26,13 +26,13 @@ public class SlimeEntity extends EnemyEntity {
 
         float roll = ThreadLocalRandom.current().nextFloat();
         if (roll < 0.60f) {
-            this.color.set(0.5f, 1f, 0.5f, 1f);
+            this.color.set(0.5f, 1f, 0.5f, 0.85f);
         } else if (roll < 0.80f) {
-            this.color.set(0.6f, 0.9f, 1f, 1f);   // голубой
+            this.color.set(0.6f, 0.9f, 1f, 0.85f);   // голубой
         } else if (roll < 0.95f) {
-            this.color.set(1f, 0.5f, 0.5f, 1f);   // красный
+            this.color.set(1f, 0.5f, 0.5f, 0.85f);   // красный
         } else {
-            this.color.set(0.8f, 0.6f, 1f, 1f);   // фиолетовый
+            this.color.set(0.8f, 0.6f, 1f, 0.85f);   // фиолетовый
         }
     }
 }
