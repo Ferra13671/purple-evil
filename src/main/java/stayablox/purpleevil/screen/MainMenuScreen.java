@@ -39,7 +39,7 @@ public class MainMenuScreen extends Screen {
         this.buttons.add(new Button(
                 "Settings", halfWidth - (buttonWidth / 2), startY + buttonHeight + spacing,
                 buttonWidth, buttonHeight,
-                () -> game.setScreen(new SettingsScreen(this))
+                () -> game.setScreen(new SettingsMenuScreen(this))
         ));
         this.buttons.add(new Button(
                 "Quit", halfWidth - (buttonWidth / 2), startY + (buttonHeight + spacing) * 2,

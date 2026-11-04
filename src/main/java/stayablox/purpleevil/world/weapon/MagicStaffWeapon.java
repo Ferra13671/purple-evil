@@ -1,5 +1,6 @@
 package stayablox.purpleevil.world.weapon;
 
+import stayablox.purpleevil.Settings;
 import stayablox.purpleevil.world.attribute.Attributes;
 import stayablox.purpleevil.world.entity.LivingEntity;
 import stayablox.purpleevil.world.entity.MagicStaffChargeEntity;
@@ -23,7 +24,7 @@ public class MagicStaffWeapon extends Weapon {
     protected void attack(LivingEntity entity) {
         super.attack(entity);
 
-        game.getSoundManager().playSound(game.getSounds().STAFF, 0.5f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
+        game.getSoundManager().playSound(game.getSounds().STAFF, 0.5f * Settings.WORLD_SOUNDS_VOLUME, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
 
         float angleRad = (float) Math.toRadians(entity.yaw - 45);
         float halfSize = getSize() / 2.0f;

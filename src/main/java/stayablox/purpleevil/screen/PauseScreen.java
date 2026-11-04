@@ -50,7 +50,7 @@ public class PauseScreen extends Screen {
                 "Settings",
                 halfWidth - (buttonWidth / 2), firstButtonY + (buttonHeight + spacing) * 2,
                 buttonWidth, buttonHeight,
-                () -> game.setScreen(new SettingsScreen(this))
+                () -> game.setScreen(new SettingsMenuScreen(this))
         ));
 
         this.buttons.add(new Button(

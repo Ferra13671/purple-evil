@@ -227,11 +227,11 @@ public class Game {
                 this.currentMusic = Overtone.create2DSource();
                 this.currentMusic.setSoundBuffer(this.currentMusicBuffer);
                 this.currentMusic.setLooping(true);
-                this.currentMusic.setVolume(Settings.SOUNDS_VOLUME);
+                this.currentMusic.setVolume(Settings.MUSIC_VOLUME);
                 this.currentMusic.play();
             }
         } else if (this.currentMusic != null)
-            this.currentMusic.setVolume(Settings.SOUNDS_VOLUME * 0.7f);
+            this.currentMusic.setVolume(Settings.MUSIC_VOLUME * 0.7f);
     }
 
     public boolean isGamePaused() {

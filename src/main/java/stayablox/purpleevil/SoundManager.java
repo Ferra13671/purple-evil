@@ -26,7 +26,7 @@ public class SoundManager {
     public SoundSource playSound(SoundBuffer buffer, float volume, float pitch, boolean loop) {
         SoundSource soundSource = Overtone.create2DSource();
         soundSource.setSoundBuffer(buffer);
-        soundSource.setVolume(volume * Settings.SOUNDS_VOLUME);
+        soundSource.setVolume(volume);
         soundSource.setPitch(pitch);
         soundSource.setLooping(loop);
 

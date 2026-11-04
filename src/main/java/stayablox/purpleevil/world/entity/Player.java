@@ -162,7 +162,7 @@ public class Player extends LivingEntity {
 
             if (this.stepTimer <= 0) {
                 float pitch = 0.8f + random.nextFloat() * 0.4f;
-                game.getSoundManager().playSound(game.getSounds().STEP, 0.4f, pitch);
+                game.getSoundManager().playSound(game.getSounds().STEP, 0.4f * Settings.WORLD_SOUNDS_VOLUME, pitch);
 
                 this.stepTimer = newStepTimer;
             }
@@ -177,7 +177,7 @@ public class Player extends LivingEntity {
         if (this.model != null) {
             SoundBuffer damageBuffer = game.getSounds().entityDamageSounds.get("player");
             if (damageBuffer != null)
-                game.getSoundManager().playSound(damageBuffer, 1f, 0.8f + ThreadLocalRandom.current().nextFloat() * 0.6f);
+                game.getSoundManager().playSound(damageBuffer, Settings.WORLD_SOUNDS_VOLUME, 0.8f + ThreadLocalRandom.current().nextFloat() * 0.6f);
         }
 
         this.health -= damage;

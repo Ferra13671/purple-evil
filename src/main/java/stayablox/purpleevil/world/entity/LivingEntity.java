@@ -1,6 +1,7 @@
 package stayablox.purpleevil.world.entity;
 
 import com.ferra13671.overtone.SoundBuffer;
+import stayablox.purpleevil.Settings;
 import stayablox.purpleevil.model.EntityModel;
 import stayablox.purpleevil.utils.AABB;
 import stayablox.purpleevil.utils.Direction;
@@ -206,7 +207,7 @@ public class LivingEntity extends Entity {
         if (this.model != null) {
             SoundBuffer damageBuffer = game.getSounds().entityDamageSounds.get(this.model.getName());
             if (damageBuffer != null)
-                game.getSoundManager().playSound(damageBuffer, 1f, 0.8f + ThreadLocalRandom.current().nextFloat() * 0.6f);
+                game.getSoundManager().playSound(damageBuffer, Settings.WORLD_SOUNDS_VOLUME, 0.8f + ThreadLocalRandom.current().nextFloat() * 0.6f);
         }
 
         this.health -= damage;

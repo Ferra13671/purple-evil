@@ -1,5 +1,6 @@
 package stayablox.purpleevil.world.weapon;
 
+import stayablox.purpleevil.Settings;
 import stayablox.purpleevil.world.attribute.Attributes;
 import stayablox.purpleevil.world.entity.Entity;
 import stayablox.purpleevil.world.entity.LivingEntity;
@@ -39,7 +40,7 @@ public class SwordWeapon extends Weapon {
         super.attack(entity);
 
         this.hasHit = false;
-        game.getSoundManager().playSound(game.getSounds().SWING, 0.5f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
+        game.getSoundManager().playSound(game.getSounds().SWING, 0.5f * Settings.WORLD_SOUNDS_VOLUME, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
     }
 
     @Override
@@ -79,7 +80,7 @@ public class SwordWeapon extends Weapon {
                 if (angleDiff > 180) angleDiff = 360 - angleDiff;
 
                 if (angleDiff <= attackArc / 2) {
-                    game.getSoundManager().playSound(game.getSounds().SWING_HIT, 0.3f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
+                    game.getSoundManager().playSound(game.getSounds().SWING_HIT, 0.3f * Settings.WORLD_SOUNDS_VOLUME, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
                     livingTarget.damage(getAttributeValue(WeaponAttributes.DAMAGE));
 
                     double poison = getAttributeValue(WeaponAttributes.POISONING);

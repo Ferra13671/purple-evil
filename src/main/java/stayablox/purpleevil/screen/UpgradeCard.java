@@ -4,6 +4,7 @@ import com.ferra13671.cometrenderer.texture.GLTexture;
 import com.ferra13671.cometrenderer.texture.atlas.TextureBorder;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
+import stayablox.purpleevil.Settings;
 import stayablox.purpleevil.renderer.RectColors;
 import stayablox.purpleevil.renderer.batch.impl.BasicTextureBatch;
 import stayablox.purpleevil.renderer.batch.impl.ColoredRectBatch;
@@ -171,7 +172,7 @@ public class UpgradeCard extends Button {
                     int price = game.getGameSession().getCurrentPrice(upgrade);
                     if (game.getGameSession().score >= price) {
                         if (game.getGameSession().purchaseUpgrade(upgrade)) {
-                            game.getSoundManager().playSound(game.getSounds().BUY, 0.3f, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
+                            game.getSoundManager().playSound(game.getSounds().BUY, 0.3f * Settings.UI_SOUNDS_VOLUME, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
                         }
                     }
                 }
