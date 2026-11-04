@@ -10,14 +10,14 @@ import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
 public class Button implements GameInstance {
-    private final String text;
-    private final float x;
-    private final float y;
-    private final float width;
-    private final float height;
-    private final Runnable pressRunnable;
+    protected final String text;
+    protected final float x;
+    protected final float y;
+    protected final float width;
+    protected final float height;
+    protected final Runnable pressRunnable;
 
-    private final AABB aabb;
+    protected final AABB aabb;
 
     public Button(String text, float x, float y, float width, float height, Runnable pressRunnable) {
         this.text = text;
