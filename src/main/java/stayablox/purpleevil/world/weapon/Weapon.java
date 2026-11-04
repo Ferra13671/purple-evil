@@ -1,5 +1,6 @@
 package stayablox.purpleevil.world.weapon;
 
+import lombok.Setter;
 import stayablox.purpleevil.GameInstance;
 import stayablox.purpleevil.world.attribute.Attributes;
 import stayablox.purpleevil.world.attribute.modifier.AttributeModifier;
@@ -22,6 +23,10 @@ public class Weapon implements GameInstance {
     @Getter
     protected boolean usingWeapon = false;
     protected long lastUseTime = 0;
+
+    @Getter
+    @Setter
+    private float smoothRenderYaw = Float.NaN;
 
     public Weapon(@NonNull String textureId, float size, @NonNull Attributes attributes, @NonNull Map<String, AttributeModifier> entityModifiers) {
         this.textureId = textureId;

@@ -220,11 +220,34 @@ public class WorldRenderer implements GameInstance {
     private void renderLivingEntityWeapon(AABB aabb, LivingEntity livingEntity) {
         Weapon weapon = livingEntity.getWeapon();
         if (weapon != null) {
-            float renderAngle = (float) livingEntity.getRenderYaw();
+            float targetYaw = (float) livingEntity.getRenderYaw();
 
-            // Если это меч — берем угол из меча (там уже учтен взмах)
-            if (weapon instanceof SwordWeapon sword) {
-                renderAngle = sword.getRenderAngle(livingEntity);
+            float currentVisual = weapon.getSmoothRenderYaw();
+            if (Float.isNaN(currentVisual)) {
+                currentVisual = targetYaw;
+            } else {
+                float diff = targetYaw - currentVisual;
+
+                diff = (diff + 180) % 360 - 180;
+                if (diff < -180) diff += 360;
+
+                // Коэффициент плавности.
+                // 0.15f - очень плавно (сильное отставание),
+                // 0.35f - хороший баланс,
+                // 1.0f - мгновенно (как было раньше)
+                float smoothingFactor = 0.5f;
+                currentVisual += diff * smoothingFactor;
+            }
+            weapon.setSmoothRenderYaw(currentVisual);
+
+            float renderAngle = currentVisual;
+            if (weapon instanceof SwordWeapon sword && sword.isSwinging()) {
+                float progress = sword.getSwingProgress();
+                float easedProgress = progress * progress * (3.0f - 2.0f * progress);
+
+                float startOffset = -60f;
+                float endOffset = 60f;
+                renderAngle += startOffset + (endOffset - startOffset) * easedProgress;
             }
 
             this.renderer.view.pushMatrix().translate(
@@ -235,7 +258,6 @@ public class WorldRenderer implements GameInstance {
 
             float halfWeaponSize = weapon.getSize() / 2;
 
-            // Рендерим сам меч
             new BasicTextureBatch()
                     .texture(game.getTextures().weaponAtlas)
                     .rectPositioned(

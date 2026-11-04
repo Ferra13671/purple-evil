@@ -93,18 +93,4 @@ public class SwordWeapon extends Weapon {
             }
         }
     }
-
-    public float getRenderAngle(LivingEntity entity) {
-        float baseAngle = (float) entity.getRenderYaw();
-        if (!isSwinging()) return baseAngle;
-
-        float progress = getSwingProgress();
-        float easedProgress = progress * progress * (3.0f - 2.0f * progress);
-
-        float startOffset = -60f;
-        float endOffset = 60f;
-        float currentOffset = startOffset + (endOffset - startOffset) * easedProgress;
-
-        return baseAngle + currentOffset;
-    }
 }
