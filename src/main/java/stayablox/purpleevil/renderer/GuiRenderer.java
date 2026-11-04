@@ -13,6 +13,7 @@ import stayablox.purpleevil.renderer.batch.impl.text.RenderText;
 import stayablox.purpleevil.renderer.batch.impl.text.TextBatch;
 import stayablox.purpleevil.screen.ShopScreen;
 import stayablox.purpleevil.utils.AABB;
+import stayablox.purpleevil.utils.Utils;
 import stayablox.purpleevil.world.LobbyWorld;
 import stayablox.purpleevil.world.World;
 import stayablox.purpleevil.world.attribute.Attributes;
@@ -20,6 +21,7 @@ import stayablox.purpleevil.world.attribute.modifier.AttributeInstance;
 import stayablox.purpleevil.world.attribute.modifier.AttributeModifier;
 import stayablox.purpleevil.world.entity.EnemyEntity;
 import stayablox.purpleevil.world.entity.Entity;
+import stayablox.purpleevil.world.entity.EntityAttributes;
 import stayablox.purpleevil.world.entity.Player;
 import stayablox.purpleevil.world.room.Room;
 import stayablox.purpleevil.world.upgrades.Upgrade;
@@ -31,6 +33,8 @@ public class GuiRenderer implements GameInstance {
     public static final float MINIMAP_SIZE = 150f;
     public static final float MINIMAP_MARGIN = 20f;
     public static final float MINIMAP_INNER_OFFSET = 12f;
+    public static final float PLAYER_HEALTH_BAR_WIDTH = 200;
+    public static final float PLAYER_HEALTH_BAR_HEIGHT = 20;
 
     private final Renderer renderer;
 
@@ -92,8 +96,35 @@ public class GuiRenderer implements GameInstance {
         final float startY = 10f;
 
         renderIcon(game.getTextures().healthTexture, startX, startY, iconSize);
+        double maxHealth = player.getAttributeValue(EntityAttributes.MAX_HEALTH);
+        double currentHealth = Utils.lerp(player.renderHealth, player.getHealth(), 5f / game.getFpsCounter().getCurrentFPS());
+        player.renderHealth = currentHealth;
+        float playerHealthBarY = startY + (iconSize - PLAYER_HEALTH_BAR_HEIGHT)/2;
+        new ColoredRectBatch()
+                .rectSized(
+                        startX + iconSize + gap,
+                        playerHealthBarY,
+                        PLAYER_HEALTH_BAR_WIDTH,
+                        PLAYER_HEALTH_BAR_HEIGHT,
+                        RectColors.oneColor(new Vector4f(0.7f, 0.7f, 0.7f, 1f)))
+                .rectSized(
+                        startX + iconSize + gap + 1,
+                        playerHealthBarY + 1,
+                        PLAYER_HEALTH_BAR_WIDTH - 2,
+                        PLAYER_HEALTH_BAR_HEIGHT - 2,
+                        RectColors.oneColor(new Vector4f(0f, 0f, 0f, 1f)))
+                .rectSized(
+                        startX + iconSize + gap + 1,
+                        playerHealthBarY + 1,
+                        (PLAYER_HEALTH_BAR_WIDTH * (float) (currentHealth / maxHealth)) - 2,
+                        PLAYER_HEALTH_BAR_HEIGHT - 2,
+                        RectColors.oneColor(new Vector4f(0f, 1f, 0f, 1f))
+                )
+                        .build()
+                        .tryDraw()
+                        .close();
         renderValueText(String.valueOf((int) player.getHealth()),
-                startX + iconSize + gap, startY, iconSize);
+                startX + iconSize + PLAYER_HEALTH_BAR_WIDTH + (gap * 2), startY, iconSize);
 
         float scoreY = startY + lineHeight;
         renderIcon(game.getTextures().coinTexture, startX, scoreY, iconSize);

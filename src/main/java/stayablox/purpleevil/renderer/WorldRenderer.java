@@ -206,13 +206,14 @@ public class WorldRenderer implements GameInstance {
         float x = (float) aabb.getMinX() + (float) aabb.getXLength() * 0.1f; // Центрируем
         float y = (float) aabb.getMinY() - 0.25f; // Смещаем вниз под врага
 
-        // 1. Фон (черный, полупрозрачный)
-        Vector4f bgColor = new Vector4f(0f, 0f, 0f, 0.7f);
+        Vector4f outlineColor = new Vector4f(0.7f, 0.7f, 0.7f, 1f);
+        Vector4f backgroundColor = new Vector4f(0f, 0f, 0f, 1f);
         Vector4f fillColor = new Vector4f(0.8f, 0.1f, 0.1f, 1f);
 
         new ColoredRectBatch()
-                .rectSized(x, y, barWidth, barHeight, RectColors.verticalGradient(bgColor, bgColor))
-                .rectSized(x, y, barWidth * progress, barHeight, RectColors.verticalGradient(fillColor, fillColor))
+                .rectSized(x - 0.01f, y - 0.01f, barWidth + 0.02f, barHeight + 0.02f, RectColors.oneColor(outlineColor))
+                .rectSized(x, y, barWidth, barHeight, RectColors.oneColor(backgroundColor))
+                .rectSized(x, y, barWidth * progress, barHeight, RectColors.oneColor(fillColor))
                 .build().tryDraw().close();
     }
 
