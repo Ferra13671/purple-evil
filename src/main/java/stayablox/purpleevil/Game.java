@@ -2,10 +2,7 @@ package stayablox.purpleevil;
 
 import com.ferra13671.cometrenderer.CometRenderer;
 import com.ferra13671.cometrenderer.plugins.bettercompiler.BetterCompilerPlugin;
-import com.ferra13671.cometrenderer.plugins.glfw.CometGLFW;
-import com.ferra13671.cometrenderer.plugins.glfw.FullScreenSwitchCombination;
-import com.ferra13671.cometrenderer.plugins.glfw.Window;
-import com.ferra13671.cometrenderer.plugins.glfw.WindowHints;
+import com.ferra13671.cometrenderer.plugins.glfw.*;
 import com.ferra13671.overtone.Overtone;
 import com.ferra13671.overtone.SoundBuffer;
 import com.ferra13671.overtone.SoundSource;
@@ -120,6 +117,7 @@ public class Game {
         this.window.setSize(1300, 750);
         this.window.setMonitorCenterPosition();
         this.window.setVisible(true);
+        CometGLFW.setVSync(Settings.VSYNC ? VsyncMode.Adaptive : VsyncMode.Disabled);
 
         this.window.setFramebufferSizeCallback((width, height) -> {
             if (this.screen != null)

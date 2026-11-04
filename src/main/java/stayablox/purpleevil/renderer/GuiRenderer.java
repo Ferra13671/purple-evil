@@ -30,7 +30,6 @@ import org.joml.Vector4f;
 import java.util.*;
 
 public class GuiRenderer implements GameInstance {
-    public static final float MINIMAP_SIZE = 150f;
     public static final float MINIMAP_MARGIN = 20f;
     public static final float MINIMAP_INNER_OFFSET = 12f;
     public static final float PLAYER_HEALTH_BAR_WIDTH = 200;
@@ -69,11 +68,11 @@ public class GuiRenderer implements GameInstance {
     }
 
     private void renderOverlay(Framebuffer framebuffer) {
-        renderVignette(framebuffer);
+        if (Settings.SHOW_VIGNETTE) renderVignette(framebuffer);
         renderStats(framebuffer);
         renderUpgrades(framebuffer);
-        renderActionButtons(framebuffer);
-        renderMinimap(framebuffer);
+        if (Settings.SHOW_ACTION_BUTTONS) renderActionButtons(framebuffer);
+        if (Settings.SHOW_MINIMAP) renderMinimap(framebuffer);
         renderFPS(framebuffer);
     }
 
@@ -159,10 +158,12 @@ public class GuiRenderer implements GameInstance {
     private void renderFPS(Framebuffer framebuffer) {
         String text = String.format("FPS: %s", game.getFpsCounter().getCurrentFPS());
 
+        float offset = Settings.SHOW_MINIMAP ? (Settings.MINIMAP_SIZE + MINIMAP_MARGIN) : 0f;
+
         new TextBatch(this.renderer.smallFont)
                 .text(new RenderText(
                         text,
-                        framebuffer.getWidth() - MINIMAP_SIZE - (MINIMAP_MARGIN * 2) - this.renderer.smallFont.getTextWidth(text),
+                        framebuffer.getWidth() - MINIMAP_MARGIN - offset - this.renderer.smallFont.getTextWidth(text),
                         MINIMAP_MARGIN
                 ).withShadow(true))
                 .build()
@@ -173,6 +174,9 @@ public class GuiRenderer implements GameInstance {
     private void renderMinimap(Framebuffer framebuffer) {
         World world = game.getWorld();
         if (world.rooms.isEmpty()) return;
+
+        // Заменяем старую константу на значение из настроек
+        float currentMapSize = Settings.MINIMAP_SIZE;
 
         // --- 1. Вычисляем границы всего мира (всех комнат) ---
         double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE;
@@ -190,27 +194,27 @@ public class GuiRenderer implements GameInstance {
         float worldHeight = (float) (maxY - minY);
         float maxWorldDim = Math.max(worldWidth, worldHeight);
 
-        float mapX = framebuffer.getWidth() - MINIMAP_SIZE - MINIMAP_MARGIN;
+        float mapX = framebuffer.getWidth() - currentMapSize - MINIMAP_MARGIN;
         float mapY = MINIMAP_MARGIN;
 
-        float innerSize = MINIMAP_SIZE - MINIMAP_INNER_OFFSET * 2;
+        float innerSize = currentMapSize - MINIMAP_INNER_OFFSET * 2;
         float scale = innerSize / maxWorldDim;
 
         float offsetX = MINIMAP_INNER_OFFSET + (innerSize - worldWidth * scale) / 2f;
         float offsetY = MINIMAP_INNER_OFFSET + (innerSize - worldHeight * scale) / 2f;
 
         new ColoredRectBatch()
-                .rectSized(mapX, mapY, MINIMAP_SIZE, MINIMAP_SIZE,
+                .rectSized(mapX, mapY, currentMapSize, currentMapSize,
                         RectColors.verticalGradient(new Vector4f(0, 0, 0, 0.125f), new Vector4f(0, 0, 0, 0.125f)))
                 .build().tryDraw().close();
 
         float borderThickness = 2f;
         Vector4f borderColor = new Vector4f(1f, 1f, 1f, 0.25f);
         new ColoredRectBatch()
-                .rectSized(mapX, mapY, MINIMAP_SIZE, borderThickness, RectColors.verticalGradient(borderColor, borderColor))
-                .rectSized(mapX, mapY + MINIMAP_SIZE - borderThickness, MINIMAP_SIZE, borderThickness, RectColors.verticalGradient(borderColor, borderColor))
-                .rectSized(mapX, mapY + borderThickness, borderThickness, MINIMAP_SIZE - borderThickness * 2, RectColors.verticalGradient(borderColor, borderColor))
-                .rectSized(mapX + MINIMAP_SIZE - borderThickness, mapY + borderThickness, borderThickness, MINIMAP_SIZE - borderThickness * 2, RectColors.verticalGradient(borderColor, borderColor))
+                .rectSized(mapX, mapY, currentMapSize, borderThickness, RectColors.verticalGradient(borderColor, borderColor))
+                .rectSized(mapX, mapY + currentMapSize - borderThickness, currentMapSize, borderThickness, RectColors.verticalGradient(borderColor, borderColor))
+                .rectSized(mapX, mapY + borderThickness, borderThickness, currentMapSize - borderThickness * 2, RectColors.verticalGradient(borderColor, borderColor))
+                .rectSized(mapX + currentMapSize - borderThickness, mapY + borderThickness, borderThickness, currentMapSize - borderThickness * 2, RectColors.verticalGradient(borderColor, borderColor))
                 .build().tryDraw().close();
 
         ColoredRectBatch roomBatch = new ColoredRectBatch();

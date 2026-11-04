@@ -1,14 +1,22 @@
 package stayablox.purpleevil.screen;
 
+import com.ferra13671.cometrenderer.plugins.glfw.CometGLFW;
+import com.ferra13671.cometrenderer.plugins.glfw.VsyncMode;
+import stayablox.purpleevil.Settings;
 import stayablox.purpleevil.renderer.batch.impl.text.RenderText;
 import stayablox.purpleevil.renderer.batch.impl.text.TextBatch;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GraphicsSettingsScreen extends Screen {
+    public static final float ROW_WIDTH = 500f;
+    public static final float ROW_HEIGHT = 44f;
+    private static final float ROW_GAP = 12f;
+
     private final Screen previousScreen;
-    private final List<Button> buttons = new ArrayList<>();
+    private final List<Button> buttons = new CopyOnWriteArrayList<>();
+    private final List<Slider> sliders = new CopyOnWriteArrayList<>();
 
     public GraphicsSettingsScreen(Screen previousScreen) {
         this.previousScreen = previousScreen;
@@ -22,6 +30,58 @@ public class GraphicsSettingsScreen extends Screen {
     @Override
     public void resize(int width, int height) {
         buttons.clear();
+        sliders.clear();
+
+        float startX = (width - ROW_WIDTH) / 2f;
+
+        int elementsCount = 6;
+        float totalHeight = elementsCount * ROW_HEIGHT + (elementsCount - 1) * ROW_GAP;
+        float startY = (height - totalHeight) / 2f - 20f;
+
+        float currentY = startY;
+
+        sliders.add(new Slider(
+                "Camera Zoom", startX, currentY, ROW_WIDTH, ROW_HEIGHT,
+                () -> (Settings.CAMERA_ZOOM - 15.0) / (60.0 - 15.0),
+                v -> Settings.CAMERA_ZOOM = (int) (15 + v * (60 - 15))
+        ));
+        currentY += ROW_HEIGHT + ROW_GAP;
+
+        sliders.add(new Slider(
+                "Minimap Size", startX, currentY, ROW_WIDTH, ROW_HEIGHT,
+                () -> (Settings.MINIMAP_SIZE - 100.0) / (300.0 - 100.0),
+                v -> Settings.MINIMAP_SIZE = (float) (100 + v * (300 - 100))
+        ));
+        currentY += ROW_HEIGHT + ROW_GAP;
+
+        buttons.add(new Button("Action Buttons: " + (Settings.SHOW_ACTION_BUTTONS ? "ON" : "OFF"),
+                startX, currentY, ROW_WIDTH, ROW_HEIGHT, () -> {
+            Settings.SHOW_ACTION_BUTTONS = !Settings.SHOW_ACTION_BUTTONS;
+            resize(width, height); // Пересоздаем интерфейс для обновления текста
+        }));
+        currentY += ROW_HEIGHT + ROW_GAP;
+
+        buttons.add(new Button("Vignette: " + (Settings.SHOW_VIGNETTE ? "ON" : "OFF"),
+                startX, currentY, ROW_WIDTH, ROW_HEIGHT, () -> {
+            Settings.SHOW_VIGNETTE = !Settings.SHOW_VIGNETTE;
+            resize(width, height);
+        }));
+        currentY += ROW_HEIGHT + ROW_GAP;
+
+        buttons.add(new Button("Minimap: " + (Settings.SHOW_MINIMAP ? "ON" : "OFF"),
+                startX, currentY, ROW_WIDTH, ROW_HEIGHT, () -> {
+            Settings.SHOW_MINIMAP = !Settings.SHOW_MINIMAP;
+            resize(width, height);
+        }));
+        currentY += ROW_HEIGHT + ROW_GAP;
+
+        buttons.add(new Button("VSync: " + (Settings.VSYNC ? "ON" : "OFF"),
+                startX, currentY, ROW_WIDTH, ROW_HEIGHT, () -> {
+            Settings.VSYNC = !Settings.VSYNC;
+            CometGLFW.setVSync(Settings.VSYNC ? VsyncMode.Enabled : VsyncMode.Disabled);
+            resize(width, height);
+        }));
+
         float btnW = 200f;
         float btnH = 50f;
         buttons.add(new Button("Back", (width - btnW) / 2f, height - btnH - 30f,
@@ -30,8 +90,9 @@ public class GraphicsSettingsScreen extends Screen {
 
     @Override
     public void render(double mouseX, double mouseY) {
+        for (Slider s : sliders) s.updateIfDragging(mouseX);
+
         int width = game.getWindow().getFramebufferWidth();
-        int height = game.getWindow().getFramebufferHeight();
 
         renderBackground(mouseX, mouseY);
 
@@ -41,17 +102,24 @@ public class GraphicsSettingsScreen extends Screen {
                 .text(new RenderText(title, (width - titleW) / 2f, 20f).withShadow(true))
                 .build().tryDraw().close();
 
-        String emptyText = "No graphics settings available yet.";
-        float textW = game.getRenderer().smallFont.getTextWidth(emptyText);
-        new TextBatch(game.getRenderer().smallFont)
-                .text(new RenderText(emptyText, (width - textW) / 2f, height / 2f).withShadow(true))
-                .build().tryDraw().close();
-
+        for (Slider s : sliders) s.render(mouseX, mouseY);
         for (Button b : buttons) b.render(mouseX, mouseY);
     }
 
     @Override
+    public void onMousePress(double mouseX, double mouseY, int button) {
+        for (Slider s : sliders) s.onMousePress(mouseX, mouseY, button);
+    }
+
+    @Override
     public void onMouseRelease(double mouseX, double mouseY, int button) {
+        boolean anySliderHit = sliders.stream().anyMatch(s -> s.contains(mouseX, mouseY));
+        boolean wasDragging = sliders.stream().anyMatch(Slider::isDragging);
+
+        for (Slider s : sliders) s.onMouseRelease(mouseX, mouseY, button);
+
+        if (anySliderHit || wasDragging) return;
+
         for (Button b : buttons) b.onMouseRelease(mouseX, mouseY, button);
     }
 

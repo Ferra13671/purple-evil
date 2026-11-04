@@ -11,6 +11,13 @@ public class Settings {
     public float WORLD_SOUNDS_VOLUME = 0.75f;
     public float UI_SOUNDS_VOLUME = 0.75f;
 
+    public boolean VSYNC = false;
+    public int CAMERA_ZOOM = 30;
+    public boolean SHOW_ACTION_BUTTONS = true;
+    public boolean SHOW_VIGNETTE = true;
+    public boolean SHOW_MINIMAP = true;
+    public float MINIMAP_SIZE = 150f;
+
     public final KeyBind ATTACK = KeyBind.builder()
             .keyType(KeyType.Mouse)
             .key(GLFW.GLFW_MOUSE_BUTTON_LEFT)

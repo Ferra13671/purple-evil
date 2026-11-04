@@ -258,7 +258,7 @@ public class WorldRenderer implements GameInstance {
 
     private void setWorldMatrices() {
         float aspect    = (float) GameInstance.game.getWindow().getFramebufferWidth() / GameInstance.game.getWindow().getFramebufferHeight();
-        float halfW = MAX_BLOCKS_IN_WIDTH * 0.5f;
+        float halfW = stayablox.purpleevil.Settings.CAMERA_ZOOM * 0.5f;
         float halfH = halfW / aspect;
 
         this.renderer.projection.identity().ortho(
