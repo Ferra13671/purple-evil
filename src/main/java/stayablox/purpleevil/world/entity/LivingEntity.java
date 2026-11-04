@@ -51,11 +51,13 @@ public class LivingEntity extends Entity {
     protected int poisonTickTimer = 0;
     protected double poisonLevel = 0;
 
+    public double renderHealth;
+
     public LivingEntity(@NonNull EntityModel model, @NonNull AABB aabb, @NonNull Attributes attributes, Vector2d handPos, Weapon weapon) {
         super(model, aabb);
 
         this.attributes = attributes;
-        this.health = getAttributeValue(EntityAttributes.MAX_HEALTH);
+        this.health = this.renderHealth = getAttributeValue(EntityAttributes.MAX_HEALTH);
         this.handPos = handPos;
         setWeapon(weapon);
     }

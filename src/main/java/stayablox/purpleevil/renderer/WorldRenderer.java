@@ -192,7 +192,8 @@ public class WorldRenderer implements GameInstance {
 
     private void renderHealthBar(LivingEntity entity, AABB aabb) {
         double maxHealth = entity.getAttributeValue(EntityAttributes.MAX_HEALTH);
-        double currentHealth = entity.getHealth();
+        double currentHealth = Utils.lerp(entity.renderHealth, entity.getHealth(), 5f / game.getFpsCounter().getCurrentFPS());
+        entity.renderHealth = currentHealth;
 
         if (currentHealth <= 0)
             return;
