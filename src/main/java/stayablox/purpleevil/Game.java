@@ -1,6 +1,7 @@
 package stayablox.purpleevil;
 
 import com.ferra13671.cometrenderer.CometRenderer;
+import com.ferra13671.cometrenderer.CometTags;
 import com.ferra13671.cometrenderer.plugins.bettercompiler.BetterCompilerPlugin;
 import com.ferra13671.cometrenderer.plugins.glfw.*;
 import com.ferra13671.overtone.Overtone;
@@ -61,7 +62,6 @@ public class Game {
     private final Textures textures;
     @Getter
     private final EntityModelTemplates entityModelTemplates;
-    private final ShaderLibraries shaderLibraries;
     @Getter
     private final Programs programs;
     @Getter
@@ -81,25 +81,37 @@ public class Game {
     public Game() {
         instance = this;
 
+        System.out.println("Start initialize game");
+        long time = System.currentTimeMillis();
+
         initWindow();
         CometRenderer.init();
         BetterCompilerPlugin.init();
+        System.out.printf("Initialized CometRenderer v%s%n", CometRenderer.getRegistry().get(CometTags.COMET_RENDERER_VERSION).orElse("UNKNOWN"));
 
         this.roomTemplates = new RoomTemplates();
+        System.out.printf("Loaded room templates: %s%n", this.roomTemplates.templates.size());
         this.attributesTemplates = new AttributesTemplates();
         this.upgrades = new Upgrades();
+        System.out.printf("Loaded upgrades: %s%n", this.upgrades.upgrades.size());
 
         this.textures = new Textures();
+        System.out.printf("Loaded textures: %s%n", CometRenderer.getTexturesCount());
         this.entityModelTemplates = new EntityModelTemplates();
-        this.shaderLibraries = new ShaderLibraries();
+        new ShaderLibraries();
         this.programs = new Programs();
+        System.out.printf("Compiled programs: %s%n", CometRenderer.getProgramsCount());
         this.renderer = new Renderer();
 
         this.textures.buildAtlases();
 
+        System.out.println("Initialize Overtone");
         Overtone.init();
         this.sounds = new Sounds();
         this.soundManager = new SoundManager();
+        System.out.printf("Loaded sounds: %s%n", Overtone.getBuffers().size());
+
+        System.out.printf("Game initialized! Initialization time: %s%n", System.currentTimeMillis() - time);
 
         this.window.loop();
     }
