@@ -240,16 +240,16 @@ public class GuiRenderer implements GameInstance {
 
         new ColoredRectBatch()
                 .rectSized(mapX, mapY, currentMapSize, currentMapSize,
-                        RectColors.verticalGradient(new Vector4f(0, 0, 0, 0.125f), new Vector4f(0, 0, 0, 0.125f)))
+                        RectColors.oneColor(new Vector4f(0, 0, 0, 0.125f)))
                 .build().tryDraw().close();
 
         float borderThickness = 2f;
         Vector4f borderColor = new Vector4f(1f, 1f, 1f, 0.25f);
         new ColoredRectBatch()
-                .rectSized(mapX, mapY, currentMapSize, borderThickness, RectColors.verticalGradient(borderColor, borderColor))
-                .rectSized(mapX, mapY + currentMapSize - borderThickness, currentMapSize, borderThickness, RectColors.verticalGradient(borderColor, borderColor))
-                .rectSized(mapX, mapY + borderThickness, borderThickness, currentMapSize - borderThickness * 2, RectColors.verticalGradient(borderColor, borderColor))
-                .rectSized(mapX + currentMapSize - borderThickness, mapY + borderThickness, borderThickness, currentMapSize - borderThickness * 2, RectColors.verticalGradient(borderColor, borderColor))
+                .rectSized(mapX, mapY, currentMapSize, borderThickness, RectColors.oneColor(borderColor))
+                .rectSized(mapX, mapY + currentMapSize - borderThickness, currentMapSize, borderThickness, RectColors.oneColor(borderColor))
+                .rectSized(mapX, mapY + borderThickness, borderThickness, currentMapSize - borderThickness * 2, RectColors.oneColor(borderColor))
+                .rectSized(mapX + currentMapSize - borderThickness, mapY + borderThickness, borderThickness, currentMapSize - borderThickness * 2, RectColors.oneColor(borderColor))
                 .build().tryDraw().close();
 
         ColoredRectBatch roomBatch = new ColoredRectBatch();
@@ -263,7 +263,7 @@ public class GuiRenderer implements GameInstance {
             float rw = (float) (b.getMaxX() - b.getMinX()) * scale;
             float rh = (float) (b.getMaxY() - b.getMinY()) * scale;
 
-            roomBatch.rectSized(rx, ry, rw, rh, RectColors.verticalGradient(roomColor, roomColor));
+            roomBatch.rectSized(rx, ry, rw, rh, RectColors.oneColor(roomColor));
         }
         roomBatch.build().tryDraw().close();
 
@@ -273,7 +273,7 @@ public class GuiRenderer implements GameInstance {
 
         new ColoredRectBatch()
                 .rectSized(pX - playerSize / 2, pY - playerSize / 2, playerSize, playerSize,
-                        RectColors.verticalGradient(new Vector4f(0, 0, 1, 1), new Vector4f(0, 0, 1, 1)))
+                        RectColors.oneColor(new Vector4f(0, 0, 1, 1)))
                 .build().tryDraw().close();
 
         ColoredRectBatch enemyBatch = new ColoredRectBatch();
@@ -294,7 +294,7 @@ public class GuiRenderer implements GameInstance {
                 float size = Math.clamp((float) (aabbSize * 2.5f), 3f, 6f);
 
                 enemyBatch.rectSized(ex - size / 2, ey - size / 2, size, size,
-                        RectColors.verticalGradient(enemyColor, enemyColor));
+                        RectColors.oneColor(enemyColor));
             }
         }
         enemyBatch.build().tryDraw().close();
@@ -413,42 +413,46 @@ public class GuiRenderer implements GameInstance {
 
         boolean inLobby = game.getWorld() instanceof LobbyWorld;
 
+        ColoredRectBatch coloredRectBatch = new ColoredRectBatch();
+        TextBatch smallTextBatch = new TextBatch(this.renderer.smallFont);
+        TextBatch tinyTextBatch = new TextBatch(this.renderer.tinyFont);
+
         float x = margin;
         renderActionButton(x, upperY, size, Settings.PAUSE.getDisplayName(), "Pause",
-                0f, false, Settings.PAUSE.isPressed());
+                0f, false, Settings.PAUSE.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
         x += size + gap;
 
         renderActionButton(x, upperY, size, Settings.PLAYER_SWAP.getDisplayName(), "Swap",
-                game.getGameSession().getSwapCooldownProgress(), true, Settings.PLAYER_SWAP.isPressed());
+                game.getGameSession().getSwapCooldownProgress(), true, Settings.PLAYER_SWAP.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
         x += size + gap;
 
         renderActionButton(x, upperY, size, Settings.DASH.getDisplayName(), "Dash",
-                game.getGameSession().player.getDashCooldownProgress(), true, Settings.DASH.isPressed());
+                game.getGameSession().player.getDashCooldownProgress(), true, Settings.DASH.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
         x += size + gap;
 
         if (game.getGameSession().player.isMage()) {
             renderActionButton(x, upperY, size, Settings.SHOCK_DASH.getDisplayName(), "Shock",
-                    game.getGameSession().player.getShockDashCooldownProgress(), true, Settings.SHOCK_DASH.isPressed());
+                    game.getGameSession().player.getShockDashCooldownProgress(), true, Settings.SHOCK_DASH.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
             x += size + gap;
         }
 
         if (inLobby) {
             renderActionButton(x, upperY, size, Settings.SHOP.getDisplayName(), "Shop",
-                    0f, false, Settings.SHOP.isPressed());
+                    0f, false, Settings.SHOP.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
         }
 
         float buttonswidth = 3 * size + 2 * gap;
 
         renderActionButton(margin + size + gap, lowerY, size, Settings.FORWARD.getDisplayName(),
-                null, 0f, false, Settings.FORWARD.isPressed());
+                null, 0f, false, Settings.FORWARD.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
 
         float lowerRowY = lowerY + size + gap;
         renderActionButton(margin, lowerRowY, size, Settings.LEFT.getDisplayName(),
-                null, 0f, false, Settings.LEFT.isPressed());
+                null, 0f, false, Settings.LEFT.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
         renderActionButton(margin + size + gap, lowerRowY, size, Settings.BACK.getDisplayName(),
-                null, 0f, false, Settings.BACK.isPressed());
+                null, 0f, false, Settings.BACK.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
         renderActionButton(margin + 2 * (size + gap), lowerRowY, size, Settings.RIGHT.getDisplayName(),
-                null, 0f, false, Settings.RIGHT.isPressed());
+                null, 0f, false, Settings.RIGHT.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
 
         String movementText = "Movement";
         float movementTextWidth = this.renderer.tinyFont.getTextWidth(movementText);
@@ -459,7 +463,11 @@ public class GuiRenderer implements GameInstance {
                 .build().tryDraw().close();
 
         renderActionButton(margin + buttonswidth + gap * 2, lowerRowY, size, Settings.ATTACK.getDisplayName(),
-                "Attack", 0f, false, Settings.ATTACK.isPressed());
+                "Attack", 0f, false, Settings.ATTACK.isPressed(), coloredRectBatch, smallTextBatch, tinyTextBatch);
+
+        coloredRectBatch.build().tryDraw().close();
+        smallTextBatch.build().tryDraw().close();
+        tinyTextBatch.build().tryDraw().close();
     }
 
     private void renderActionButton(float x, float y, float size,
@@ -467,54 +475,53 @@ public class GuiRenderer implements GameInstance {
                                     String name,
                                     float cooldownProgress,
                                     boolean showFill,
-                                    boolean pressed) {
+                                    boolean pressed,
+                                    ColoredRectBatch coloredBatch,
+                                    TextBatch smallTextBatch,
+                                    TextBatch tinyTextBatch
+    ) {
         Vector4f bg = new Vector4f(0.1f, 0.1f, 0.1f, 0.75f);
-        new ColoredRectBatch()
-                .rectSized(x, y, size, size, RectColors.verticalGradient(bg, bg))
-                .build().tryDraw().close();
+        coloredBatch
+                .rectSized(x, y, size, size, RectColors.oneColor(bg))
+        ;
 
         if (showFill && cooldownProgress > 0.001f) {
             float fillHeight = size * Math.clamp(cooldownProgress, 0f, 1f);
             Vector4f fill = new Vector4f(1f, 1f, 1f, 0.4f);
-            new ColoredRectBatch()
-                    .rectSized(x, y, size, fillHeight, RectColors.verticalGradient(fill, fill))
-                    .build().tryDraw().close();
+            coloredBatch
+                    .rectSized(x, y, size, fillHeight, RectColors.oneColor(fill));
         }
 
         if (pressed) {
             Vector4f glow = new Vector4f(0.4f, 0.7f, 1f, 0.35f);
-            new ColoredRectBatch()
-                    .rectSized(x, y, size, size, RectColors.verticalGradient(glow, glow))
-                    .build().tryDraw().close();
+            coloredBatch
+                    .rectSized(x, y, size, size, RectColors.oneColor(glow));
         }
 
         float bt = 2f;
         Vector4f border = pressed
                 ? new Vector4f(0.6f, 0.85f, 1f, 0.95f)
                 : new Vector4f(1f, 1f, 1f, 0.55f);
-        new ColoredRectBatch()
-                .rectSized(x, y, size, bt, RectColors.verticalGradient(border, border))
-                .rectSized(x, y + size - bt, size, bt, RectColors.verticalGradient(border, border))
-                .rectSized(x, y + bt, bt, size - bt * 2, RectColors.verticalGradient(border, border))
-                .rectSized(x + size - bt, y + bt, bt, size - bt * 2, RectColors.verticalGradient(border, border))
-                .build().tryDraw().close();
+        coloredBatch
+                .rectSized(x, y, size, bt, RectColors.oneColor(border))
+                .rectSized(x, y + size - bt, size, bt, RectColors.oneColor(border))
+                .rectSized(x, y + bt, bt, size - bt * 2, RectColors.oneColor(border))
+                .rectSized(x + size - bt, y + bt, bt, size - bt * 2, RectColors.oneColor(border));
 
         float keyWidth  = this.renderer.smallFont.getTextWidth(keyText);
         float keyHeight = this.renderer.smallFont.getTextHeight();
         float keyX = x + (size - keyWidth) / 2f;
         float keyY = y + (size - keyHeight) / 2f;
 
-        new TextBatch(this.renderer.smallFont)
-                .text(new RenderText(keyText, keyX, keyY).withShadow(true))
-                .build().tryDraw().close();
+        smallTextBatch
+                .text(new RenderText(keyText, keyX, keyY).withShadow(true));
 
         if (name != null && !name.isEmpty()) {
             float nameWidth = this.renderer.tinyFont.getTextWidth(name);
             float nameX = x + (size - nameWidth) / 2f;
             float nameY = y + size + 4f;
-            new TextBatch(this.renderer.tinyFont)
-                    .text(new RenderText(name, nameX, nameY).withShadow(true))
-                    .build().tryDraw().close();
+            tinyTextBatch
+                    .text(new RenderText(name, nameX, nameY).withShadow(true));
         }
     }
 }

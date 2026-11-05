@@ -57,13 +57,11 @@ public class WorldRenderer implements GameInstance {
         program.getUniform("playerPos", UniformType.VEC2).set(new Vector2f((float) pos.x, (float) pos.y));
 
         float halfW = Settings.CAMERA_ZOOM / 2f;
-        CometRenderer.draw(CometRenderer.createMesh(DrawMode.QUADS, VertexFormat.POSITION, builder -> {
-            builder
-                    .vertex(-halfW, -halfW, 0)
-                    .vertex(-halfW, halfW, 0)
-                    .vertex(halfW, halfW, 0)
-                    .vertex(halfW, -halfW, 0);
-        }));
+        CometRenderer.draw(CometRenderer.createMesh(DrawMode.QUADS, VertexFormat.POSITION, builder -> builder
+                .vertex(-halfW, -halfW, 0)
+                .vertex(-halfW, halfW, 0)
+                .vertex(halfW, halfW, 0)
+                .vertex(halfW, -halfW, 0)));
         CometRenderer.getShaderColor().resetColor();
         this.renderer.view.popMatrix();
     }
