@@ -3,6 +3,8 @@ package stayablox.purpleevil.world;
 import stayablox.purpleevil.GameInstance;
 import stayablox.purpleevil.utils.AABB;
 import stayablox.purpleevil.world.block.Block;
+import stayablox.purpleevil.world.block.BlockType;
+import stayablox.purpleevil.world.entity.EnemyEntity;
 import stayablox.purpleevil.world.entity.Entity;
 import stayablox.purpleevil.world.entity.Player;
 import stayablox.purpleevil.world.room.Room;
@@ -12,6 +14,7 @@ import org.joml.Vector2dc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class World implements GameInstance {
     public static final double MAX_VELOCITY_STEP = 0.25;
@@ -69,14 +72,8 @@ public class World implements GameInstance {
             room.tick();
         }
 
-        for (Room room : activeRooms) {
-            if (room.intersects(player.worldAABB) && room != this.currentRoom) {
-                this.currentRoom.entities.remove(player);
-                this.currentRoom = room;
-                this.currentRoom.entities.add(player);
-                break;
-            }
-        }
+        tryChangeRoom(activeRooms, player);
+        handleCombatRoomLogic(player);
 
         List<Entity> activeEntities = new ArrayList<>();
         List<Block> activeBlocks = new ArrayList<>();
@@ -89,7 +86,114 @@ public class World implements GameInstance {
         this.camera.tick();
     }
 
+    private void tryChangeRoom(List<Room> activeRooms, Player player) {
+        Room nextRoom = this.currentRoom;
+
+        for (Room room : activeRooms) {
+            if (room == this.currentRoom)
+                continue;
+
+            AABB roomBounds = room.getBounds();
+            AABB pAABB = player.worldAABB;
+
+            if (room.roomType.combat) {
+                if (room.intersects(pAABB)) {
+                    boolean overlappingDoor = false;
+                    for (Block block : room.blocks) {
+                        if (block.blockType == BlockType.Exit || block.blockType == BlockType.ClosedExit) {
+                            if (pAABB.getMinX() < block.x + 1 && pAABB.getMaxX() > block.x &&
+                                    pAABB.getMinY() < block.y + 1 && pAABB.getMaxY() > block.y) {
+                                overlappingDoor = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!overlappingDoor) {
+                        int pX = (int) Math.floor(player.position.x);
+                        int pY = (int) Math.floor(player.position.y);
+                        boolean onFloor = false;
+
+                        for (Block block : room.blocks) {
+                            if (block.x == pX && block.y == pY) {
+                                if (block.blockType == BlockType.Floor || block.blockType == BlockType.PortalFloor) {
+                                    onFloor = true;
+                                }
+                                break;
+                            }
+                        }
+
+                        if (onFloor) {
+                            nextRoom = room;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                if (roomBounds.contains(player.position.x, player.position.y)) {
+                    if (nextRoom == this.currentRoom) {
+                        nextRoom = room;
+                    }
+                }
+            }
+        }
+
+        if (nextRoom != this.currentRoom) {
+            this.currentRoom.entities.remove(player);
+            this.currentRoom = nextRoom;
+            this.currentRoom.entities.add(player);
+        }
+    }
+
+    private void handleCombatRoomLogic(Player player) {
+        Room currentRoom = this.currentRoom;
+
+        if (currentRoom.roomType.combat) {
+            AABB roomBounds = currentRoom.getBounds();
+            List<Block> floorBlocks = currentRoom.getBlocks(BlockType.Floor);
+
+            if (!floorBlocks.isEmpty()) {
+                for (Entity entity : currentRoom.entities) {
+                    if (entity instanceof EnemyEntity && !entity.removed) {
+                        if (!roomBounds.contains(entity.position.x, entity.position.y)) {
+                            Block targetBlock = floorBlocks.get(ThreadLocalRandom.current().nextInt(floorBlocks.size()));
+
+                            entity.position.set(targetBlock.x + 0.5, targetBlock.y + 0.5);
+                            entity.prevPosition.set(entity.position);
+                            entity.velocity.set(0, 0);
+                            entity.updateAABB();
+                        }
+                    }
+                }
+            }
+
+            boolean playerInExit = false;
+            for (Block block : currentRoom.blocks) {
+                if (block.blockType == BlockType.Exit || block.blockType == BlockType.ClosedExit) {
+                    final double padding = 0.5;
+                    AABB doorZone = new AABB(
+                            block.x - padding, block.y - padding,
+                            block.x + 1.0 + padding, block.y + 1.0 + padding
+                    );
+                    if (doorZone.contains(player.position.x, player.position.y)) {
+                        playerInExit = true;
+                        break;
+                    }
+                }
+            }
+
+            if (currentRoom.entities.stream().anyMatch(entity -> entity instanceof EnemyEntity && !entity.removed)) {
+                if (!currentRoom.isClosed() && !playerInExit)
+                    currentRoom.closeRoom();
+            } else {
+                if (currentRoom.isClosed())
+                    currentRoom.openRoom();
+            }
+        }
+    }
+
     public void tickPhysics(List<Entity> entities, List<Block> blocks) {
+        // ... (остается без изменений)
         if (entities.isEmpty()) return;
 
         double maxSpeed = 0;

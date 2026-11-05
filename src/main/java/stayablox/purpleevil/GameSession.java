@@ -5,19 +5,14 @@ import stayablox.purpleevil.screen.ComicsScreen;
 import stayablox.purpleevil.screen.DeathScreen;
 import stayablox.purpleevil.screen.MainMenuScreen;
 import stayablox.purpleevil.screen.ShopScreen;
-import stayablox.purpleevil.utils.AABB;
 import stayablox.purpleevil.world.LobbyWorld;
 import stayablox.purpleevil.world.attribute.Attributes;
 import stayablox.purpleevil.world.attribute.modifier.AttributeInstance;
 import stayablox.purpleevil.world.attribute.modifier.AttributeModifier;
-import stayablox.purpleevil.world.block.Block;
-import stayablox.purpleevil.world.block.BlockType;
 import stayablox.purpleevil.world.dungeon.DungeonProperties;
 import stayablox.purpleevil.world.dungeon.DungeonWorld;
 import stayablox.purpleevil.world.dungeon.spawn.EnemyType;
 import stayablox.purpleevil.world.dungeon.spawn.SpawnProperty;
-import stayablox.purpleevil.world.entity.EnemyEntity;
-import stayablox.purpleevil.world.entity.Entity;
 import stayablox.purpleevil.world.entity.Player;
 import stayablox.purpleevil.world.room.Room;
 import stayablox.purpleevil.world.upgrades.Upgrade;
@@ -25,9 +20,7 @@ import stayablox.purpleevil.world.weapon.MagicStaffWeapon;
 import stayablox.purpleevil.world.weapon.SwordWeapon;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class GameSession implements GameInstance {
     private final Player knight = new Player(
@@ -215,50 +208,6 @@ public class GameSession implements GameInstance {
             if (game.getWorld() instanceof LobbyWorld && game.getScreen() == null && Settings.SHOP.isPressed()) {
                 game.setScreen(new ShopScreen());
                 Settings.SHOP.setPressed(false);
-            }
-
-            Room currentRoom = game.getWorld().currentRoom;
-            if (currentRoom.roomType.combat) {
-                AABB roomBounds = currentRoom.getBounds();
-                List<Block> floorBlocks = currentRoom.getBlocks(BlockType.Floor);
-
-                if (!floorBlocks.isEmpty()) {
-                    for (Entity entity : currentRoom.entities) {
-                        if (entity instanceof EnemyEntity && !entity.removed) {
-                            if (!roomBounds.contains(entity.position.x, entity.position.y)) {
-                                Block targetBlock = floorBlocks.get(ThreadLocalRandom.current().nextInt(floorBlocks.size()));
-
-                                entity.position.set(targetBlock.x + 0.5, targetBlock.y + 0.5);
-                                entity.prevPosition.set(entity.position);
-                                entity.velocity.set(0, 0);
-                                entity.updateAABB();
-                            }
-                        }
-                    }
-                }
-
-                boolean playerInExit = false;
-                for (Block block : currentRoom.blocks) {
-                    if (block.blockType == BlockType.Exit || block.blockType == BlockType.ClosedExit) {
-                        final double padding = 0.5;
-                        AABB doorZone = new AABB(
-                                block.x - padding, block.y - padding,
-                                block.x + 1.0 + padding, block.y + 1.0 + padding
-                        );
-                        if (doorZone.contains(player.position.x, player.position.y)) {
-                            playerInExit = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (currentRoom.entities.stream().anyMatch(entity -> entity instanceof EnemyEntity && !entity.removed)) {
-                    if (!currentRoom.isClosed() && !playerInExit)
-                        currentRoom.closeRoom();
-                } else {
-                    if (currentRoom.isClosed())
-                        currentRoom.openRoom();
-                }
             }
         }
     }
