@@ -1,9 +1,14 @@
 package stayablox.purpleevil.renderer;
 
 import com.ferra13671.cometrenderer.CometRenderer;
+import com.ferra13671.cometrenderer.glsl.Program;
+import com.ferra13671.cometrenderer.glsl.uniform.UniformType;
 import com.ferra13671.cometrenderer.texture.atlas.TextureAtlas;
 import com.ferra13671.cometrenderer.texture.atlas.TextureBorder;
+import com.ferra13671.cometrenderer.vertex.DrawMode;
+import com.ferra13671.cometrenderer.vertex.format.VertexFormat;
 import stayablox.purpleevil.GameInstance;
+import stayablox.purpleevil.Settings;
 import stayablox.purpleevil.model.Sprite;
 import stayablox.purpleevil.renderer.batch.impl.BasicTextureBatch;
 import stayablox.purpleevil.renderer.batch.impl.ColoredRectBatch;
@@ -23,7 +28,6 @@ import org.joml.Vector4f;
 import java.util.List;
 
 public class WorldRenderer implements GameInstance {
-    public static final int MAX_BLOCKS_IN_WIDTH = 30;
     private final Renderer renderer;
 
     public WorldRenderer(Renderer renderer) {
@@ -33,8 +37,35 @@ public class WorldRenderer implements GameInstance {
     public void render() {
         setWorldMatrices();
         game.getWindow().getFramebuffer().bind(true);
+        renderFog();
         renderRooms();
         renderEntities();
+    }
+
+    private void renderFog() {
+        Program program = game.getPrograms().FOG;
+        CometRenderer.setCurrentProgram(program);
+
+        CometRenderer.getShaderColor().setColor(new Vector4f(0.1f, 0.0f, 0.15f, 1f));
+        CometRenderer.applyShaderColorUniform();
+        this.renderer.view.pushMatrix();
+        this.renderer.view.identity();
+        this.renderer.applyMatrices();
+
+        program.getUniform("time", UniformType.FLOAT).set((System.currentTimeMillis() - game.getInitTime()) / 1000f);
+        Vector2d pos = Utils.lerp(game.getGameSession().player.prevPosition, game.getGameSession().player.position, game.getTicker().getTickDelta());
+        program.getUniform("playerPos", UniformType.VEC2).set(new Vector2f((float) pos.x, (float) pos.y));
+
+        float halfW = Settings.CAMERA_ZOOM / 2f;
+        CometRenderer.draw(CometRenderer.createMesh(DrawMode.QUADS, VertexFormat.POSITION, builder -> {
+            builder
+                    .vertex(-halfW, -halfW, 0)
+                    .vertex(-halfW, halfW, 0)
+                    .vertex(halfW, halfW, 0)
+                    .vertex(halfW, -halfW, 0);
+        }));
+        CometRenderer.getShaderColor().resetColor();
+        this.renderer.view.popMatrix();
     }
 
     private void renderRooms() {
@@ -73,7 +104,6 @@ public class WorldRenderer implements GameInstance {
 
         Player player = game.getGameSession().player;
         renderDashTrail(player);
-        renderEntity(player);
     }
 
     private void renderDashTrail(Player player) {

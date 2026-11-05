@@ -73,6 +73,8 @@ public class Game {
     @Getter
     @Setter
     private GameSession gameSession;
+    @Getter
+    private long initTime;
 
     // Поля для управления фоновой музыкой
     private SoundSource currentMusic;
@@ -111,7 +113,8 @@ public class Game {
         this.soundManager = new SoundManager();
         System.out.printf("Loaded sounds: %s%n", Overtone.getBuffers().size());
 
-        System.out.printf("Game initialized! Initialization time: %s%n", System.currentTimeMillis() - time);
+        this.initTime = System.currentTimeMillis();
+        System.out.printf("Game initialized! Initialization time: %s%n", this.initTime - time);
 
         this.window.loop();
     }
