@@ -8,7 +8,7 @@ import stayablox.purpleevil.world.room.Room;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
 
-public class SlimeBossEntity extends EnemyEntity {
+public class SlimeBossEntity extends BossEntity {
 
     public SlimeBossEntity(Room room) {
         super(

@@ -10,7 +10,7 @@ import org.joml.Vector2d;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LichBossEntity extends EnemyEntity {
+public class LichBossEntity extends BossEntity {
     public final List<Entity> summonedMinions = new ArrayList<>();
 
     public LichBossEntity(Room room) {

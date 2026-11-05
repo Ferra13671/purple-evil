@@ -159,7 +159,7 @@ public class WorldRenderer implements GameInstance {
         if (entity instanceof LivingEntity le && !le.isDying()) {
             renderLivingEntityWeapon(aabb, le);
 
-            if (le instanceof EnemyEntity)
+            if (le instanceof EnemyEntity && !(le instanceof BossEntity))
                 renderHealthBar(le, aabb);
         }
     }

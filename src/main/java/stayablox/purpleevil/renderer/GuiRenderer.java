@@ -19,10 +19,7 @@ import stayablox.purpleevil.world.World;
 import stayablox.purpleevil.world.attribute.Attributes;
 import stayablox.purpleevil.world.attribute.modifier.AttributeInstance;
 import stayablox.purpleevil.world.attribute.modifier.AttributeModifier;
-import stayablox.purpleevil.world.entity.EnemyEntity;
-import stayablox.purpleevil.world.entity.Entity;
-import stayablox.purpleevil.world.entity.EntityAttributes;
-import stayablox.purpleevil.world.entity.Player;
+import stayablox.purpleevil.world.entity.*;
 import stayablox.purpleevil.world.room.Room;
 import stayablox.purpleevil.world.upgrades.Upgrade;
 import org.joml.Vector4f;
@@ -34,6 +31,9 @@ public class GuiRenderer implements GameInstance {
     public static final float MINIMAP_INNER_OFFSET = 12f;
     public static final float PLAYER_HEALTH_BAR_WIDTH = 200;
     public static final float PLAYER_HEALTH_BAR_HEIGHT = 20;
+    public static final float BOSS_HEALTH_BAR_WIDTH = 400;
+    public static final float BOSS_HEALTH_BAR_HEIGHT = 40f;
+    public static final float BOSS_HEALTH_BAR_MARGIN = 20f;
 
     private final Renderer renderer;
 
@@ -74,6 +74,7 @@ public class GuiRenderer implements GameInstance {
         if (Settings.SHOW_ACTION_BUTTONS) renderActionButtons(framebuffer);
         if (Settings.SHOW_MINIMAP) renderMinimap(framebuffer);
         renderFPS(framebuffer);
+        renderBossHealthBar(framebuffer);
     }
 
     private void renderVignette(Framebuffer framebuffer) {
@@ -169,6 +170,40 @@ public class GuiRenderer implements GameInstance {
                 .build()
                 .tryDraw()
                 .close();
+    }
+
+    private void renderBossHealthBar(Framebuffer framebuffer) {
+        Room room = game.getWorld().currentRoom;
+
+        if (room != null) {
+            for (Entity entity : room.entities) {
+                if (entity instanceof BossEntity be) {
+                    double maxHealth = be.getAttributeValue(EntityAttributes.MAX_HEALTH);
+                    double currentHealth = Utils.lerp(be.renderHealth, be.getHealth(), 5f / game.getFpsCounter().getCurrentFPS());
+                    be.renderHealth = currentHealth;
+
+                    if (currentHealth <= 0)
+                        return;
+
+                    float progress = (float) (currentHealth / maxHealth);
+
+                    float x = (framebuffer.getWidth() - BOSS_HEALTH_BAR_WIDTH) / 2;
+                    float y = framebuffer.getHeight() - BOSS_HEALTH_BAR_MARGIN - BOSS_HEALTH_BAR_HEIGHT;
+
+                    Vector4f outlineColor = new Vector4f(0.7f, 0.7f, 0.7f, 1f);
+                    Vector4f backgroundColor = new Vector4f(0f, 0f, 0f, 1f);
+                    Vector4f fillColor = new Vector4f(0.8f, 0.1f, 0.1f, 1f);
+
+                    new ColoredRectBatch()
+                            .rectSized(x, y, BOSS_HEALTH_BAR_WIDTH, BOSS_HEALTH_BAR_HEIGHT, RectColors.oneColor(outlineColor))
+                            .rectSized(x + 1, y + 1, BOSS_HEALTH_BAR_WIDTH - 2, BOSS_HEALTH_BAR_HEIGHT - 2, RectColors.oneColor(backgroundColor))
+                            .rectSized(x + 1, y + 1, (BOSS_HEALTH_BAR_WIDTH - 2) * progress, BOSS_HEALTH_BAR_HEIGHT - 2, RectColors.oneColor(fillColor))
+                            .build()
+                            .tryDraw()
+                            .close();
+                }
+            }
+        }
     }
 
     private void renderMinimap(Framebuffer framebuffer) {

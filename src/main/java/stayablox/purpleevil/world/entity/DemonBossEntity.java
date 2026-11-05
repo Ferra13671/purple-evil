@@ -11,7 +11,7 @@ import org.joml.Vector2dc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DemonBossEntity extends EnemyEntity {
+public class DemonBossEntity extends BossEntity {
     public final List<Entity> summonedMinions = new ArrayList<>();
 
     public DemonBossEntity(Room room) {
