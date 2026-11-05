@@ -2,6 +2,7 @@ package stayablox.purpleevil.renderer;
 
 import com.ferra13671.cometrenderer.CometRenderer;
 import com.ferra13671.cometrenderer.texture.atlas.TextureAtlas;
+import com.ferra13671.cometrenderer.texture.atlas.TextureBorder;
 import stayablox.purpleevil.GameInstance;
 import stayablox.purpleevil.model.Sprite;
 import stayablox.purpleevil.renderer.batch.impl.BasicTextureBatch;
@@ -113,6 +114,12 @@ public class WorldRenderer implements GameInstance {
     private void renderEntity(Entity entity) {
         Vector4f color = new Vector4f(1f);
 
+        if (entity instanceof SlimeEntity se)
+            color.mul(se.color);
+
+        AABB aabb = new AABB(entity.modelAABB).move(Utils.lerp(entity.prevPosition, entity.position, game.getTicker().getTickDelta()));
+        Sprite sprite = entity.model.getCurrentSprite();
+
         if (entity instanceof LivingEntity livingEntity) {
             if (livingEntity.isInvincible() && !livingEntity.isDying()) {
                 int blinkPhase = (int) (livingEntity.getInvincibilityTimer() * 10);
@@ -123,13 +130,9 @@ public class WorldRenderer implements GameInstance {
                 color.set(0, 0.9f, 0, 1f);
             else if (livingEntity.isShocked())
                 color.set(0.4f, 0.7f, 1f, 1f);   // ← синий тинт для шокированных
+
+            renderShadow(aabb);
         }
-
-        if (entity instanceof SlimeEntity se)
-            color.mul(se.color);
-
-        AABB aabb = new AABB(entity.modelAABB).move(Utils.lerp(entity.prevPosition, entity.position, game.getTicker().getTickDelta()));
-        Sprite sprite = entity.model.getCurrentSprite();
 
         // ===== Проектили рендерятся с поворотом по yaw =====
         if (entity instanceof DemonArrowEntity) {
@@ -215,6 +218,19 @@ public class WorldRenderer implements GameInstance {
                 .rectSized(x, y, barWidth, barHeight, RectColors.oneColor(backgroundColor))
                 .rectSized(x, y, barWidth * progress, barHeight, RectColors.oneColor(fillColor))
                 .build().tryDraw().close();
+    }
+
+    private void renderShadow(AABB renderAABB) {
+        float x = (float) (renderAABB.getMinX() + (renderAABB.getXLength() / 2));
+        float halfSize = (float) renderAABB.getXLength() / 2;
+        float y = (float) renderAABB.getMinY() + 0.1f;
+
+        new BasicTextureBatch()
+                .texture(game.getTextures().shadowTexture)
+                .rectPositioned(x - halfSize, y - halfSize, x + halfSize, y + halfSize, TextureBorder.DEFAULT)
+                .build()
+                .tryDraw()
+                .close();
     }
 
     private void renderLivingEntityWeapon(AABB aabb, LivingEntity livingEntity) {

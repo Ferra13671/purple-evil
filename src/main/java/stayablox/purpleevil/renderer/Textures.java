@@ -73,6 +73,11 @@ public class Textures {
             .info("assets/textures/vignette.png")
             .filtering(TextureFiltering.DEFAULT)
             .build();
+    public final GLTexture shadowTexture = GLTexture.builder(TextureLoader.IN_JAR)
+            .name("shadow")
+            .info("assets/textures/shadow.png")
+            .filtering(TextureFiltering.DEFAULT)
+            .build();
 
     public Textures() {
         this.worldAtlas = loadRoomAtlas();
