@@ -10,7 +10,7 @@ public class PortalEntity extends Entity {
     private boolean runnableRunned = false;
 
     public PortalEntity(Vector2dc position, Runnable onEnter) {
-        super(new EntityModel(game.getEntityModelTemplates().templates.get("portal")), new AABB(-1, -1, 1, 1));
+        super(new EntityModel(game.getEntityModelTemplates().templates.get("portal")), new AABB(-1, 0, 1, 2));
 
         this.position.set(position);
         this.prevPosition.set(position);
@@ -20,6 +20,8 @@ public class PortalEntity extends Entity {
 
     @Override
     public void tick() {
+        super.tick();
+
         if (this.runnableRunned)
             return;
 
