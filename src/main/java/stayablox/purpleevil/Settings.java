@@ -17,6 +17,8 @@ public class Settings {
     public boolean SHOW_VIGNETTE = true;
     public boolean SHOW_MINIMAP = true;
     public float MINIMAP_SIZE = 150f;
+    public boolean SHOW_SHADOWS = true;
+    public boolean SHOW_FOG = true;
 
     public final KeyBind ATTACK = KeyBind.builder()
             .keyType(KeyType.Mouse)

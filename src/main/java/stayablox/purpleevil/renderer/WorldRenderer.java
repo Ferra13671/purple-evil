@@ -37,7 +37,8 @@ public class WorldRenderer implements GameInstance {
     public void render() {
         setWorldMatrices();
         game.getWindow().getFramebuffer().bind(true);
-        renderFog();
+        if (Settings.SHOW_FOG)
+            renderFog();
         renderRooms();
         renderEntities();
     }
@@ -95,13 +96,12 @@ public class WorldRenderer implements GameInstance {
     }
 
     private void renderEntities() {
-        for (Room room : game.getWorld().rooms) {
-            for (Entity entity : room.entities)
-                renderEntity(entity);
-        }
-
         Player player = game.getGameSession().player;
         renderDashTrail(player);
+
+        for (Room room : game.getWorld().rooms)
+            for (Entity entity : room.entities)
+                renderEntity(entity);
     }
 
     private void renderDashTrail(Player player) {
@@ -160,7 +160,8 @@ public class WorldRenderer implements GameInstance {
             else if (livingEntity.isShocked())
                 color.set(0.4f, 0.7f, 1f, 1f);   // ← синий тинт для шокированных
 
-            renderShadow(aabb);
+            if (Settings.SHOW_SHADOWS)
+                renderShadow(aabb);
         }
 
         // ===== Проектили рендерятся с поворотом по yaw =====

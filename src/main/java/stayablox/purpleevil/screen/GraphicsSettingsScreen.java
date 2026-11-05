@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class GraphicsSettingsScreen extends Screen {
     public static final float ROW_WIDTH = 500f;
     public static final float ROW_HEIGHT = 44f;
-    private static final float ROW_GAP = 12f;
+    private static final float ROW_GAP = 10f; // Чуть уменьшили отступ, чтобы всё влезло
 
     private final Screen previousScreen;
     private final List<Button> buttons = new CopyOnWriteArrayList<>();
@@ -34,7 +34,8 @@ public class GraphicsSettingsScreen extends Screen {
 
         float startX = (width - ROW_WIDTH) / 2f;
 
-        int elementsCount = 6;
+
+        int elementsCount = 8;
         float totalHeight = elementsCount * ROW_HEIGHT + (elementsCount - 1) * ROW_GAP;
         float startY = (height - totalHeight) / 2f - 20f;
 
@@ -57,7 +58,7 @@ public class GraphicsSettingsScreen extends Screen {
         buttons.add(new Button("Action Buttons: " + (Settings.SHOW_ACTION_BUTTONS ? "ON" : "OFF"),
                 startX, currentY, ROW_WIDTH, ROW_HEIGHT, () -> {
             Settings.SHOW_ACTION_BUTTONS = !Settings.SHOW_ACTION_BUTTONS;
-            resize(width, height); // Пересоздаем интерфейс для обновления текста
+            resize(width, height);
         }));
         currentY += ROW_HEIGHT + ROW_GAP;
 
@@ -75,6 +76,20 @@ public class GraphicsSettingsScreen extends Screen {
         }));
         currentY += ROW_HEIGHT + ROW_GAP;
 
+        buttons.add(new Button("Shadows: " + (Settings.SHOW_SHADOWS ? "ON" : "OFF"),
+                startX, currentY, ROW_WIDTH, ROW_HEIGHT, () -> {
+            Settings.SHOW_SHADOWS = !Settings.SHOW_SHADOWS;
+            resize(width, height);
+        }));
+        currentY += ROW_HEIGHT + ROW_GAP;
+
+        buttons.add(new Button("Fog: " + (Settings.SHOW_FOG ? "ON" : "OFF"),
+                startX, currentY, ROW_WIDTH, ROW_HEIGHT, () -> {
+            Settings.SHOW_FOG = !Settings.SHOW_FOG;
+            resize(width, height);
+        }));
+        currentY += ROW_HEIGHT + ROW_GAP;
+
         buttons.add(new Button("VSync: " + (Settings.VSYNC ? "ON" : "OFF"),
                 startX, currentY, ROW_WIDTH, ROW_HEIGHT, () -> {
             Settings.VSYNC = !Settings.VSYNC;
@@ -84,7 +99,7 @@ public class GraphicsSettingsScreen extends Screen {
 
         float btnW = 200f;
         float btnH = 50f;
-        buttons.add(new Button("Back", (width - btnW) / 2f, height - btnH - 30f,
+        buttons.add(new Button("Back", (width - btnW) / 2f, height - btnH - 20f, // Чуть приподняли кнопку Назад
                 btnW, btnH, () -> game.setScreen(previousScreen)));
     }
 
