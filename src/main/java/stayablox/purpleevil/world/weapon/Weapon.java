@@ -35,6 +35,18 @@ public class Weapon implements GameInstance {
         this.entityModifiers = entityModifiers;
     }
 
+    public float getRenderOffsetX() {
+        return 0f;
+    }
+
+    public float getRenderOffsetY() {
+        return 0f;
+    }
+
+    public float getRenderAngleOffset() {
+        return 0f;
+    }
+
     public int getCooldownMS() {
         return (int) (getAttributeValue(WeaponAttributes.COOLDOWN_MS) / getAttributeValue(WeaponAttributes.ATTACK_SPEED));
     }

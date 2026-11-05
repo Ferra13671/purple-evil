@@ -1,6 +1,7 @@
 package stayablox.purpleevil.world.weapon;
 
 import stayablox.purpleevil.Settings;
+import stayablox.purpleevil.utils.Utils;
 import stayablox.purpleevil.world.attribute.Attributes;
 import stayablox.purpleevil.world.entity.LivingEntity;
 import stayablox.purpleevil.world.entity.MagicStaffChargeEntity;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MagicStaffWeapon extends Weapon {
+    private float currentRecoil = 0f;
 
     public MagicStaffWeapon() {
         super("magic-staff", 1.5f, new Attributes(new HashMap<>(){{
@@ -23,6 +25,8 @@ public class MagicStaffWeapon extends Weapon {
     @Override
     protected void attack(LivingEntity entity) {
         super.attack(entity);
+
+        this.currentRecoil = 1f;
 
         game.getSoundManager().playSound(game.getSounds().STAFF, 0.5f * Settings.WORLD_SOUNDS_VOLUME, ThreadLocalRandom.current().nextFloat(1f, 1.5f));
 
@@ -52,5 +56,28 @@ public class MagicStaffWeapon extends Weapon {
                 ).normalize(),
                 this.attributes
         ));
+    }
+
+    public void updateRenderRecoil() {
+        if (this.currentRecoil > 0)
+            this.currentRecoil = Math.round(Utils.lerp(this.currentRecoil, 0, 2f / game.getFpsCounter().getCurrentFPS()) * 1000) / 1000f;
+    }
+
+    @Override
+    public float getRenderOffsetX() {
+        if (this.currentRecoil <= 0)
+            return 0f;
+
+        float angleRad = (float) Math.toRadians(getSmoothRenderYaw());
+        return -(float) Math.cos(angleRad) * this.currentRecoil * 0.3f;
+    }
+
+    @Override
+    public float getRenderOffsetY() {
+        if (this.currentRecoil <= 0)
+            return 0f;
+
+        float angleRad = (float) Math.toRadians(getSmoothRenderYaw());
+        return -(float) Math.sin(angleRad) * this.currentRecoil * 0.3f;
     }
 }

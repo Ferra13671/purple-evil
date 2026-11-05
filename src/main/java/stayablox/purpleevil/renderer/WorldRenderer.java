@@ -12,6 +12,7 @@ import stayablox.purpleevil.utils.Utils;
 import stayablox.purpleevil.world.entity.*;
 import stayablox.purpleevil.world.room.Room;
 import stayablox.purpleevil.world.block.Block;
+import stayablox.purpleevil.world.weapon.MagicStaffWeapon;
 import stayablox.purpleevil.world.weapon.SwordWeapon;
 import stayablox.purpleevil.world.weapon.Weapon;
 import org.joml.Matrix4f;
@@ -255,9 +256,16 @@ public class WorldRenderer implements GameInstance {
                 renderAngle += startOffset + (endOffset - startOffset) * easedProgress;
             }
 
+            if (weapon instanceof MagicStaffWeapon w)
+                w.updateRenderRecoil();
+
+            float offsetX = weapon.getRenderOffsetX();
+            float offsetY = weapon.getRenderOffsetY();
+            float angleOffset = weapon.getRenderAngleOffset();
+
             this.renderer.view.pushMatrix().translate(
-                    (float) (aabb.getMinX() + livingEntity.getHandPos().x),
-                    (float) (aabb.getMinY() + livingEntity.getHandPos().y),
+                    (float) (aabb.getMinX() + livingEntity.getHandPos().x) + offsetX,
+                    (float) (aabb.getMinY() + livingEntity.getHandPos().y) + offsetY,
                     0f
             );
 
@@ -272,7 +280,8 @@ public class WorldRenderer implements GameInstance {
                             halfWeaponSize,
                             game.getTextures().weaponAtlas.getBorder(game.getTextures().getWeaponTexture(weapon.getTextureId())),
                             new Matrix4f()
-                                    .rotateZ((float) Math.toRadians(renderAngle - 45))
+                                    // Применяем дополнительный угол отдачи
+                                    .rotateZ((float) Math.toRadians(renderAngle - 45 + angleOffset))
                                     .translate(0.5f, 0.5f, 0)
                     )
                     .build()
