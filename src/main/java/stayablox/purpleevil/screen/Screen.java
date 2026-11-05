@@ -28,20 +28,7 @@ public class Screen implements GameInstance {
         int width = game.getWindow().getFramebufferWidth();
         int height = game.getWindow().getFramebufferHeight();
 
-        boolean hasWorld = game.getWorld() != null;
-
-        if (hasWorld) {
-            float a = Math.clamp(alphaMultiplier, 0f, 1f);
-
-            new ColoredRectBatch()
-                    .rectSized(0, 0, width, height, RectColors.verticalGradient(
-                            new Vector4f(0, 0, 0, 0.75f * a),
-                            new Vector4f(0, 0, 0, 0.75f * a)
-                    ))
-                    .build()
-                    .tryDraw()
-                    .close();
-        } else {
+        if (game.getWorld() == null)  {
             double nx = Math.clamp((mouseX / width) * 2 - 1, -1.0, 1.0);
             double ny = Math.clamp((mouseY / height) * 2 - 1, -1.0, 1.0);
 
@@ -54,6 +41,15 @@ public class Screen implements GameInstance {
             renderMenuLayer(nx, ny, 1.00f, width, height, game.getTextures().menuNear1Texture, batch);
 
             batch.build().tryDraw().close();
+        }
+
+        if (showDarkBackground()) {
+            float a = Math.clamp(alphaMultiplier, 0f, 1f);
+            new ColoredRectBatch()
+                    .rectSized(0, 0, width, height, RectColors.oneColor(new Vector4f(0, 0, 0, 0.6f * a)))
+                    .build()
+                    .tryDraw()
+                    .close();
         }
     }
 
@@ -118,6 +114,10 @@ public class Screen implements GameInstance {
     }
 
     public boolean shouldCloseOnEsc() {
+        return true;
+    }
+
+    public boolean showDarkBackground() {
         return true;
     }
 }

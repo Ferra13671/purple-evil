@@ -27,8 +27,9 @@ public class MainMenuScreen extends Screen {
         float buttonHeight = 50;
         float spacing = 15;
 
-        float totalHeight = buttonHeight * 3 + spacing * 2;
-        float startY = halfHeight - totalHeight / 2;
+        // Теперь у нас 4 кнопки (Play, Settings, Credits, Quit)
+        float totalHeight = buttonHeight * 4 + spacing * 3;
+        float startY = halfHeight - totalHeight / 2 + 30f; // Чуть сдвинули вниз
 
         this.buttons.add(new Button(
                 "Play", halfWidth - (buttonWidth / 2), startY, buttonWidth, buttonHeight, () -> {
@@ -36,13 +37,21 @@ public class MainMenuScreen extends Screen {
             game.getGameSession().startGame();
         }
         ));
+
         this.buttons.add(new Button(
                 "Settings", halfWidth - (buttonWidth / 2), startY + buttonHeight + spacing,
                 buttonWidth, buttonHeight,
                 () -> game.setScreen(new SettingsMenuScreen(this))
         ));
+
         this.buttons.add(new Button(
-                "Quit", halfWidth - (buttonWidth / 2), startY + (buttonHeight + spacing) * 2,
+                "Credits", halfWidth - (buttonWidth / 2), startY + (buttonHeight + spacing) * 2,
+                buttonWidth, buttonHeight,
+                () -> game.setScreen(new CreditsScreen(this))
+        ));
+
+        this.buttons.add(new Button(
+                "Quit", halfWidth - (buttonWidth / 2), startY + (buttonHeight + spacing) * 3,
                 buttonWidth, buttonHeight, CometGLFW::close
         ));
     }
@@ -91,5 +100,10 @@ public class MainMenuScreen extends Screen {
     public void onMouseRelease(double mouseX, double mouseY, int button) {
         for (Button b : buttons)
             b.onMouseRelease(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean showDarkBackground() {
+        return false;
     }
 }
