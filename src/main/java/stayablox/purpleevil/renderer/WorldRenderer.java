@@ -239,21 +239,10 @@ public class WorldRenderer implements GameInstance {
             float targetYaw = (float) livingEntity.getRenderYaw();
 
             float currentVisual = weapon.getSmoothRenderYaw();
-            if (Float.isNaN(currentVisual)) {
+            if (Float.isNaN(currentVisual))
                 currentVisual = targetYaw;
-            } else {
-                float diff = targetYaw - currentVisual;
-
-                diff = (diff + 180) % 360 - 180;
-                if (diff < -180) diff += 360;
-
-                // Коэффициент плавности.
-                // 0.15f - очень плавно (сильное отставание),
-                // 0.35f - хороший баланс,
-                // 1.0f - мгновенно (как было раньше)
-                float smoothingFactor = 0.5f;
-                currentVisual += diff * smoothingFactor;
-            }
+            else
+                currentVisual = (float) Utils.lerpDegress(currentVisual, targetYaw, Math.min(1f, 15f / game.getFpsCounter().getCurrentFPS()));
             weapon.setSmoothRenderYaw(currentVisual);
 
             float renderAngle = currentVisual;
