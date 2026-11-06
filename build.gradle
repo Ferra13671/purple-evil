@@ -18,17 +18,15 @@ configurations {
 
 dependencies {
     library platform("com.ferra13671:comet-renderer-bom:${cometrenderer_version}")
-
     library "com.ferra13671:comet-renderer"
     library "com.ferra13671:comet-renderer-better-compiler"
     library "com.ferra13671:comet-renderer-glfw"
+
     library "de.marhali:json5-java:${project.json5_version}"
     library "com.ferra13671:json-utils:${project.json_utils_version}"
     library "com.ferra13671:overtone:${project.overtone_version}"
 
-
     library platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-
     library "org.lwjgl:lwjgl"
     library "org.lwjgl:lwjgl-glfw"
     library "org.lwjgl:lwjgl-opengl"
@@ -63,133 +61,118 @@ jar {
 
 shadowJar {
     configurations = [project.configurations.shadow]
-
     archiveClassifier.set('')
 }
 
 import java.nio.file.Paths
 
-tasks.register('packageSingleExe') {
+// --- НОВАЯ ЗАДАЧА: Сборка через jlink + bat + WinRAR SFX ---
+tasks.register('packageMonolithicExe') {
     dependsOn shadowJar
 
     doLast {
-        // --- НАСТРОЙКИ ПРИЛОЖЕНИЯ ---
         def appName = project.name
-        def mainClassName = "" // Пусто, так как Main-Class уже прописан в jar-манифесте
         def winRarPath = "C:\\Program Files\\WinRAR\\WinRAR.exe"
-
-        // Иконка — должна лежать в ресурсах проекта. Используется для:
-        //   1) jpackage --icon (иконка встроенного exe)
-        //   2) WinRAR -iicon (иконка SFX-обёртки)
         def iconSource = file("${projectDir}/src/main/resources/window-icon.ico")
-
-        // Куда сохранять финальный результат
         def finalOutputDir = "${project.layout.buildDirectory.get().asFile.absolutePath}/libs"
-        file(finalOutputDir).mkdirs()
-        // ------------------------------------------------
 
-        // 1. Создаем временную папку в системном Temp
-        def tempDir = file("${System.getProperty('java.io.tmpdir')}/jpackage-temp-${appName}-${System.currentTimeMillis()}")
+        // 1. Создаём временную директорию для сборки
+        def tempDir = file("${System.getProperty('java.io.tmpdir')}/monolithic-build-${appName}-${System.currentTimeMillis()}")
         tempDir.mkdirs()
 
         try {
-            println "=== Шаг 1: Подготовка временной директории ==="
-            println "Рабочая папка: ${tempDir.absolutePath}"
-
-            // Копируем shadowJar во временную папку
-            def originalJar = shadowJar.archiveFile.get().asFile
-            def tempJar = file("${tempDir.absolutePath}/${originalJar.name}")
-            tempJar.bytes = originalJar.bytes
-
-            def mainJarName = tempJar.name
-            def inputDir = tempDir.absolutePath
-
-            // Копируем иконку в temp под простым именем (без пробелов в пути —
-            // WinRAR -iicon не парсит пути с пробелами).
-            File sfxIcon = file("${tempDir.absolutePath}/app.ico")
-            boolean hasIcon = iconSource.exists()
-            if (hasIcon) {
-                sfxIcon.bytes = iconSource.bytes
-                println "Иконка скопирована: ${sfxIcon.absolutePath}"
-            } else {
-                println "WARN: Иконка не найдена по пути ${iconSource.absolutePath} — будет использована дефолтная"
-            }
-
-            def jpackageOutputDir = "${tempDir.absolutePath}/jpackage-out"
-            def finalExeFile = file("${tempDir.absolutePath}/${appName}.exe")
-
+            println "=== Шаг 1: Подготовка JRE через jlink ==="
             def javaHome = System.getProperty("java.home")
-            def jpackagePath = Paths.get(javaHome, "bin", "jpackage.exe").toString()
+            def jlinkPath = Paths.get(javaHome, "bin", "jlink.exe").toString()
+            def customJreDir = file("${tempDir.absolutePath}/jre")
 
-            println "=== Шаг 2: Запуск jpackage ==="
-            def jpackageArgs = [
-                    '--input', inputDir,
-                    '--name', appName,
-                    '--main-jar', mainJarName,
-                    '--type', 'app-image',
-                    '--dest', jpackageOutputDir,
-                    '--win-console'
-            ]
-
-            if (hasIcon) {
-                jpackageArgs.add('--icon')
-                jpackageArgs.add(sfxIcon.absolutePath)
-            }
-
-            if (mainClassName != null && !mainClassName.trim().isEmpty()) {
-                jpackageArgs.add('--main-class')
-                jpackageArgs.add(mainClassName)
-            }
+            // Список модулей, необходимых для LWJGL/GLFW и игры.
+            // При необходимости добавьте другие (например, java.sql, java.naming).
+            def modules = [
+                    'java.base',
+                    'java.desktop',
+                    'java.logging',
+                    'java.xml',
+                    'jdk.unsupported'
+            ].join(',')
 
             providers.exec {
-                commandLine jpackagePath
-                args jpackageArgs
+                commandLine jlinkPath,
+                        '--add-modules', modules,
+                        '--output', customJreDir.absolutePath,
+                        '--strip-debug',
+                        '--no-header-files',
+                        '--no-man-pages',
+                        '--compress', '2'
             }.result.get()
 
-            println "=== Шаг 3: Создание sfx-options.txt ==="
-            def sfxOptionsFile = file("${tempDir.absolutePath}/sfxoptions.txt")
-            sfxOptionsFile.text = """Setup=${appName}.exe
-TempMode
-Silent=1
-"""
+            // 2. Копируем JAR и иконку во временную папку
+            println "=== Шаг 2: Копирование JAR и иконки ==="
+            def jarFile = shadowJar.archiveFile.get().asFile
+            def targetJar = file("${tempDir.absolutePath}/${jarFile.name}")
+            targetJar.bytes = jarFile.bytes
 
-            println "=== Шаг 4: Упаковка в монолитный .exe через WinRAR ==="
-            def generatedAppFolder = "${jpackageOutputDir}/${appName}"
-
-            if (file(winRarPath).exists()) {
-                // Собираем команду WinRAR. Если есть иконка — добавляем -iicon,
-                // чтобы SFX-обёртка тоже получила нашу иконку (а не стандартную WinRAR).
-                List<String> rarArgs = [
-                        winRarPath, 'a', '-sfx', '-ep1', '-r',
-                        '-zsfxoptions.txt'
-                ]
-                if (hasIcon) {
-                    rarArgs.add("-iicon${sfxIcon.absolutePath}")
-                }
-                rarArgs.add(finalExeFile.absolutePath)
-                rarArgs.add("${generatedAppFolder}\\*")
-
-                def rarResult = providers.exec {
-                    workingDir = tempDir
-                    commandLine rarArgs
-                }.result.get()
-
-                if (rarResult.exitValue != 0 && rarResult.exitValue != 1) {
-                    throw new GradleException("WinRAR завершился с кодом ${rarResult.exitValue}.\n" +
-                            "STDOUT: ${rarResult.standardOutput.asText.get()}\n" +
-                            "STDERR: ${rarResult.standardError.asText.get()}")
-                }
-
-                // Копируем готовый exe обратно
-                def finalDestination = file("${finalOutputDir}/${appName}.exe")
-                finalDestination.bytes = finalExeFile.bytes
-                println "\n УСПЕХ! Финальный файл собран и возвращен в: ${finalDestination.absolutePath}"
-            } else {
-                throw new GradleException("Ошибка: WinRAR не найден по пути: ${winRarPath}.")
+            def targetIcon = file("${tempDir.absolutePath}/app.ico")
+            boolean hasIcon = iconSource.exists()
+            if (hasIcon) {
+                targetIcon.bytes = iconSource.bytes
             }
 
+            // 3. Создаём .bat-файл для запуска
+            println "=== Шаг 3: Создание .bat-файла ==="
+            def batFile = file("${tempDir.absolutePath}/launch.bat")
+            batFile.text = """@echo off
+cd /d "%~dp0"
+start "" "jre\\bin\\java.exe" -jar "${jarFile.name}"
+"""
+            // Используем start "" чтобы окно консоли не висело, если не нужен --win-console.
+            // Если консоль нужна, уберите start "" и оставьте просто java.exe
+
+            // 4. Создаём sfxoptions.txt для WinRAR
+            println "=== Шаг 4: Настройка SFX-архива ==="
+            def sfxOptionsFile = file("${tempDir.absolutePath}/sfxoptions.txt")
+            sfxOptionsFile.text = """Setup=launch.bat
+TempMode
+Silent=1
+Overwrite=1
+"""
+            // Setup=launch.bat указывает WinRAR SFX запустить этот bat-файл после распаковки.
+
+            // 5. Упаковка через WinRAR
+            println "=== Шаг 5: Упаковка в монолитный .exe ==="
+            def finalExeFile = file("${finalOutputDir}/${appName}.exe")
+            // Убедимся, что папка libs существует
+            finalExeFile.parentFile.mkdirs()
+
+            if (!file(winRarPath).exists()) {
+                throw new GradleException("WinRAR не найден по пути: ${winRarPath}")
+            }
+
+            List<String> rarArgs = [
+                    winRarPath, 'a', '-sfx', '-ep1', '-r',
+                    '-zsfxoptions.txt'
+            ]
+            if (hasIcon) {
+                rarArgs.add("-iicon${targetIcon.absolutePath}")
+            }
+            rarArgs.add(finalExeFile.absolutePath)
+            // Добавляем ВСЁ содержимое временной папки, кроме самого sfxoptions.txt (он уже прочитан WinRAR)
+            rarArgs.add("${tempDir.absolutePath}\\*")
+
+            def rarResult = providers.exec {
+                workingDir = tempDir
+                commandLine rarArgs
+            }.result.get()
+
+            if (rarResult.exitValue != 0 && rarResult.exitValue != 1) {
+                throw new GradleException("WinRAR завершился с кодом ${rarResult.exitValue}.\n" +
+                        "STDOUT: ${rarResult.standardOutput.asText.get()}\n" +
+                        "STDERR: ${rarResult.standardError.asText.get()}")
+            }
+
+            println "\n УСПЕХ! Монолитный .exe собран: ${finalExeFile.absolutePath}"
         } finally {
-            println "=== Шаг 5: Очистка временных файлов ==="
+            println "=== Шаг 6: Очистка временных файлов ==="
             delete(tempDir)
         }
     }
@@ -200,5 +183,5 @@ build {
 }
 
 shadowJar {
-    finalizedBy tasks.getByName('packageSingleExe')
+    finalizedBy tasks.getByName('packageMonolithicExe')
 }
