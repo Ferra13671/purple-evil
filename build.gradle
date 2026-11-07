@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "stayablox.purpleevil"
-version = '1.1.1-post-jam'
+version = '1.1.2-post-jam'
 
 repositories {
     mavenCentral()
