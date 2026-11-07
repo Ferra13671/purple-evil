@@ -26,33 +26,27 @@ public class Renderer implements GameInstance {
     public TTFFont tinyFont;
     {
         try {
-            this.javaFont = Font.createFont(Font.TRUETYPE_FONT, GuiRenderer.class.getClassLoader().getResourceAsStream("assets/Classic-Console-Neue-Regular.ttf"));
-            this.font = new TTFFont(
-                    FontInfo.builder()
-                            .font(javaFont)
-                            .fontSize(32)
-                            .build()
-            );
-            this.bigFont = new TTFFont(
-                    FontInfo.builder()
-                            .font(javaFont)
-                            .fontSize(64)
-                            .build()
-            );
-            this.smallFont = new TTFFont(
-                    FontInfo.builder()
-                            .font(javaFont)
-                            .fontSize(24)
-                            .build()
-            );
-            this.tinyFont = new TTFFont(
-                    FontInfo.builder()
-                            .font(javaFont)
-                            .fontSize(16)
-                            .build()
-            );
+            String fontPath = "/assets/Classic-Console-Neue-Regular.ttf";
+            java.io.InputStream fontStream = Renderer.class.getResourceAsStream(fontPath);
+
+            if (fontStream == null) {
+                throw new RuntimeException(String.format("Font file not found at path '%s'!", fontPath));
+            }
+
+            byte[] fontData = fontStream.readAllBytes();
+            fontStream.close();
+
+            java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(fontData);
+
+            this.javaFont = Font.createFont(Font.TRUETYPE_FONT, bais);
+
+            this.font = new TTFFont(FontInfo.builder().font(javaFont).fontSize(32).build());
+            this.bigFont = new TTFFont(FontInfo.builder().font(javaFont).fontSize(64).build());
+            this.smallFont = new TTFFont(FontInfo.builder().font(javaFont).fontSize(24).build());
+            this.tinyFont = new TTFFont(FontInfo.builder().font(javaFont).fontSize(16).build());
+
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Не удалось загрузить шрифт: " + e.getMessage(), e);
         }
     }
 

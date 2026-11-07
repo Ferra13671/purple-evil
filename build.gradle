@@ -8,6 +8,9 @@ version = '1.1-post-jam'
 
 repositories {
     mavenCentral()
+
+    //This build use local version CometRenderer v3.1-alpha.4
+    //If you want to build a game, you can replace the CometRenderer implementation with one via JitPack
     mavenLocal()
 }
 
@@ -93,7 +96,10 @@ tasks.register('packageMonolithicExe') {
                     'java.desktop',
                     'java.logging',
                     'java.xml',
-                    'jdk.unsupported'
+                    'java.datatransfer',
+                    'jdk.charsets',
+                    'jdk.unsupported',
+                    'java.naming'
             ].join(',')
 
             providers.exec {
@@ -102,8 +108,7 @@ tasks.register('packageMonolithicExe') {
                         '--output', customJreDir.absolutePath,
                         '--strip-debug',
                         '--no-header-files',
-                        '--no-man-pages',
-                        '--compress', '2'
+                        '--no-man-pages'
             }.result.get()
 
             // 2. Копируем JAR и иконку во временную папку
@@ -123,7 +128,12 @@ tasks.register('packageMonolithicExe') {
             def batFile = file("${tempDir.absolutePath}/launch.bat")
             batFile.text = """@echo off
 cd /d "%~dp0"
-start "" "jre\\bin\\java.exe" -jar "${jarFile.name}"
+"jre\\bin\\java.exe" -Djava.home="%CD%\\\\jre" -jar "${jarFile.name}"
+if %ERRORLEVEL% neq 0 (
+    echo.
+    echo CRITICAL ERROR! The game has terminated with code %ERRORLEVEL%.
+    pause
+)
 """
             // Используем start "" чтобы окно консоли не висело, если не нужен --win-console.
             // Если консоль нужна, уберите start "" и оставьте просто java.exe
